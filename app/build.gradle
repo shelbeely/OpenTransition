@@ -28,11 +28,12 @@ def getVersionName = { ->
 }
 
 android {
+    compileSdk 36
+    
     defaultConfig {
         applicationId "com.drspaceboo.transtracks"
         minSdkVersion 21
-        compileSdk 34
-        targetSdkVersion 33
+        targetSdkVersion 36
         versionCode getVersionCode()
         versionName getVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
