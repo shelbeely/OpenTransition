@@ -16,6 +16,7 @@ It provides:
 - CI helper scripts to:
   - Decode `google-services.json` from a Base64-encoded GitHub secret
   - Decode a release keystore from a Base64-encoded GitHub secret
+  - Prepare `secrets.properties` from a Base64-encoded secret or fallback to example file
 
 ## Files
 
@@ -24,6 +25,7 @@ It provides:
 - `.github/workflows/pr-debug.yml` – PR debug build workflow
 - `.github/ci-scripts/prepare-google-services.sh` – recreates `app/google-services.json`
 - `.github/ci-scripts/prepare-keystore.sh` – recreates `keys/release-keystore.jks`
+- `.github/ci-scripts/prepare-secrets.sh` – prepares `secrets.properties`
 
 ## Required GitHub Secrets
 
@@ -41,6 +43,17 @@ Go to **Settings → Secrets and variables → Actions** in your repo and create
   ```
 
   Copy the single-line output and paste it as the secret value.
+
+### Application secrets (optional)
+
+- `SECRETS_PROPERTIES_B64`  
+  Base64-encoded contents of your `secrets.properties`:
+
+  ```bash
+  base64 -w 0 secrets.properties
+  ```
+
+  If not set, the build will use `secrets.properties.example` as a fallback.
 
 ### Release keystore (optional, but recommended for signed releases)
 
