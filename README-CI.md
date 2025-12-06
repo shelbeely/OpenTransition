@@ -1,39 +1,40 @@
-# TransTracks Android CI / CD Setup
+# TransTracks Android CI/CD Bundle
 
-This bundle contains example GitHub Actions workflows and helper scripts to build and release the TransTracks Android app using GitHub Actions.
+This bundle is designed to drop directly into the **root** of your `TransTracks-Android` repo.
 
-It is designed to:
+It provides:
 
-- Build **debug** and **release** APKs on GitHub's x86_64 runners
-- Decode `google-services.json` from a GitHub secret
-- Optionally decode a release keystore from a GitHub secret
-- Upload APKs as build artifacts
-- Create GitHub Releases and attach the release APK
+- A **Build & Release** workflow that:
+  - Builds **debug** or **release** APKs via `workflow_dispatch`
+  - Builds a **release** APK for tags like `v1.2.3`
+  - Uploads APKs as **artifacts**
+  - Creates a **GitHub Release** and attaches the APK for tagged builds
+- A **PR Debug** workflow that:
+  - Runs on pull requests
+  - Builds a **debug** APK
+  - Uploads it as an artifact for quick download
+- CI helper scripts to:
+  - Decode `google-services.json` from a Base64-encoded GitHub secret
+  - Decode a release keystore from a Base64-encoded GitHub secret
 
 ## Files
 
-- `.github/workflows/android-build-and-release.yml`  
-  Main workflow to build debug/release APKs and optionally publish a GitHub Release.
+- `README-CI.md` – this file
+- `.github/workflows/build-release.yml` – main CI/CD workflow
+- `.github/workflows/pr-debug.yml` – PR debug build workflow
+- `.github/ci-scripts/prepare-google-services.sh` – recreates `app/google-services.json`
+- `.github/ci-scripts/prepare-keystore.sh` – recreates `keys/release-keystore.jks`
 
-- `.github/workflows/android-pr-check.yml`  
-  Lightweight workflow that runs on pull requests and builds a debug APK.
+## Required GitHub Secrets
 
-- `.github/ci-scripts/prepare-google-services.sh`  
-  Decodes the `GOOGLE_SERVICES_JSON` secret (Base64) into `app/google-services.json`.
-
-- `.github/ci-scripts/prepare-keystore.sh`  
-  Decodes the `ANDROID_KEYSTORE_B64` secret (Base64) into `keys/release-keystore.jks` if present.
-
-## Required Secrets
-
-In your repository settings, go to **Settings → Secrets and variables → Actions** and add:
+Go to **Settings → Secrets and variables → Actions** in your repo and create:
 
 ### Firebase
 
 - `GOOGLE_SERVICES_JSON`  
-  Base64-encoded contents of your `google-services.json` file.
+  Base64-encoded contents of your `app/google-services.json`.
 
-  To generate on a local machine:
+  From your local machine:
 
   ```bash
   base64 -w 0 app/google-services.json
@@ -41,46 +42,58 @@ In your repository settings, go to **Settings → Secrets and variables → Acti
 
   Copy the single-line output and paste it as the secret value.
 
-### Release keystore (optional but recommended for signed releases)
+### Release keystore (optional, but recommended for signed releases)
 
 - `ANDROID_KEYSTORE_B64`  
-  Base64-encoded contents of your `release-keystore.jks`.
+  Base64-encoded contents of your `keys/release-keystore.jks`:
 
   ```bash
   base64 -w 0 keys/release-keystore.jks
   ```
 
 - `ANDROID_KEYSTORE_PASSWORD`  
-  Keystore password (STORE_PASS).
+  The keystore password (mapped to `STORE_PASS` in Gradle).
 
 - `ANDROID_KEY_ALIAS`  
-  Key alias (KEY_ALIAS).
+  The key alias (mapped to `KEY_ALIAS`).
 
 - `ANDROID_KEY_ALIAS_PASSWORD`  
-  Key password (KEY_PASS).
+  The key password (mapped to `KEY_PASS`).
 
-These names assume your Gradle configuration uses:
+These env vars are exported in the workflow as:
 
-```bash
-STORE_PASS
-KEY_ALIAS
-KEY_PASS
+- `STORE_PASS` → `ANDROID_KEYSTORE_PASSWORD`
+- `KEY_ALIAS` → `ANDROID_KEY_ALIAS`
+- `KEY_PASS` → `ANDROID_KEY_ALIAS_PASSWORD`
+
+Make sure your `signingConfigs` in `app/build.gradle` use those names, e.g.:
+
+```kotlin
+signingConfigs {
+    release {
+        storeFile = file("${rootDir}/keys/release-keystore.jks")
+        storePassword = System.getenv("STORE_PASS") ?: "debugkey"
+        keyAlias = System.getenv("KEY_ALIAS") ?: "transtracks"
+        keyPassword = System.getenv("KEY_PASS") ?: "debugkey"
+    }
+}
 ```
-
-as environment variables. If your Gradle files use different names, update the workflow `env:` block accordingly.
 
 ## Using the Build & Release workflow
 
-### 1. Manual run (Actions tab)
+### Manual run (Actions tab)
 
-1. Push this folder structure into your repo.
-2. Go to **Actions → Build & Release Android APK → Run workflow**.
-3. Choose `debug` or `release` build type.
-4. Wait for the workflow to finish:
-   - Download the APK from the **Artifacts** section, or
-   - If you ran a `release` build with a Git tag, download it from the **Releases** page.
+1. Commit & push this bundle into the root of your repo.
+2. Set the secrets listed above.
+3. Go to **Actions → Build & Release Android APK → Run workflow**.
+4. Choose:
+   - `debug` to build only a debug APK
+   - `release` to build a release APK (using your keystore secrets if configured)
+5. After it finishes:
+   - Download the APK from the **Artifacts** section of the run, or
+   - For `release` type on a tag, from the **Releases** page.
 
-### 2. Tag-based releases
+### Tag-based releases
 
 When you push a tag like:
 
@@ -96,11 +109,17 @@ The workflow will:
 - Create a GitHub Release named `TransTracks v1.0.0`
 - Attach the APK as a release asset
 
+## Using the PR Debug workflow
+
+- Runs on every `pull_request` targeting any branch.
+- Builds a **debug** APK.
+- Uploads it as an artifact named `transtracks-pr-debug-apk`.
+
+You can grab the PR’s APK from the **Artifacts** section of that workflow run.
+
 ## Notes
 
-- These workflows expect your Android project (with `app/` module) at the repo root.
-- They use the `android-actions/setup-android` action to install the Android SDK and tools.
-- `local.properties` is generated dynamically with `sdk.dir` pointing to the SDK installed by the action.
-- Firebase is always enabled; `google-services.json` is provided at build time from the secret.
-
-Adjust paths and environment variables as needed to match your exact Gradle configuration.
+- These workflows assume your Android project root contains the `app/` module.
+- `local.properties` is generated automatically in CI using the `ANDROID_SDK_ROOT` provided by `android-actions/setup-android`.
+- `google-services.json` is **not** checked into your repo; it is generated at build time from the `GOOGLE_SERVICES_JSON` secret.
+- The workflows use `actions/upload-artifact@v4` and `actions/download-artifact@v4` (no deprecated v3 usage).

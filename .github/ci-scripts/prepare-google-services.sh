@@ -2,8 +2,8 @@
 set -euo pipefail
 
 if [[ -z "${GOOGLE_SERVICES_JSON:-}" ]]; then
-  echo "GOOGLE_SERVICES_JSON is not set. Skipping google-services.json creation."
-  exit 0
+  echo "GOOGLE_SERVICES_JSON is not set. Cannot create app/google-services.json."
+  exit 1
 fi
 
 mkdir -p app
