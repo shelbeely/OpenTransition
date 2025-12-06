@@ -47,6 +47,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Prepare secrets.properties
+        env:
+          SECRETS_PROPERTIES_B64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
+        run: |
+          bash .github/ci-scripts/prepare-secrets.sh
+
       - name: Prepare google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
