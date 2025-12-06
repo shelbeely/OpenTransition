@@ -11,34 +11,50 @@
 <resources>
 
     <style name="PinkAppTheme" parent="BaseAppTheme">
-        <item name="colorPrimaryLight">@color/pinkColorPrimaryLight</item>
         <item name="colorPrimary">@color/pinkColorPrimary</item>
-        <item name="colorPrimaryDark">@color/pinkColorPrimaryDark</item>
-        <item name="colorAccent">@color/pinkColorAccent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/pinkColorPrimaryLight</item>
+        <item name="colorOnPrimaryContainer">@color/pinkColorPrimaryDark</item>
+        <item name="colorSecondary">@color/pinkColorAccent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/pinkColorAccent</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
     </style>
 
     <style name="BlueAppTheme" parent="BaseAppTheme">
-        <item name="colorPrimaryLight">@color/blueColorPrimaryLight</item>
         <item name="colorPrimary">@color/blueColorPrimary</item>
-        <item name="colorPrimaryDark">@color/blueColorPrimaryDark</item>
-        <item name="colorAccent">@color/blueColorAccent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/blueColorPrimaryLight</item>
+        <item name="colorOnPrimaryContainer">@color/blueColorPrimaryDark</item>
+        <item name="colorSecondary">@color/blueColorAccent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/blueColorAccent</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
     </style>
 
     <style name="PurpleAppTheme" parent="BaseAppTheme">
-        <item name="colorPrimaryLight">@color/purpleColorPrimaryLight</item>
         <item name="colorPrimary">@color/purpleColorPrimary</item>
-        <item name="colorPrimaryDark">@color/purpleColorPrimaryDark</item>
-        <item name="colorAccent">@color/purpleColorAccent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/purpleColorPrimaryLight</item>
+        <item name="colorOnPrimaryContainer">@color/purpleColorPrimaryDark</item>
+        <item name="colorSecondary">@color/purpleColorAccent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/purpleColorAccent</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
     </style>
 
     <style name="GreenAppTheme" parent="BaseAppTheme">
-        <item name="colorPrimaryLight">@color/greenColorPrimaryLight</item>
         <item name="colorPrimary">@color/greenColorPrimary</item>
-        <item name="colorPrimaryDark">@color/greenColorPrimaryDark</item>
-        <item name="colorAccent">@color/greenColorAccent</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/greenColorPrimaryLight</item>
+        <item name="colorOnPrimaryContainer">@color/greenColorPrimaryDark</item>
+        <item name="colorSecondary">@color/greenColorAccent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="colorSecondaryContainer">@color/greenColorAccent</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
     </style>
 
-    <style name="BaseAppTheme" parent="Theme.MaterialComponents.Light.NoActionBar.Bridge">
+    <style name="BaseAppTheme" parent="Theme.Material3.Light.NoActionBar">
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
         <item name="windowActionModeOverlay">true</item>
@@ -49,7 +65,7 @@
         <item name="color">@color/white</item>
     </style>
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.MaterialComponents.Light">
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Light">
         <item name="colorControlNormal">@android:color/white</item>
     </style>
 </resources>
