@@ -17,6 +17,27 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/gallery_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.PopupOverlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
+
+        <TextView
+            android:id="@+id/gallery_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textColor="@color/white_text_selector"
+            tools:text="@string/face_gallery" />
+    </androidx.appcompat.widget.Toolbar>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/gallery_recycler_view"
         android:layout_width="match_parent"
@@ -24,7 +45,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/gallery_toolbar" />
 
     <TextView
         android:id="@+id/gallery_empty_message"
@@ -38,7 +59,7 @@
         app:layout_constraintBottom_toTopOf="@+id/gallery_empty_add"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gallery_toolbar"
         app:layout_constraintVertical_chainStyle="packed"
         tools:visibility="visible" />
 
