@@ -31,7 +31,7 @@ android {
     compileSdk 36
     
     defaultConfig {
-        applicationId "com.drspaceboo.transtracks"
+        applicationId "com.shelbeely.opentransition"
         minSdkVersion 21
         targetSdkVersion 36
         versionCode getVersionCode()
@@ -98,7 +98,7 @@ android {
     buildFeatures {
         viewBinding true
     }
-    namespace 'com.drspaceboo.transtracks'
+    namespace 'com.shelbeely.opentransition'
 }
 
 dependencies {

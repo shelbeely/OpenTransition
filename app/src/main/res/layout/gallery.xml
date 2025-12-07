@@ -10,7 +10,7 @@
   ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<com.drspaceboo.transtracks.ui.gallery.GalleryView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.shelbeely.opentransition.ui.gallery.GalleryView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -63,7 +63,7 @@
         app:layout_constraintVertical_chainStyle="packed"
         tools:visibility="visible" />
 
-    <com.drspaceboo.transtracks.ui.widget.SquareImageView
+    <com.shelbeely.opentransition.ui.widget.SquareImageView
         android:id="@+id/gallery_empty_add"
         android:layout_width="64dp"
         android:layout_height="64dp"
@@ -76,4 +76,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/gallery_empty_message"
         tools:visibility="visible" />
-</com.drspaceboo.transtracks.ui.gallery.GalleryView>
+</com.shelbeely.opentransition.ui.gallery.GalleryView>
