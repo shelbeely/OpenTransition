@@ -34,3 +34,7 @@ _sandbox
 /secrets.properties
 /app/google-services.json
 release-keystore.jks
+
+# MkDocs
+site/
+.cache/
