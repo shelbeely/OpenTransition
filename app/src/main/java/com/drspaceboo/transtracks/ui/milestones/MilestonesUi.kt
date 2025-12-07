@@ -40,7 +40,7 @@ sealed class MilestonesUiEvent {
 }
 
 sealed class MilestonesUiState {
-    data class Loaded(val initialDay: Long, val showAds: Boolean) : MilestonesUiState()
+    data class Loaded(val initialDay: Long) : MilestonesUiState()
 
     companion object {
         fun getInitialDay(state: MilestonesUiState): Long = when (state) {

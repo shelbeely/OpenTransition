@@ -53,23 +53,17 @@ sealed class GalleryUiEvent {
 }
 
 sealed class GalleryUiState {
-    data class Loaded(val type: Int, val initialDay: Long, val showAds: Boolean) : GalleryUiState()
+    data class Loaded(val type: Int, val initialDay: Long) : GalleryUiState()
     data class Selection(
         val type: Int,
         val initialDay: Long,
-        val selectedIds: ArrayList<String>,
-        val showAds: Boolean
+        val selectedIds: ArrayList<String>
     ) : GalleryUiState()
 
     companion object {
         fun getInitialDay(state: GalleryUiState) = when (state) {
             is GalleryUiState.Loaded -> state.initialDay
             is GalleryUiState.Selection -> state.initialDay
-        }
-
-        fun getShowAds(state: GalleryUiState): Boolean = when (state) {
-            is GalleryUiState.Loaded -> state.showAds
-            is GalleryUiState.Selection -> state.showAds
         }
 
         @Photo.Type

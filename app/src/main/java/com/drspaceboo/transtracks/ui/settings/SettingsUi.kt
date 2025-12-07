@@ -44,8 +44,6 @@ sealed class SettingsUiEvent {
     object Export : SettingsUiEvent()
     object ToggleAnalytics : SettingsUiEvent()
     object ToggleCrashReports : SettingsUiEvent()
-    object ToggleAds : SettingsUiEvent()
-    object ShowAdConsent : SettingsUiEvent()
     object Contribute : SettingsUiEvent()
     object PrivacyPolicy : SettingsUiEvent()
 }
@@ -58,8 +56,8 @@ sealed class SettingsUiState {
     data class Content(
         val userDetails: SettingsUIUserDetails?, val startDate: LocalDate, val theme: String,
         val lockMode: String, val enableLockDelay: Boolean, val lockDelay: String,
-        val appVersion: String, val copyright: String, val showAds: Boolean,
-        val hasAdConsent: Boolean, val enableAnalytics: Boolean, val enableCrashReports: Boolean
+        val appVersion: String, val copyright: String,
+        val enableAnalytics: Boolean, val enableCrashReports: Boolean
     ) : SettingsUiState()
 
     data class Loading(val content: Content, val overallProgress: Int, val stepProgress: Int) :

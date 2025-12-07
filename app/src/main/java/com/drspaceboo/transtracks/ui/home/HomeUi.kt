@@ -56,8 +56,7 @@ sealed class HomeUiState {
     object Loading : HomeUiState()
     data class Loaded(
         val dayString: String, val showPreviousRecord: Boolean, val showNextRecord: Boolean,
-        val startDate: LocalDate, val currentDate: LocalDate, val hasMilestones: Boolean,
-        val showAds: Boolean
+        val startDate: LocalDate, val currentDate: LocalDate, val hasMilestones: Boolean
     ) : HomeUiState()
 }
 

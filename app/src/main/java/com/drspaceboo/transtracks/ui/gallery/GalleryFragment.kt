@@ -66,8 +66,7 @@ class GalleryFragment : Fragment(R.layout.gallery) {
         view.display(
             GalleryUiState.Loaded(
                 type,
-                args.initialDay,
-                TransTracksApp.hasConsentToShowAds() && SettingsManager.showAds()
+                args.initialDay
             )
         )
 
@@ -98,8 +97,7 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                     GalleryUiState.Selection(
                         type,
                         args.initialDay,
-                        selectedIds,
-                        TransTracksApp.hasConsentToShowAds() && SettingsManager.showAds()
+                        selectedIds
                     )
                 )
             }
@@ -109,8 +107,7 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                 view.display(
                     GalleryUiState.Loaded(
                         type,
-                        args.initialDay,
-                        TransTracksApp.hasConsentToShowAds() && SettingsManager.showAds()
+                        args.initialDay
                     )
                 )
             }
@@ -215,8 +212,7 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                 view.display(
                     GalleryUiState.Loaded(
                         type,
-                        args.initialDay,
-                        TransTracksApp.hasConsentToShowAds() && SettingsManager.showAds()
+                        args.initialDay
                     )
                 )
 
@@ -276,8 +272,7 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                             view.display(
                                 GalleryUiState.Loaded(
                                     type,
-                                    args.initialDay,
-                                    TransTracksApp.hasConsentToShowAds() && SettingsManager.showAds()
+                                    args.initialDay
                                 )
                             )
                         } else {

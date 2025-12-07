@@ -261,12 +261,6 @@ class SettingsFragment : Fragment(R.layout.settings) {
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleCrashReports>()
             .subscribe { SettingsManager.toggleEnableCrashReports(requireActivity()) }
 
-        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleAds>()
-            .subscribe { SettingsManager.toggleShowAds(requireActivity()) }
-
-        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ShowAdConsent>()
-            .subscribe { (activity as? MainActivity)?.showConsentForm() }
-
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.Contribute>()
             .subscribe {
                 val activity = activity ?: return@subscribe
@@ -743,10 +737,6 @@ fun settingsResultsToStates(context: Context) =
                 copyright = context.getString(
                     R.string.copyright, Calendar.getInstance().get(Calendar.YEAR).toString()
                 ),
-                showAds = SettingsManager.showAds(),
-                hasAdConsent = listOf(ConsentStatus.REQUIRED, ConsentStatus.OBTAINED)
-                    .contains(TransTracksApp.instance.adConsentStatus.value)
-                        && (context as? MainActivity)?.consentInformation?.isConsentFormAvailable == true,
                 enableAnalytics = content.enableAnalytics,
                 enableCrashReports = content.enableCrashReports
             )
