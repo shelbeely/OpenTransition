@@ -10,7 +10,7 @@
   ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<com.drspaceboo.transtracks.ui.singlephoto.SinglePhotoView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.shelbeely.transtracks.ui.singlephoto.SinglePhotoView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -74,4 +74,4 @@
         app:layout_constraintTop_toBottomOf="@+id/single_photo_image"
         tools:text="10/09/2018 - Body" />
 
-</com.drspaceboo.transtracks.ui.singlephoto.SinglePhotoView>
+</com.shelbeely.transtracks.ui.singlephoto.SinglePhotoView>

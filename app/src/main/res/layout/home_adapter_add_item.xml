@@ -10,7 +10,7 @@
   ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<com.drspaceboo.transtracks.ui.widget.SquareConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.shelbeely.transtracks.ui.widget.SquareConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
@@ -27,4 +27,4 @@
         android:background="@color/transparent"
         android:contentDescription="@string/add_face_photo"
         android:src="@drawable/add" />
-</com.drspaceboo.transtracks.ui.widget.SquareConstraintLayout>
+</com.shelbeely.transtracks.ui.widget.SquareConstraintLayout>
