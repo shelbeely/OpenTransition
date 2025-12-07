@@ -1,4 +1,7 @@
-# TransTracks-Android
+# TransTracks-Android (Fork)
+
+**Note:** This is a fork of TransTracks with the package name updated to `com.shelbeely.transtracks` to allow independent distribution. See [PACKAGE_NAME_UPDATE.md](PACKAGE_NAME_UPDATE.md) for details on the changes made and GPL v3 compliance requirements.
+
 TransTracks is a transition tracking application made specifically for Transgender people. Is is based mostly around photo tracking at the moment.
 
 The purpose of this repository is to help the community work together to improve the application.

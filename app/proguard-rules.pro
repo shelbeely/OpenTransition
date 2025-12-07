@@ -20,7 +20,7 @@
 -dontwarn okhttp3.internal.platform.*
 
 # Realm
--keep class com.gettotallyrad.pictapgo.data.** { *; }
+-keep class com.shelbeely.transtracks.data.** { *; }
 -keep class io.realm.annotations.RealmModule
 -keep @io.realm.annotations.RealmModule class *
 -keep class io.realm.internal.Keep
