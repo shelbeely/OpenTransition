@@ -31,7 +31,7 @@ android {
     compileSdk 36
     
     defaultConfig {
-        applicationId "com.drspaceboo.transtracks"
+        applicationId "com.mytransition.app"
         minSdkVersion 21
         targetSdkVersion 36
         versionCode getVersionCode()

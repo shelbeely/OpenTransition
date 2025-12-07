@@ -212,15 +212,15 @@ class MainActivity : AppCompatActivity() {
 
                 packageManager.setComponentEnabledSetting(
                     ComponentName(
-                        "com.drspaceboo.transtracks",
-                        "com.drspaceboo.transtracks.MainActivityDefault"
+                        "com.mytransition.app",
+                        "com.mytransition.app.MainActivityDefault"
                     ),
                     defaultLauncherState, PackageManager.DONT_KILL_APP
                 )
 
                 packageManager.setComponentEnabledSetting(
                     ComponentName(
-                        "com.drspaceboo.transtracks", "com.drspaceboo.transtracks.MainActivityTrain"
+                        "com.mytransition.app", "com.mytransition.app.MainActivityTrain"
                     ),
                     trainLauncherState, PackageManager.DONT_KILL_APP
                 )

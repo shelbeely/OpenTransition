@@ -9,7 +9,7 @@
   -->
 
 <resources>
-    <string name="app_name">TransTracks</string>
+    <string name="app_name">MyTransition</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>
@@ -250,7 +250,7 @@
     <string name="untitled_album">Untitled Album</string>
 
     <!-- Lock -->
-    <string name="train_tracks_title">Train Tracks</string>
+    <string name="train_tracks_title">Journey Tracker</string>
     <string name="train_tracks_message">Enter the train\'s reporting number to find it. Depending on where you are they can be a mixture of letters an numbers, e.g. 2MS6 is the sixth Melbourne to Sydney ARTC train leave on Monday.</string>
     <string name="enter_train_reporting_number">Enter Train Reporting Number</string>
     <string name="search">Search</string>
