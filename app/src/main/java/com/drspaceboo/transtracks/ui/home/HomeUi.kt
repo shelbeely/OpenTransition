@@ -11,36 +11,24 @@
 package com.drspaceboo.transtracks.ui.home
 
 import android.content.Context
-import android.transition.ChangeBounds
-import android.transition.Slide
-import android.transition.TransitionManager
-import android.transition.TransitionSet
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MenuItem
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.drspaceboo.transtracks.R
 import com.drspaceboo.transtracks.data.Photo
 import com.drspaceboo.transtracks.ui.widget.SwipeGestureListener
 import com.drspaceboo.transtracks.util.getString
-import com.drspaceboo.transtracks.util.gone
-import com.drspaceboo.transtracks.util.loadAd
 import com.drspaceboo.transtracks.util.nullAllElements
 import com.drspaceboo.transtracks.util.setVisibleOrInvisible
 import com.drspaceboo.transtracks.util.toFullDateString
 import com.drspaceboo.transtracks.util.toV3
-import com.drspaceboo.transtracks.util.visible
-import com.google.android.gms.ads.AdListener
-import com.google.android.gms.ads.AdView
-import com.google.android.gms.ads.LoadAdError
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
@@ -68,8 +56,7 @@ sealed class HomeUiState {
     object Loading : HomeUiState()
     data class Loaded(
         val dayString: String, val showPreviousRecord: Boolean, val showNextRecord: Boolean,
-        val startDate: LocalDate, val currentDate: LocalDate, val hasMilestones: Boolean,
-        val showAds: Boolean
+        val startDate: LocalDate, val currentDate: LocalDate, val hasMilestones: Boolean
     ) : HomeUiState()
 }
 
@@ -93,8 +80,6 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
 
     private val bodyGallery: Button by bindView(R.id.home_body_gallery)
     private val bodyRecyclerView: RecyclerView by bindView(R.id.home_body_images)
-
-    private val adViewLayout: ViewGroup by bindView(R.id.home_ad_layout)
 
     private val eventRelay: PublishRelay<HomeUiEvent> = PublishRelay.create()
     val events: Observable<HomeUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
@@ -151,14 +136,6 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         )
     }
 
-    override fun onDetachedFromWindow() {
-        if (adViewLayout.childCount > 0) {
-            (adViewLayout[0] as? AdView)?.destroy()
-            adViewLayout.removeAllViews()
-        }
-        super.onDetachedFromWindow()
-    }
-
     fun display(state: HomeUiState) {
         facePhotoIds.nullAllElements()
         bodyPhotoIds.nullAllElements()
@@ -200,39 +177,6 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
                     state.currentDate, Photo.TYPE_BODY,
                     eventRelay
                 )
-
-                if (state.showAds) {
-                    adViewLayout.visible()
-
-                    if (adViewLayout.childCount <= 0) {
-                        AdView(context).apply {
-                            adUnitId = getString(R.string.ADS_HOME_AD_ID)
-                            adViewLayout.addView(this)
-                            loadAd(context)
-                            adListener = object : AdListener() {
-                                override fun onAdFailedToLoad(error: LoadAdError) {
-                                    val transitionSet = TransitionSet()
-                                        .addTransition(
-                                            Slide().addTarget(adViewLayout)
-                                                .addTarget(faceGallery)
-                                                .addTarget(bodyRecyclerView)
-                                        )
-                                        .addTransition(
-                                            ChangeBounds().addTarget(faceRecyclerView)
-                                                .addTarget(bodyRecyclerView)
-                                        )
-
-                                    TransitionManager.beginDelayedTransition(
-                                        this@HomeView, transitionSet
-                                    )
-                                    adViewLayout.gone()
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    adViewLayout.gone()
-                }
             }
         }
     }

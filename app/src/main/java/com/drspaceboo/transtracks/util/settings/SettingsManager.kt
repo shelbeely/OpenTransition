@@ -123,7 +123,7 @@ object SettingsManager {
     //endregion
 
     //region Show Ads
-    fun showAds(): Boolean = PrefUtil.getBoolean(showAds, true)
+    fun showAds(): Boolean = PrefUtil.getBoolean(showAds, false)
 
     fun toggleShowAds(context: Context?) {
         val newShowAds = !showAds()

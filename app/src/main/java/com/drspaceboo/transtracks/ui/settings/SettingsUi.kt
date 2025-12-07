@@ -13,21 +13,15 @@ package com.drspaceboo.transtracks.ui.settings
 import android.content.Context
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.get
 import com.drspaceboo.transtracks.R
-import com.drspaceboo.transtracks.TransTracksApp
 import com.drspaceboo.transtracks.databinding.SettingsBinding
 import com.drspaceboo.transtracks.ui.settings.SettingsUiState.Content
 import com.drspaceboo.transtracks.ui.settings.SettingsUiState.Loading
-import com.drspaceboo.transtracks.util.HideViewOnFailedAdLoad
 import com.drspaceboo.transtracks.util.getString
 import com.drspaceboo.transtracks.util.gone
-import com.drspaceboo.transtracks.util.loadAd
-import com.drspaceboo.transtracks.util.setVisibleOrGone
 import com.drspaceboo.transtracks.util.toFullDateString
 import com.drspaceboo.transtracks.util.toV3
 import com.drspaceboo.transtracks.util.visible
-import com.google.android.gms.ads.AdView
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.widget.checkedChanges
@@ -50,8 +44,6 @@ sealed class SettingsUiEvent {
     object Export : SettingsUiEvent()
     object ToggleAnalytics : SettingsUiEvent()
     object ToggleCrashReports : SettingsUiEvent()
-    object ToggleAds : SettingsUiEvent()
-    object ShowAdConsent : SettingsUiEvent()
     object Contribute : SettingsUiEvent()
     object PrivacyPolicy : SettingsUiEvent()
 }
@@ -64,8 +56,8 @@ sealed class SettingsUiState {
     data class Content(
         val userDetails: SettingsUIUserDetails?, val startDate: LocalDate, val theme: String,
         val lockMode: String, val enableLockDelay: Boolean, val lockDelay: String,
-        val appVersion: String, val copyright: String, val showAds: Boolean,
-        val hasAdConsent: Boolean, val enableAnalytics: Boolean, val enableCrashReports: Boolean
+        val appVersion: String, val copyright: String,
+        val enableAnalytics: Boolean, val enableCrashReports: Boolean
     ) : SettingsUiState()
 
     data class Loading(val content: Content, val overallProgress: Int, val stepProgress: Int) :
@@ -97,9 +89,6 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
                 .filter { userAction }.map { SettingsUiEvent.ToggleAnalytics },
             binding.settingsCrashReports.checkedChanges().toV3()
                 .filter { userAction }.map { SettingsUiEvent.ToggleCrashReports },
-            binding.settingsShowAds.checkedChanges().toV3()
-                .filter { userAction }.map { SettingsUiEvent.ToggleAds },
-            binding.settingsAdConsentShow.clicks().toV3().map { SettingsUiEvent.ShowAdConsent },
             binding.settingsContribute.clicks().toV3().map { SettingsUiEvent.Contribute },
             binding.settingsPrivacyPolicy.clicks().toV3().map { SettingsUiEvent.PrivacyPolicy }
         )
@@ -124,14 +113,6 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
         binding.settingsLockLabel.setOnClickListener { binding.settingsLock.performClick() }
         binding.settingsLockDescription.setOnClickListener { binding.settingsLock.performClick() }
         binding.settingsLockDelayLabel.setOnClickListener { binding.settingsLockDelay.performClick() }
-    }
-
-    override fun onDetachedFromWindow() {
-        if (binding.settingsAdLayout.childCount > 0) {
-            (binding.settingsAdLayout[0] as? AdView)?.destroy()
-            binding.settingsAdLayout.removeAllViews()
-        }
-        super.onDetachedFromWindow()
     }
 
     fun display(state: SettingsUiState) {
@@ -179,28 +160,10 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
 
         binding.settingsAnalytics.isChecked = content.enableAnalytics
         binding.settingsCrashReports.isChecked = content.enableCrashReports
-        binding.settingsShowAds.isChecked = content.showAds
-        binding.settingsAdLayout.setVisibleOrGone(content.hasAdConsent)
-        binding.settingsAdConsentShow.isEnabled = content.showAds
 
         binding.settingsAppVersion.text = content.appVersion
 
         binding.settingsCopyright.text = content.copyright
-
-        if (TransTracksApp.hasConsentToShowAds() && content.showAds) {
-            binding.settingsAdLayout.visible()
-
-            if (binding.settingsAdLayout.childCount <= 0) {
-                AdView(context).apply {
-                    adUnitId = getString(R.string.ADS_SETTINGS_AD_ID)
-                    binding.settingsAdLayout.addView(this)
-                    loadAd(context)
-                    adListener = HideViewOnFailedAdLoad(binding.settingsAdLayout)
-                }
-            }
-        } else {
-            binding.settingsAdLayout.gone()
-        }
     }
 
     private fun displayUserDetails(user: SettingsUIUserDetails) {

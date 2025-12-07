@@ -276,7 +276,7 @@ val homeResultsToStates = ObservableTransformer<HomeResult, HomeUiState> { resul
             is HomeResult.Loaded ->
                 HomeUiState.Loaded(
                     result.dayString, result.showPreviousRecord, result.showNextRecord,
-                    result.startDate, result.currentDate, result.hasMilestones, result.showAds
+                    result.startDate, result.currentDate, result.hasMilestones
                 )
         }
     }

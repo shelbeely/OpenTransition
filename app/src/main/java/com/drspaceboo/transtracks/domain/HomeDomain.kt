@@ -41,8 +41,7 @@ sealed class HomeResult {
         val showNextRecord: Boolean,
         val startDate: LocalDate,
         val currentDate: LocalDate,
-        val hasMilestones: Boolean,
-        val showAds: Boolean
+        val hasMilestones: Boolean
     ) : HomeResult()
 }
 
@@ -108,8 +107,7 @@ fun homeActionsToResults(): ObservableTransformer<HomeAction, HomeResult> {
             showNextRecord,
             startDate,
             currentDate,
-            hasMilestones,
-            TransTracksApp.hasConsentToShowAds() && SettingsManager.showAds()
+            hasMilestones
         )
     }
 

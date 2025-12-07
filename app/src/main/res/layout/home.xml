@@ -209,18 +209,8 @@
         android:gravity="center"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
-        app:layout_constraintBottom_toTopOf="@id/home_ad_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/home_body_gallery" />
-
-    <FrameLayout
-        android:id="@+id/home_ad_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ad_background"
-        android:paddingTop="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </com.drspaceboo.transtracks.ui.home.HomeView>

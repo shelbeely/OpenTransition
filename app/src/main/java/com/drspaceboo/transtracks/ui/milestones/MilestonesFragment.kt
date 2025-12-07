@@ -36,8 +36,7 @@ class MilestonesFragment : Fragment(R.layout.milestones) {
 
         view.display(
             MilestonesUiState.Loaded(
-                args.initialDay,
-                TransTracksApp.hasConsentToShowAds() && SettingsManager.showAds()
+                args.initialDay
             )
         )
 
