@@ -31,7 +31,7 @@ android {
     compileSdk 36
     
     defaultConfig {
-        applicationId "com.mytransition.app"
+        applicationId "com.shelbeely.opentransition"
         minSdkVersion 21
         targetSdkVersion 36
         versionCode getVersionCode()

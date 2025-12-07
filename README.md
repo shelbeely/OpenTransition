@@ -1,5 +1,5 @@
-# MyTransition
-MyTransition is a transition tracking application made specifically for Transgender people. It is based mostly around photo tracking at the moment.
+# OpenTransition
+OpenTransition is a transition tracking application made specifically for Transgender people. It is based mostly around photo tracking at the moment.
 
 This is a customized fork of the original TransTracks application, rebranded and repackaged for independent deployment.
 
@@ -14,8 +14,8 @@ The purpose of this repository is to help the community work together to improve
 
 ## Package Information
 
-- **Package Name**: `com.mytransition.app`
-- **App Name**: MyTransition
+- **Package Name**: `com.shelbeely.opentransition`
+- **App Name**: OpenTransition
 - This fork uses a different package name to allow independent deployment on app stores
 
 ## Contributing
@@ -24,11 +24,11 @@ If you are looking to help contribute but are not sure on what to work on please
 
 ## License
 
-MyTransition is a fork of TransTracks and maintains the same GPL v3 license.
+OpenTransition is a fork of TransTracks and maintains the same GPL v3 license.
 
 ```
 Original Copyright (C) 2018 - 2021 TransTracks
-Fork modifications and rebranding by the MyTransition contributors
+Fork modifications and rebranding by the OpenTransition contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

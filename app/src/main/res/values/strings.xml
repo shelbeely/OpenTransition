@@ -9,7 +9,7 @@
   -->
 
 <resources>
-    <string name="app_name">MyTransition</string>
+    <string name="app_name">OpenTransition</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>
