@@ -21,7 +21,7 @@
     android:paddingEnd="16dp"
     android:paddingBottom="2dp">
 
-    <com.drspaceboo.transtracks.ui.widget.SquareImageView
+    <com.shelbeely.transtracks.ui.widget.SquareImageView
         android:id="@+id/select_album_adapter_item_image"
         android:layout_width="64dp"
         android:layout_height="64dp"
