@@ -98,7 +98,7 @@ android {
     buildFeatures {
         viewBinding true
     }
-    namespace 'com.drspaceboo.transtracks'
+    namespace 'com.shelbeely.opentransition'
 }
 
 dependencies {

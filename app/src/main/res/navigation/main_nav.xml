@@ -17,7 +17,7 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.drspaceboo.transtracks.ui.home.HomeFragment"
+        android:name="com.shelbeely.opentransition.ui.home.HomeFragment"
         android:label="HomeFragment">
         <action
             android:id="@+id/action_goToSettings"
@@ -57,7 +57,7 @@
     </fragment>
     <fragment
         android:id="@+id/lockFragment"
-        android:name="com.drspaceboo.transtracks.ui.lock.LockFragment"
+        android:name="com.shelbeely.opentransition.ui.lock.LockFragment"
         android:label="LockFragment" />
     <action
         android:id="@+id/action_global_lockFragment"
@@ -67,7 +67,7 @@
         app:popExitAnim="@anim/slide_out_bottom" />
     <fragment
         android:id="@+id/assignPhotosFragment"
-        android:name="com.drspaceboo.transtracks.ui.assignphoto.AssignPhotosFragment"
+        android:name="com.shelbeely.opentransition.ui.assignphoto.AssignPhotosFragment"
         android:label="AssignPhotosFragment">
         <argument
             android:name="uris"
@@ -75,7 +75,7 @@
         <argument
             android:name="epochDay"
             android:defaultValue="@null"
-            app:argType="com.drspaceboo.transtracks.util.BoxedLong"
+            app:argType="com.shelbeely.opentransition.util.BoxedLong"
             app:nullable="true" />
         <argument
             android:name="type"
@@ -93,7 +93,7 @@
         app:popExitAnim="@anim/slide_out_right" />
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.drspaceboo.transtracks.ui.settings.SettingsFragment"
+        android:name="com.shelbeely.opentransition.ui.settings.SettingsFragment"
         android:label="SettingsFragment" >
         <action
             android:id="@+id/action_reloadSettingsFragment"
@@ -106,7 +106,7 @@
     </fragment>
     <fragment
         android:id="@+id/milestonesFragment"
-        android:name="com.drspaceboo.transtracks.ui.milestones.MilestonesFragment"
+        android:name="com.shelbeely.opentransition.ui.milestones.MilestonesFragment"
         android:label="MilestonesFragment">
         <action
             android:id="@+id/action_editMilestone"
@@ -146,7 +146,7 @@
     </fragment>
     <fragment
         android:id="@+id/addEditMilestoneFragment"
-        android:name="com.drspaceboo.transtracks.ui.addeditmilestone.AddEditMilestoneFragment"
+        android:name="com.shelbeely.opentransition.ui.addeditmilestone.AddEditMilestoneFragment"
         android:label="AddEditMilestoneFragment">
         <argument
             android:name="initialDay"
@@ -158,7 +158,7 @@
     </fragment>
     <fragment
         android:id="@+id/galleryFragment"
-        android:name="com.drspaceboo.transtracks.ui.gallery.GalleryFragment"
+        android:name="com.shelbeely.opentransition.ui.gallery.GalleryFragment"
         android:label="GalleryFragment">
         <argument
             android:name="isFaceGallery"
@@ -176,7 +176,7 @@
             <argument
                 android:name="epochDay"
                 android:defaultValue="@null"
-                app:argType="com.drspaceboo.transtracks.util.BoxedLong"
+                app:argType="com.shelbeely.opentransition.util.BoxedLong"
                 app:nullable="true" />
         </action>
         <action
@@ -189,7 +189,7 @@
     </fragment>
     <fragment
         android:id="@+id/selectPhotoFragment"
-        android:name="com.drspaceboo.transtracks.ui.selectphoto.SelectPhotoFragment"
+        android:name="com.shelbeely.opentransition.ui.selectphoto.SelectPhotoFragment"
         android:label="SelectPhotoFragment">
         <argument
             android:name="type"
@@ -200,7 +200,7 @@
         <argument
             android:name="epochDay"
             android:defaultValue="@null"
-            app:argType="com.drspaceboo.transtracks.util.BoxedLong"
+            app:argType="com.shelbeely.opentransition.util.BoxedLong"
             app:nullable="true" />
         <action
             android:id="@+id/action_selectAlbum"
@@ -212,7 +212,7 @@
     </fragment>
     <fragment
         android:id="@+id/selectAlbumFragment"
-        android:name="com.drspaceboo.transtracks.ui.selectphoto.selectalbum.SelectAlbumFragment"
+        android:name="com.shelbeely.opentransition.ui.selectphoto.selectalbum.SelectAlbumFragment"
         android:label="SelectAlbumFragment">
         <argument
             android:name="type"
@@ -223,7 +223,7 @@
         <argument
             android:name="epochDay"
             android:defaultValue="@null"
-            app:argType="com.drspaceboo.transtracks.util.BoxedLong"
+            app:argType="com.shelbeely.opentransition.util.BoxedLong"
             app:nullable="true" />
         <action
             android:id="@+id/action_singleAlbum"
@@ -235,7 +235,7 @@
     </fragment>
     <fragment
         android:id="@+id/singleAlbumFragment"
-        android:name="com.drspaceboo.transtracks.ui.selectphoto.singlealbum.SingleAlbumFragment"
+        android:name="com.shelbeely.opentransition.ui.selectphoto.singlealbum.SingleAlbumFragment"
         android:label="SingleAlbumFragment">
         <argument
             android:name="bucketId"
@@ -249,12 +249,12 @@
         <argument
             android:name="epochDay"
             android:defaultValue="@null"
-            app:argType="com.drspaceboo.transtracks.util.BoxedLong"
+            app:argType="com.shelbeely.opentransition.util.BoxedLong"
             app:nullable="true" />
     </fragment>
     <fragment
         android:id="@+id/singlePhotoFragment"
-        android:name="com.drspaceboo.transtracks.ui.singlephoto.SinglePhotoFragment"
+        android:name="com.shelbeely.opentransition.ui.singlephoto.SinglePhotoFragment"
         android:label="SinglePhotoFragment">
         <argument
             android:name="photoId"
@@ -269,7 +269,7 @@
     </fragment>
     <fragment
         android:id="@+id/editPhotoFragment"
-        android:name="com.drspaceboo.transtracks.ui.editphoto.EditPhotoFragment"
+        android:name="com.shelbeely.opentransition.ui.editphoto.EditPhotoFragment"
         android:label="EditPhotoFragment">
         <argument
             android:name="photoId"

@@ -10,7 +10,7 @@
   ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<com.drspaceboo.transtracks.ui.widget.SquareImageView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.shelbeely.opentransition.ui.widget.SquareImageView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/home_adapter_item_image"
     android:layout_width="wrap_content"
