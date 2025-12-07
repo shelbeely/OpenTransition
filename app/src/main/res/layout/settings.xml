@@ -46,7 +46,7 @@
         android:layout_height="0dp"
         android:background="@color/transparent_white_25"
         android:fillViewport="true"
-        app:layout_constraintBottom_toTopOf="@id/settings_ad_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/settings_toolbar">
@@ -450,56 +450,6 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
                 android:textColor="@color/white_text_selector" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/settings_show_ads"
-                style="@style/Widget.AppCompat.Button.Borderless"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:paddingStart="@dimen/spacer_grid"
-                android:paddingTop="@dimen/spacer_grid_half"
-                android:paddingEnd="@dimen/spacer_grid"
-                android:paddingBottom="@dimen/spacer_grid_half"
-                android:text="@string/support_ads"
-                android:textAlignment="textStart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/white_text_selector" />
-
-            <LinearLayout
-                android:id="@+id/settings_ad_consent_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingStart="@dimen/spacer_grid"
-                android:paddingTop="@dimen/spacer_grid_half"
-                android:paddingEnd="@dimen/spacer_grid"
-                android:paddingBottom="@dimen/spacer_grid_half">
-
-                <TextView
-                    android:id="@+id/settings_ad_consent_label"
-                    style="@style/TextAppearance.AppCompat.Title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/ad_consent_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
-
-                <Space
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <Button
-                    android:id="@+id/settings_ad_consent_show"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/redo_consent_form"
-                    android:textAllCaps="false"
-                    android:textColor="@color/white" />
-
-            </LinearLayout>
-
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
@@ -619,16 +569,6 @@
                 tools:text="@string/copyright" />
         </LinearLayout>
     </ScrollView>
-
-    <FrameLayout
-        android:id="@+id/settings_ad_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/ad_background"
-        android:paddingTop="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@+id/settings_loading_layout"

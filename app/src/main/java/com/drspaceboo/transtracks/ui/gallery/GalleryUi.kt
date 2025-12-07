@@ -18,27 +18,22 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.get
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.drspaceboo.transtracks.R
 import com.drspaceboo.transtracks.data.Photo
 import com.drspaceboo.transtracks.ui.widget.AdapterSpanSizeLookup
-import com.drspaceboo.transtracks.util.HideViewOnFailedAdLoad
 import com.drspaceboo.transtracks.util.getString
 import com.drspaceboo.transtracks.util.gone
-import com.drspaceboo.transtracks.util.loadAd
 import com.drspaceboo.transtracks.util.setGone
 import com.drspaceboo.transtracks.util.setVisible
 import com.drspaceboo.transtracks.util.toV3
 import com.drspaceboo.transtracks.util.visible
-import com.google.android.gms.ads.AdView
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
@@ -95,8 +90,6 @@ class GalleryView(
     private val emptyMessage: TextView by bindView(R.id.gallery_empty_message)
     private val emptyAdd: View by bindView(R.id.gallery_empty_add)
 
-    private val adViewLayout: FrameLayout by bindView(R.id.gallery_ad_layout)
-
     private var layoutManager = GridLayoutManager(context, GRID_SPAN)
 
     private val eventRelay: PublishRelay<GalleryUiEvent> = PublishRelay.create()
@@ -127,14 +120,6 @@ class GalleryView(
         recyclerView.layoutManager = layoutManager
 
         emptyAdd.setOnClickListener { showPhotoSourceMenu(emptyAdd) }
-    }
-
-    override fun onDetachedFromWindow() {
-        if (adViewLayout.childCount > 0) {
-            (adViewLayout[0] as? AdView)?.destroy()
-            adViewLayout.removeAllViews()
-        }
-        super.onDetachedFromWindow()
     }
 
     fun display(state: GalleryUiState) {
@@ -198,21 +183,6 @@ class GalleryView(
             if (adapter.selectionMode) {
                 adapter.updateSelectedIds(selectedIds)
             }
-        }
-
-        if (GalleryUiState.getShowAds(state)) {
-            adViewLayout.visible()
-
-            if (adViewLayout.childCount <= 0) {
-                AdView(context).apply {
-                    adUnitId = getString(R.string.ADS_GALLERY_AD_ID)
-                    adViewLayout.addView(this)
-                    loadAd(context)
-                    adListener = HideViewOnFailedAdLoad(adViewLayout)
-                }
-            }
-        } else {
-            adViewLayout.gone()
         }
     }
 
