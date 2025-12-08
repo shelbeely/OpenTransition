@@ -67,7 +67,11 @@ OpenTransition is completely **free to use** with optional ads that support deve
 
 ### 🤝 Made for the Community, by the Community
 
-OpenTransition is a fork of TransTracks, repackaged to be independently maintained and improved by community contributors. Your feedback and suggestions help make the app better for everyone.
+OpenTransition is a community-maintained fork of **TransTracks**. We're grateful to the original TransTracks developers for creating this valuable tool for the transgender community. Their foundational work made OpenTransition possible.
+
+This fork is independently maintained and improved by community contributors. Your feedback and suggestions help make the app better for everyone.
+
+**Credits**: Original app © 2018-2021 TransTracks. OpenTransition fork and enhancements by the community.
 
 ---
 

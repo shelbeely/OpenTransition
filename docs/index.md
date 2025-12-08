@@ -6,7 +6,10 @@ Welcome to the official documentation for **OpenTransition** - a transition trac
 
 ## What is OpenTransition?
 
-OpenTransition is a customized fork of the original TransTracks application, rebranded and repackaged for independent deployment. It helps transgender individuals track their transition journey through photos and milestones, providing a private and secure way to document changes over time.
+OpenTransition is a customized fork of the original **TransTracks** application, rebranded and repackaged for independent deployment. It helps transgender individuals track their transition journey through photos and milestones, providing a private and secure way to document changes over time.
+
+!!! info "Built on TransTracks"
+    OpenTransition is based on the excellent work of the original TransTracks developers. We're grateful for their contribution to the transgender community. [Learn more about credits and attribution →](credits.md)
 
 ## Key Features
 
@@ -58,6 +61,7 @@ Browse your transition photos in an organized gallery. Filter by date, body type
 - 🐛 [Report Issues](https://github.com/shelbeely/OpenTransition/issues)
 - 💡 [Feature Requests](https://github.com/shelbeely/OpenTransition/issues/new)
 - 🤝 [Contributing](contributing/guidelines.md)
+- 🏆 [Credits & Attribution](credits.md)
 
 ## License
 

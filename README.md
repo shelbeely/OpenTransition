@@ -86,3 +86,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ```
+
+## Credits
+
+OpenTransition is based on the original **TransTracks** application. We are deeply grateful to the TransTracks developers and contributors for creating this valuable tool for the transgender community. Their work provided the foundation that makes OpenTransition possible.
+
+[Full Credits & Attribution →](https://shelbeely.github.io/OpenTransition/credits/)
