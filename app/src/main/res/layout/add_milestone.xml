@@ -149,7 +149,7 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
                 android:textColorHint="@color/white_text_selector"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/ai_assistance_label"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/add_milestone_description_label">
@@ -165,6 +165,60 @@
                     android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector" />
             </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:id="@+id/ai_assistance_label"
+                style="@style/TextAppearance.Material3.TitleSmall"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="4dp"
+                android:text="@string/ai_assistance_label"
+                android:textColor="@color/transparent_white_90_text_selector"
+                app:layout_constraintBottom_toTopOf="@+id/ai_buttons_container"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/add_milestone_description_layout" />
+
+            <LinearLayout
+                android:id="@+id/ai_buttons_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/ai_assistance_label">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ai_proofread_button"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/ai_proofread"
+                    android:textAllCaps="false"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textColor="@color/white_text_selector" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ai_improve_button"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:layout_weight="1"
+                    android:text="@string/ai_improve"
+                    android:textAllCaps="false"
+                    android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
+                    android:textColor="@color/white_text_selector" />
+            </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

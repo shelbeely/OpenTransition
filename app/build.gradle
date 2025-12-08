@@ -129,6 +129,12 @@ dependencies {
     implementation 'com.google.android.gms:play-services-ads:22.4.0'
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
+    // ML Kit GenAI for Gemini Nano
+    implementation 'com.google.mlkit:genai-summarization:1.0.0-beta1'
+    implementation 'com.google.mlkit:genai-rewriting:1.0.0-beta1'
+    implementation 'com.google.mlkit:genai-proofreading:1.0.0-beta1'
+    implementation 'com.google.mlkit:genai-image-description:1.0.0-beta1'
+
     implementation 'com.google.code.gson:gson:2.10.1'
 
     implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
