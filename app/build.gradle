@@ -134,6 +134,7 @@ dependencies {
     implementation 'com.google.mlkit:genai-rewriting:1.0.0-beta1'
     implementation 'com.google.mlkit:genai-proofreading:1.0.0-beta1'
     implementation 'com.google.mlkit:genai-image-description:1.0.0-beta1'
+    // Prompt API: implementation 'com.google.mlkit:genai-prompt:1.0.0-alpha01' // Coming soon
 
     implementation 'com.google.code.gson:gson:2.10.1'
 
