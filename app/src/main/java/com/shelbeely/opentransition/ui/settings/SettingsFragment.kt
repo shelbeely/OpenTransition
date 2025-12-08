@@ -630,6 +630,9 @@ class SettingsFragment : Fragment(R.layout.settings) {
 
     private fun showAuth() {
         val mainActivity = activity as? MainActivity ?: return
+        // Note: Twitter and Apple sign-in require additional Firebase configuration
+        // If you haven't set these up in Firebase Console, comment them out to avoid crashes
+        // See docs/deployment/self-hosted-firebase.md for setup instructions
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
             AuthUI.IdpConfig.GoogleBuilder().build(),

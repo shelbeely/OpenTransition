@@ -1,0 +1,67 @@
+rules_version = '2';
+
+// Firestore Security Rules for OpenTransition
+// 
+// This file defines the security rules for the Firestore database used by OpenTransition.
+// 
+// Overview:
+// - Each authenticated user has their own collection named with their Firebase Auth UID
+// - Within that collection, there is a "settings" document that stores their preferences
+// - Users can only read and write their own data
+// 
+// Structure:
+//   /{userId}/settings
+//     - lockCode: String
+//     - lockDelay: String (enum: instant, oneMinute, twoMinutes, fiveMinutes, fifteenMinutes)
+//     - lockType: String (enum: off, normal, trains)
+//     - startDate: Long (epoch day)
+//     - theme: String (enum: pink, blue, purple, green)
+//     - enableAnalytics: Boolean
+//     - enableCrashReports: Boolean
+//     - showAds: Boolean
+//     - showWelcome: Boolean
+//
+// How to deploy these rules:
+//   1. Go to Firebase Console → Firestore Database → Rules tab
+//   2. Copy the contents of this file
+//   3. Paste into the rules editor
+//   4. Click "Publish"
+//
+// Or using Firebase CLI:
+//   firebase deploy --only firestore:rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // User data collection
+    // Each user has a collection with their UID as the collection name
+    match /{userId}/{document=**} {
+      // Users can only read and write their own data
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Optionally, you can make the settings document rule more specific:
+    // match /{userId}/settings {
+    //   // Allow read/write only if user owns the document
+    //   allow read, write: if isOwner(userId);
+    //   
+    //   // Optionally add validation rules
+    //   allow create: if isOwner(userId) 
+    //     && request.resource.data.keys().hasAll(['lockType', 'theme'])
+    //     && request.resource.data.lockType in ['off', 'normal', 'trains']
+    //     && request.resource.data.theme in ['pink', 'blue', 'purple', 'green'];
+    //   
+    //   allow update: if isOwner(userId);
+    // }
+  }
+}
