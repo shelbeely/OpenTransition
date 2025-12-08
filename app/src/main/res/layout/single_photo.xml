@@ -15,7 +15,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
+    android:background="@drawable/gradient_background">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/single_photo_toolbar"
@@ -35,7 +35,7 @@
             android:layout_gravity="center"
             android:text="@string/photo_details"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            />
+            android:textColor="@color/white_text_selector" />
     </androidx.appcompat.widget.Toolbar>
 
     <ImageView
@@ -67,7 +67,7 @@
         android:paddingEnd="0dp"
         android:paddingStart="16dp"
         android:paddingTop="8dp"
-       
+        android:textColor="@color/transparent_white_90_text_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

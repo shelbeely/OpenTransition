@@ -37,7 +37,7 @@
         android:gravity="center"
         android:padding="16dp"
         android:text="@string/train_tracks_title"
-       
+        android:textColor="@color/white_text_selector"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

@@ -17,5 +17,5 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:padding="8dp"
-   
+    android:textColor="@color/white_text_selector"
     tools:text="5 Photos" />
