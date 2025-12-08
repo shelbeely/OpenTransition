@@ -1,0 +1,70 @@
+<!--
+  ~ Copyright © 2018 TransTracks. All rights reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+
+    <!-- Dark theme variants for all app themes -->
+    <!-- These follow Material 3 dark theme guidelines -->
+
+    <style name="PinkAppTheme" parent="BaseAppTheme.Dark">
+        <item name="colorPrimary">@color/pinkColorPrimaryLight</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/pinkColorPrimaryDark</item>
+        <item name="colorOnPrimaryContainer">@color/pinkColorPrimaryLight</item>
+        <item name="colorSecondary">@color/pinkColorAccent</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/blueColorPrimaryDark</item>
+        <item name="colorOnSecondaryContainer">@color/pinkColorAccent</item>
+    </style>
+
+    <style name="BlueAppTheme" parent="BaseAppTheme.Dark">
+        <item name="colorPrimary">@color/blueColorPrimaryLight</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/blueColorPrimaryDark</item>
+        <item name="colorOnPrimaryContainer">@color/blueColorPrimaryLight</item>
+        <item name="colorSecondary">@color/blueColorAccent</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/pinkColorPrimaryDark</item>
+        <item name="colorOnSecondaryContainer">@color/blueColorAccent</item>
+    </style>
+
+    <style name="PurpleAppTheme" parent="BaseAppTheme.Dark">
+        <item name="colorPrimary">@color/purpleColorPrimaryLight</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/purpleColorPrimaryDark</item>
+        <item name="colorOnPrimaryContainer">@color/purpleColorPrimaryLight</item>
+        <item name="colorSecondary">@color/purpleColorAccent</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/blueColorPrimaryDark</item>
+        <item name="colorOnSecondaryContainer">@color/purpleColorAccent</item>
+    </style>
+
+    <style name="GreenAppTheme" parent="BaseAppTheme.Dark">
+        <item name="colorPrimary">@color/greenColorPrimaryLight</item>
+        <item name="colorOnPrimary">@color/black</item>
+        <item name="colorPrimaryContainer">@color/greenColorPrimaryDark</item>
+        <item name="colorOnPrimaryContainer">@color/greenColorPrimaryLight</item>
+        <item name="colorSecondary">@color/greenColorAccent</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorSecondaryContainer">@color/blueColorPrimaryDark</item>
+        <item name="colorOnSecondaryContainer">@color/greenColorAccent</item>
+    </style>
+
+    <style name="BaseAppTheme.Dark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+        <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:fontFamily">@font/arvo</item>
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Dark">
+        <item name="colorControlNormal">@android:color/white</item>
+    </style>
+</resources>
