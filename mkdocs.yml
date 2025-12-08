@@ -1,0 +1,117 @@
+site_name: OpenTransition Documentation
+site_description: Comprehensive documentation for OpenTransition - A transition tracking application for the transgender community
+site_author: OpenTransition Contributors
+site_url: https://shelbeely.github.io/OpenTransition
+
+repo_name: shelbeely/OpenTransition
+repo_url: https://github.com/shelbeely/OpenTransition
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: pink
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: pink
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+
+plugins:
+  - search
+  - autorefs
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - User Guide:
+    - Getting Started: user-guide/getting-started.md
+    - Features Overview: user-guide/features.md
+    - Taking & Managing Photos: user-guide/photos.md
+    - Tracking Milestones: user-guide/milestones.md
+    - Privacy & Security: user-guide/privacy.md
+    - Backup & Sync: user-guide/backup.md
+    - FAQ: user-guide/faq.md
+  - For Play Store:
+    - App Description: play-store/description.md
+    - Feature Highlights: play-store/features.md
+    - Screenshots Guide: play-store/screenshots.md
+  - Developer Guide:
+    - Getting Started:
+      - Overview: getting-started/overview.md
+      - Development Setup: getting-started/development-setup.md
+      - Building the App: getting-started/building.md
+    - Architecture:
+      - Overview: architecture/overview.md
+      - Data Layer: architecture/data-layer.md
+      - Domain Layer: architecture/domain-layer.md
+      - UI Layer: architecture/ui-layer.md
+      - Navigation: architecture/navigation.md
+    - Features:
+      - Photo Tracking: features/photo-tracking.md
+      - Milestones: features/milestones.md
+      - Gallery: features/gallery.md
+      - Lock & Security: features/lock-security.md
+      - Settings & Sync: features/settings-sync.md
+      - Import & Export: features/import-export.md
+    - Development:
+      - Code Style: development/code-style.md
+      - Testing: development/testing.md
+      - Debugging: development/debugging.md
+      - Dependencies: development/dependencies.md
+    - Contributing:
+      - Guidelines: contributing/guidelines.md
+      - Pull Requests: contributing/pull-requests.md
+      - Issue Reporting: contributing/issues.md
+    - Deployment:
+      - Release Process: deployment/release-process.md
+      - CI/CD: deployment/ci-cd.md
+      - Google Play Store: deployment/play-store.md
+  - Credits & Attribution: credits.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/shelbeely/OpenTransition
+  version:
+    provider: mike
