@@ -18,26 +18,24 @@
     android:background="@drawable/gradient_background"
     android:fitsSystemWindows="true">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/assign_photo_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:popupTheme="@style/AppTheme.PopupOverlay"
-        app:theme="@style/AppTheme.PopupOverlay">
+        app:navigationIcon="?attr/homeAsUpIndicator">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/assign_photo_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/assign_photo"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textColor="@color/white_text_selector" />
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <ImageView
         android:id="@+id/assign_photo_image"
@@ -60,7 +58,7 @@
 
     <TextView
         android:id="@+id/assign_photo_date_label"
-        style="@style/TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.Material3.TitleMedium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="end|center_vertical"
@@ -76,7 +74,7 @@
 
     <Button
         android:id="@+id/assign_photo_date"
-        style="@style/Widget.AppCompat.Button.Borderless"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="end|center_vertical"
@@ -84,7 +82,7 @@
         android:paddingTop="10dp"
         android:paddingEnd="16dp"
         android:paddingBottom="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:textColor="@color/white_text_selector"
         app:layout_constraintBottom_toTopOf="@id/assign_photo_type"
         app:layout_constraintEnd_toStartOf="@id/assign_photo_use_photo_date"
@@ -94,7 +92,7 @@
 
     <ImageButton
         android:id="@+id/assign_photo_use_photo_date"
-        style="@style/Widget.AppCompat.Button.Borderless"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginStart="0dp"
@@ -109,7 +107,7 @@
 
     <TextView
         android:id="@+id/assign_photo_type_label"
-        style="@style/TextAppearance.AppCompat.Title"
+        style="@style/TextAppearance.Material3.TitleMedium"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="end|center_vertical"
@@ -125,7 +123,7 @@
 
     <Button
         android:id="@+id/assign_photo_type"
-        style="@style/Widget.AppCompat.Button.Borderless"
+        style="@style/Widget.Material3.Button.TextButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="end|center_vertical"
@@ -133,7 +131,7 @@
         android:paddingTop="10dp"
         android:paddingEnd="16dp"
         android:paddingBottom="8dp"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:textColor="@color/white_text_selector"
         app:layout_constraintBottom_toTopOf="@id/assign_photo_save"
         app:layout_constraintEnd_toEndOf="parent"
@@ -143,13 +141,13 @@
 
     <Button
         android:id="@+id/assign_photo_save"
-        style="@style/Base.Widget.AppCompat.Button.Colored"
+        style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/save_photo"
         android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:textColor="@color/white_text_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/assign_photo_skip"
@@ -158,14 +156,14 @@
 
     <Button
         android:id="@+id/assign_photo_skip"
-        style="@style/Base.Widget.AppCompat.Button.Colored"
+        style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:backgroundTint="@color/darkGrey"
         android:text="@string/skip_photo"
         android:textAllCaps="false"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:textColor="@color/white_text_selector"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

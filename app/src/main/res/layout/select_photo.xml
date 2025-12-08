@@ -5,26 +5,24 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/select_photo_toolbar"
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:theme="@style/AppTheme.PopupOverlay"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
+        app:navigationIcon="?attr/homeAsUpIndicator">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/select_photo_title"
             android:layout_gravity="center"
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="@string/select_photo"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textColor="@color/white_text_selector" />
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/select_photo_recycler_view"

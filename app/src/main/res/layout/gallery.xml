@@ -18,26 +18,25 @@
     android:background="@drawable/gradient_background"
     android:fitsSystemWindows="true">
 
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/gallery_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.PopupOverlay"
+        android:background="@color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
+        app:navigationIcon="?attr/homeAsUpIndicator">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/gallery_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             android:textColor="@color/white_text_selector"
             tools:text="@string/face_gallery" />
-    </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/gallery_recycler_view"
