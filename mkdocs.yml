@@ -107,6 +107,7 @@ nav:
       - Release Process: deployment/release-process.md
       - CI/CD: deployment/ci-cd.md
       - Google Play Store: deployment/play-store.md
+      - Self-Hosted Firebase: deployment/self-hosted-firebase.md
   - Credits & Attribution: credits.md
 
 extra:

@@ -41,6 +41,26 @@ This is a customized fork of the original TransTracks application, rebranded and
 
 **Full setup instructions:** [Development Setup Guide](https://shelbeely.github.io/OpenTransition/getting-started/development-setup/)
 
+⚠️ **Common Issue**: If the app crashes when clicking "Sign in", see [AUTHENTICATION.md](AUTHENTICATION.md) for a quick fix.
+
+## 🔧 Self-Hosting
+
+Want complete control over your data and infrastructure? You can host your own Firebase backend:
+
+- 🏠 **Independent Infrastructure** - Host your own Firebase project
+- 🔐 **Data Ownership** - Complete control over user data
+- 🌍 **Privacy** - No dependency on shared infrastructure
+- 📊 **Custom Analytics** - Your own analytics and monitoring
+
+**Self-hosting guide:** [Self-Hosted Firebase Setup](https://shelbeely.github.io/OpenTransition/deployment/self-hosted-firebase/)
+
+This guide covers:
+- Creating your own Firebase project
+- Configuring authentication and Firestore (including fixing sign-in crashes)
+- Security rules setup
+- Cost management on Firebase free tier
+- Migrating from another Firebase project
+
 ## 📦 Package Information
 
 - **Package Name**: `com.shelbeely.opentransition`

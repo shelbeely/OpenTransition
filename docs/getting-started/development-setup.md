@@ -72,6 +72,13 @@ cd OpenTransition
 
 OpenTransition uses Firebase for authentication, cloud storage, analytics, and crash reporting.
 
+!!! tip "Self-Hosted Firebase"
+    Want complete control over your infrastructure? See the [Self-Hosted Firebase Setup](../deployment/self-hosted-firebase.md) guide for detailed instructions on hosting your own Firebase project independent from the original OpenTransition infrastructure.
+
+### Quick Setup for Development
+
+This is a simplified setup for development. For production or self-hosted deployments, see the full guide linked above.
+
 ### Create a Firebase Project
 
 1. Go to [Firebase Console](https://console.firebase.google.com/)
