@@ -26,10 +26,20 @@ This is a customized fork of the original TransTracks application, rebranded and
 
 - 📸 **Photo Tracking** - Document your transition with organized photos (face, body, custom areas)
 - 🎯 **Milestone Management** - Record and celebrate important events
+- 🤖 **AI Assistance** - On-device AI helps improve milestone text (powered by Gemini Nano)
 - 🖼️ **Gallery View** - Browse and compare your progress photos
 - 🔒 **Privacy First** - App lock, disguised mode, and local storage
 - 💾 **Data Control** - Export, backup, and sync on your terms
 - 🎨 **Customizable** - Multiple themes and personalization options
+
+### 🆕 AI Features (New!)
+
+OpenTransition now includes on-device AI powered by Google's Gemini Nano:
+- ✓ **Proofread** milestone text for grammar and spelling
+- ✨ **Improve** text with different styles (formal, casual, shorter, longer)
+- 🔒 **100% Private** - all AI processing happens on your device
+
+[Learn more about AI features →](GEMINI_NANO_AI_FEATURES.md)
 
 ## 🚀 Quick Start for Development
 
