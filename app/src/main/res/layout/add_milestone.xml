@@ -14,7 +14,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/add_milestone_toolbar"
@@ -34,7 +35,7 @@
             android:layout_gravity="center"
             android:text="@string/add_milestone"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textColor="@color/white_text_selector" />
+            />
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -60,20 +61,19 @@
                 android:paddingStart="16dp"
                 android:paddingEnd="0dp"
                 android:text="@string/title_label"
-                android:textColor="@color/transparent_white_90_text_selector"
+               
                 app:layout_constraintBottom_toBottomOf="@+id/add_milestone_title_layout"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/add_milestone_title_layout" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/add_milestone_title_layout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/add_milestone_title_hint"
                 android:paddingStart="8dp"
                 android:paddingEnd="4dp"
-                android:textColorHint="@color/white_text_selector"
+               
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/add_milestone_title_label"
                 app:layout_constraintTop_toTopOf="parent">
@@ -87,7 +87,7 @@
                     android:inputType="textCapWords"
                     android:lines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
@@ -100,14 +100,14 @@
                 android:paddingEnd="0dp"
                 android:paddingBottom="8dp"
                 android:text="@string/date_label"
-                android:textColor="@color/transparent_white_90_text_selector"
+               
                 app:layout_constraintBottom_toTopOf="@id/add_milestone_description_label"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/add_milestone_title_layout" />
 
             <Button
                 android:id="@+id/add_milestone_date"
-                style="@style/Widget.Material3.Button.TextButton"
+                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="end"
@@ -116,7 +116,7 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/white_text_selector"
+               
                 app:layout_constraintBottom_toBottomOf="@id/add_milestone_date_label"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/add_milestone_date_label"
@@ -133,7 +133,7 @@
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
                 android:text="@string/description_label"
-                android:textColor="@color/transparent_white_90_text_selector"
+               
                 app:layout_constraintBottom_toTopOf="@+id/add_milestone_description_layout"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -141,7 +141,6 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/add_milestone_description_layout"
-                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:hint="@string/add_milestone_description_hint"
@@ -149,7 +148,7 @@
                 android:paddingTop="8dp"
                 android:paddingEnd="16dp"
                 android:paddingBottom="8dp"
-                android:textColorHint="@color/white_text_selector"
+               
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -164,21 +163,21 @@
                     android:inputType="textMultiLine|textCapSentences|textAutoCorrect"
                     android:minLines="2"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector" />
+                    />
             </com.google.android.material.textfield.TextInputLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 
     <Button
         android:id="@+id/add_milestone_save"
-        style="@style/Widget.Material3.Button"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:text="@string/add_milestone"
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/white_text_selector"
+       
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

@@ -14,7 +14,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <ImageButton
         android:id="@+id/home_take_photo"
@@ -62,7 +63,7 @@
         android:gravity="center"
         android:textAllCaps="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Display3"
-        android:textColor="@color/white_text_selector"
+       
         app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toTopOf="@id/home_divider_one"
         app:layout_constraintEnd_toStartOf="@+id/home_next_record"
@@ -102,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/white_text_selector"
+       
         app:layout_constraintBottom_toTopOf="@id/home_current_date"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -115,7 +116,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="4dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/white_text_selector"
+       
         app:layout_constraintBottom_toTopOf="@id/home_divider_two"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -156,7 +157,7 @@
 
     <Button
         android:id="@+id/home_face_gallery"
-        style="@style/Widget.Material3.Button.TextButton"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginTop="8dp"
@@ -165,7 +166,7 @@
         android:paddingEnd="24dp"
         android:text="@string/face_gallery"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/white_text_selector"
+       
         app:layout_constraintBottom_toTopOf="@id/home_face_images"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -188,7 +189,7 @@
 
     <Button
         android:id="@+id/home_body_gallery"
-        style="@style/Widget.Material3.Button.TextButton"
+        style="@style/Base.Widget.AppCompat.Button.Borderless"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:background="@drawable/rounded_transparent_button"
@@ -196,7 +197,7 @@
         android:paddingEnd="24dp"
         android:text="@string/body_gallery"
         android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:textColor="@color/white_text_selector"
+       
         app:layout_constraintBottom_toTopOf="@id/home_body_images"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

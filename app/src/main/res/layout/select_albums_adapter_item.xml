@@ -39,7 +39,7 @@
         android:layout_weight="1"
         android:gravity="start|center_vertical"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/white_text_selector"
+       
         tools:text="Camera" />
 
     <TextView
@@ -49,6 +49,6 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:textColor="@color/white_text_selector"
+       
         tools:text="256" />
 </LinearLayout>

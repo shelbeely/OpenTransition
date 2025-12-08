@@ -37,7 +37,7 @@
             android:layout_gravity="center"
             android:text="@string/settings"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textColor="@color/white_text_selector" />
+            />
     </androidx.appcompat.widget.Toolbar>
 
     <ScrollView
@@ -67,7 +67,7 @@
                 android:paddingRight="@dimen/spacer_grid"
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/transtracks_account"
-                android:textColor="@color/white" />
+                />
 
             <TextView
                 android:id="@+id/settings_account_description"
@@ -79,7 +79,7 @@
                 android:paddingStart="@dimen/spacer_grid"
                 android:paddingEnd="@dimen/spacer_grid"
                 android:text="@string/transtracks_account_description"
-                android:textColor="@color/white" />
+                />
 
             <LinearLayout
                 android:id="@+id/settings_account_name_layout"
@@ -95,7 +95,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/account_name_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
+                    />
 
                 <Button
                     android:id="@+id/settings_account_name"
@@ -106,7 +106,7 @@
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector"
+                   
                     tools:text="User Name" />
             </LinearLayout>
 
@@ -124,7 +124,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/account_email_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
+                    />
 
                 <Button
                     android:id="@+id/settings_account_email"
@@ -135,7 +135,7 @@
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector"
+                   
                     tools:text="User Email" />
             </LinearLayout>
 
@@ -157,7 +157,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/sign_in"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    />
 
                 <Button
                     android:id="@+id/settings_account_change_password"
@@ -166,7 +166,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/change_password"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    />
 
                 <Space
                     android:id="@+id/settings_account_logged_in_button_space_1"
@@ -181,7 +181,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/delete_account"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    />
 
                 <Space
                     android:id="@+id/settings_account_logged_in_button_space_2"
@@ -196,7 +196,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/sign_out"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    />
 
                 <Space
                     android:layout_width="0dp"
@@ -225,7 +225,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/start_date_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
+                    />
 
                 <Button
                     android:id="@+id/settings_start_date"
@@ -238,7 +238,7 @@
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector"
+                   
                     tools:text="15/08/2017" />
             </LinearLayout>
 
@@ -255,7 +255,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/theme_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
+                    />
 
                 <Button
                     android:id="@+id/settings_theme"
@@ -268,7 +268,7 @@
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector"
+                   
                     tools:text="Blue" />
             </LinearLayout>
 
@@ -286,7 +286,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:text="@string/lock_label"
-                    android:textColor="@color/transparent_white_90_text_selector"
+                   
                     app:layout_constraintBottom_toBottomOf="@id/settings_lock"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/settings_lock" />
@@ -301,7 +301,7 @@
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector"
+                   
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@id/settings_lock_label"
@@ -314,7 +314,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/lock_description"
-                    android:textColor="@color/transparent_white_90_text_selector"
+                   
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/settings_lock_label" />
@@ -334,7 +334,7 @@
                     android:layout_height="wrap_content"
                     android:enabled="false"
                     android:text="@string/lock_delay_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
+                    />
 
                 <Button
                     android:id="@+id/settings_lock_delay"
@@ -348,7 +348,7 @@
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector"
+                   
                     tools:text="Instant" />
             </LinearLayout>
 
@@ -376,7 +376,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/data_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
+                    />
 
                 <Space
                     android:layout_width="0dp"
@@ -390,7 +390,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/_import"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    />
 
                 <Space
                     android:layout_width="0dp"
@@ -404,7 +404,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/export"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    />
 
                 <Space
                     android:layout_width="0dp"
@@ -433,7 +433,7 @@
                 android:text="@string/anonymous_analytics"
                 android:textAlignment="textStart"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/white_text_selector" />
+                />
 
             <androidx.appcompat.widget.SwitchCompat
                 android:id="@+id/settings_crash_reports"
@@ -448,7 +448,7 @@
                 android:text="@string/anonymous_crash_reports"
                 android:textAlignment="textStart"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/white_text_selector" />
+                />
 
             <ImageView
                 android:layout_width="match_parent"
@@ -470,7 +470,7 @@
                 android:paddingRight="@dimen/spacer_grid"
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/about_transtracks_title"
-                android:textColor="@color/white" />
+                />
 
             <TextView
                 android:id="@+id/settings_about_description"
@@ -482,7 +482,7 @@
                 android:paddingStart="@dimen/spacer_grid"
                 android:paddingEnd="@dimen/spacer_grid"
                 android:text="@string/about_transtracks_description"
-                android:textColor="@color/white" />
+                />
 
             <Button
                 android:id="@+id/settings_contribute"
@@ -496,7 +496,7 @@
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/contribute"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/white_text_selector" />
+                />
 
             <ImageView
                 android:layout_width="match_parent"
@@ -521,7 +521,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/app_version_label"
-                    android:textColor="@color/transparent_white_90_text_selector" />
+                    />
 
                 <TextView
                     android:id="@+id/settings_app_version"
@@ -531,7 +531,7 @@
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
                     android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                    android:textColor="@color/white_text_selector"
+                   
                     tools:text="1.0.0 (8)" />
             </LinearLayout>
 
@@ -547,7 +547,7 @@
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/privacy_policy"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
-                android:textColor="@color/white_text_selector" />
+                />
 
             <Space
                 android:layout_width="wrap_content"
@@ -565,7 +565,7 @@
                 android:paddingEnd="@dimen/spacer_grid"
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:textAppearance="@style/TextAppearance.AppCompat.Caption"
-                android:textColor="@color/white_text_selector"
+               
                 tools:text="@string/copyright" />
         </LinearLayout>
     </ScrollView>
@@ -584,7 +584,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/creating_backup_file"
-            android:textColor="@color/transparent_white_90_text_selector" />
+            />
 
         <ProgressBar
             android:id="@+id/settings_loading_progress"
