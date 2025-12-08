@@ -1,6 +1,6 @@
 # Self-Hosted Firebase Setup
 
-This guide explains how to set up your own Firebase project for OpenTransition, giving you complete control over user authentication and data synchronization independent from the original project.
+This guide explains how to set up your own Firebase project for OpenTransition, giving you complete control over user authentication and data synchronization independent of the original project.
 
 ## Overview
 
@@ -14,7 +14,7 @@ OpenTransition uses Firebase for:
 By hosting your own Firebase project, you gain:
 
 - ✅ Complete data ownership and control
-- ✅ Independence from the original OpenTransition/TransTracks infrastructure
+- ✅ Independence of the original OpenTransition/TransTracks infrastructure
 - ✅ Privacy for your users
 - ✅ Ability to customize authentication and storage rules
 - ✅ Control over costs and scaling
@@ -485,6 +485,14 @@ keytool -list -v -keystore keys/debug-keystore.jks -alias transtracks -storepass
 !!! info "Debug Keystore Location"
     The keystore path is configured in `app/build.gradle` and is relative to the project root:
     `${rootDir}/keys/debug-keystore.jks`
+
+!!! warning "Debug Keystore Security"
+    This debug keystore is included in the repository for development convenience ONLY. It should:
+    - **NEVER** be used for production releases
+    - Only be used for local development and testing
+    - Be regenerated if you're concerned about security
+    
+    For production, always create and use your own release keystore (see below).
 
 #### Get Release Keystore SHA-1
 
