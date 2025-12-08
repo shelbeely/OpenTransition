@@ -45,7 +45,7 @@ This is a customized fork of the original TransTracks application, rebranded and
 
 - **Package Name**: `com.shelbeely.opentransition`
 - **App Name**: OpenTransition
-- **Minimum SDK**: 21 (Android 5.0)
+- **Minimum SDK**: 26 (Android 8.0) - Required for AI features
 - **Target SDK**: 36
 - This fork uses a different package name to allow independent deployment
 
