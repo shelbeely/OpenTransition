@@ -10,21 +10,29 @@
   ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<com.shelbeely.opentransition.ui.widget.SquareConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Material 3 Carousel Item: Add photo button card -->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp"
-    android:background="@drawable/rounded_image_background"
-    android:padding="6dp"
-    app:ttOrientation="vertical">
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/transparent_white_25">
 
-    <androidx.appcompat.widget.AppCompatImageButton
-        android:id="@+id/home_adapter_add_button"
+    <com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/transparent"
-        android:contentDescription="@string/add_face_photo"
-        android:src="@drawable/add" />
-</com.shelbeely.opentransition.ui.widget.SquareConstraintLayout>
+        app:ttOrientation="vertical">
+
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/home_adapter_add_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/transparent"
+            android:contentDescription="@string/add_face_photo"
+            android:src="@drawable/add" />
+    </com.shelbeely.opentransition.ui.widget.SquareConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>
