@@ -13,14 +13,17 @@ package com.shelbeely.opentransition.util
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import com.google.android.gms.tasks.Task
-import kotlinx.coroutines.tasks.await
 
 /**
  * Manager class for Gemini Nano on-device AI operations.
  * Provides text enhancement and image description capabilities using ML Kit GenAI.
+ * 
+ * Note: This is a placeholder implementation. The actual ML Kit GenAI APIs
+ * will be integrated when they become fully available in production releases.
  */
 class GeminiNanoManager private constructor(context: Context) {
+    // Context stored for future ML Kit GenAI client initialization
+    @Suppress("unused")
     private val appContext = context.applicationContext
     
     companion object {
@@ -39,11 +42,16 @@ class GeminiNanoManager private constructor(context: Context) {
     /**
      * Check if image description is available on this device
      * Note: Requires ML Kit GenAI library and compatible device
+     * 
+     * TODO: Implement actual availability check when ML Kit GenAI APIs are available:
+     * val client = ImageDescriptionClient.getInstance(options)
+     * return client.isAvailable().await()
      */
     suspend fun isImageDescriptionAvailable(): Boolean {
         return try {
-            // For now, assume it's available. Real implementation would check device capabilities
-            true
+            // Placeholder: assume available for now
+            // Actual implementation will check device capabilities
+            false  // Return false until real API is available
         } catch (e: Exception) {
             Log.e(TAG, "Error checking image description availability", e)
             false
@@ -53,11 +61,16 @@ class GeminiNanoManager private constructor(context: Context) {
     /**
      * Check if rewriting is available on this device
      * Note: Requires ML Kit GenAI library and compatible device
+     * 
+     * TODO: Implement actual availability check when ML Kit GenAI APIs are available:
+     * val client = RewritingClient.getInstance(options)
+     * return client.isAvailable().await()
      */
     suspend fun isRewritingAvailable(): Boolean {
         return try {
-            // For now, assume it's available. Real implementation would check device capabilities
-            true
+            // Placeholder: assume available for now
+            // Actual implementation will check device capabilities
+            false  // Return false until real API is available
         } catch (e: Exception) {
             Log.e(TAG, "Error checking rewriting availability", e)
             false
@@ -67,11 +80,16 @@ class GeminiNanoManager private constructor(context: Context) {
     /**
      * Check if proofreading is available on this device
      * Note: Requires ML Kit GenAI library and compatible device
+     * 
+     * TODO: Implement actual availability check when ML Kit GenAI APIs are available:
+     * val client = ProofreadingClient.getInstance(options)
+     * return client.isAvailable().await()
      */
     suspend fun isProofreadingAvailable(): Boolean {
         return try {
-            // For now, assume it's available. Real implementation would check device capabilities
-            true
+            // Placeholder: assume available for now
+            // Actual implementation will check device capabilities
+            false  // Return false until real API is available
         } catch (e: Exception) {
             Log.e(TAG, "Error checking proofreading availability", e)
             false
@@ -81,14 +99,16 @@ class GeminiNanoManager private constructor(context: Context) {
     /**
      * Generate a description for an image to improve accessibility and organization
      * Note: Actual implementation requires ML Kit GenAI Image Description API
+     * 
+     * TODO: Implement when ML Kit GenAI APIs are available:
+     * val options = ImageDescriptionOptions.Builder().build()
+     * val client = ImageDescriptionClient.getInstance(options)
+     * val result = client.process(bitmap).await()
+     * return Result.success(result.description)
      */
     suspend fun describeImage(bitmap: Bitmap): Result<String> {
         return try {
-            // Placeholder implementation
-            // Actual implementation would use:
-            // val options = ImageDescriptionOptions.Builder().build()
-            // val client = ImageDescriptionClient.getInstance(options)
-            // val result = client.process(bitmap).await()
+            Log.d(TAG, "Image description requested for bitmap: ${bitmap.width}x${bitmap.height}")
             Result.failure(Exception("Image description API not yet available in ML Kit GenAI Beta"))
         } catch (e: Exception) {
             Log.e(TAG, "Error describing image", e)
@@ -131,14 +151,16 @@ class GeminiNanoManager private constructor(context: Context) {
     /**
      * Rewrite text with the specified style
      * Note: Actual implementation requires ML Kit GenAI Rewriting API
+     * 
+     * TODO: Implement when ML Kit GenAI APIs are available:
+     * val options = RewritingOptions.Builder().setStyle(RewritingStyle.valueOf(style)).build()
+     * val client = RewritingClient.getInstance(options)
+     * val result = client.process(text).await()
+     * return Result.success(result.rewrittenText)
      */
     private suspend fun rewriteText(text: String, style: String): Result<String> {
         return try {
-            // Placeholder implementation
-            // Actual implementation would use:
-            // val options = RewritingOptions.Builder().setStyle(style).build()
-            // val client = RewritingClient.getInstance(options)
-            // val result = client.process(text).await()
+            Log.d(TAG, "Rewriting text with style: $style, length: ${text.length}")
             Result.failure(Exception("Rewriting API not yet available in ML Kit GenAI Beta"))
         } catch (e: Exception) {
             Log.e(TAG, "Error rewriting text with style $style", e)
@@ -149,14 +171,16 @@ class GeminiNanoManager private constructor(context: Context) {
     /**
      * Proofread text to correct grammar and spelling errors
      * Note: Actual implementation requires ML Kit GenAI Proofreading API
+     * 
+     * TODO: Implement when ML Kit GenAI APIs are available:
+     * val options = ProofreadingOptions.Builder().build()
+     * val client = ProofreadingClient.getInstance(options)
+     * val result = client.process(text).await()
+     * return Result.success(result.correctedText)
      */
     suspend fun proofread(text: String): Result<String> {
         return try {
-            // Placeholder implementation
-            // Actual implementation would use:
-            // val options = ProofreadingOptions.Builder().build()
-            // val client = ProofreadingClient.getInstance(options)
-            // val result = client.process(text).await()
+            Log.d(TAG, "Proofreading text, length: ${text.length}")
             Result.failure(Exception("Proofreading API not yet available in ML Kit GenAI Beta"))
         } catch (e: Exception) {
             Log.e(TAG, "Error proofreading text", e)
