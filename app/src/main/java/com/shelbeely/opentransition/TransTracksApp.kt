@@ -12,6 +12,7 @@ package com.shelbeely.opentransition
 
 import android.annotation.SuppressLint
 import android.app.Application
+import com.google.android.material.color.DynamicColors
 import com.shelbeely.opentransition.domain.DomainManager
 import com.shelbeely.opentransition.util.FileUtil
 import com.shelbeely.opentransition.util.settings.FirebaseSettingUtil
@@ -38,6 +39,9 @@ class TransTracksApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        // Enable Material You dynamic colors on Android 12+
+        DynamicColors.applyToActivitiesIfAvailable(this)
 
         MobileAds.initialize(this)
 
