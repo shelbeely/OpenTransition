@@ -15,7 +15,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background">
+    >
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/gallery_toolbar"
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textColor="@color/white_text_selector"
+           
             tools:text="@string/face_gallery" />
     </androidx.appcompat.widget.Toolbar>
 
