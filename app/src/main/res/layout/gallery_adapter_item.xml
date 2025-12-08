@@ -16,7 +16,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/transparent_white_25">
 
     <com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
         android:layout_width="match_parent"

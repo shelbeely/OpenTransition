@@ -17,11 +17,13 @@
     android:layout_marginStart="4dp"
     android:layout_marginEnd="4dp"
     app:cardCornerRadius="12dp"
-    app:cardElevation="2dp">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/transparent_white_25">
 
     <com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="6dp"
         app:ttOrientation="vertical">
 
         <androidx.appcompat.widget.AppCompatImageButton
