@@ -176,6 +176,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/home_face_images" />
 
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/home_bottom_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/transparent_white_25"
+        app:fabCradleMargin="8dp"
+        app:fabCradleRoundedCornerRadius="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/home_toolbar"
+        app:navigationIcon="@drawable/ic_photo_camera_white_24dp"
+        app:navigationContentDescription="@string/take_photo" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/home_body_images"
         android:layout_width="wrap_content"
@@ -190,19 +204,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/home_body_gallery" />
-
-    <com.google.android.material.bottomappbar.BottomAppBar
-        android:id="@+id/home_bottom_app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/transparent_white_25"
-        app:fabCradleMargin="8dp"
-        app:fabCradleRoundedCornerRadius="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:menu="@menu/home_toolbar"
-        app:navigationIcon="@drawable/ic_photo_camera_white_24dp"
-        app:navigationContentDescription="@string/take_photo" />
 
 </com.shelbeely.opentransition.ui.home.HomeView>

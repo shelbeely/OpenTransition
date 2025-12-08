@@ -41,22 +41,33 @@ For devices below Android 12, the app falls back to our custom color schemes def
 
 ### Toolbar / AppBar
 
-The home screen now uses a Material 3 `MaterialToolbar` that provides:
+The home screen now uses a Material 3 `BottomAppBar` that provides:
 
-- **Elevated design**: Follows Material 3 elevation patterns
-- **Icon actions**: Camera and settings icons integrated into the toolbar
+- **Bottom positioning**: Floating toolbar at the bottom of the screen for better thumb reach
+- **Modern design**: Follows Material 3 elevation and surface patterns
+- **Icon actions**: Camera and settings icons integrated into the bottom bar
 - **Responsive layout**: Adapts to different screen sizes
 - **Touch targets**: Meets Material accessibility guidelines (48dp minimum)
+- **FAB-ready**: Supports optional Floating Action Button integration with fab cradle
 
 **Implementation:**
 ```xml
-<com.google.android.material.appbar.MaterialToolbar
-    android:id="@+id/home_toolbar"
+<com.google.android.material.bottomappbar.BottomAppBar
+    android:id="@+id/home_bottom_app_bar"
     android:layout_width="match_parent"
-    android:layout_height="?attr/actionBarSize"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@color/transparent_white_25"
+    app:fabCradleMargin="8dp"
+    app:fabCradleRoundedCornerRadius="16dp"
     app:menu="@menu/home_toolbar"
     app:navigationIcon="@drawable/ic_photo_camera_white_24dp" />
 ```
+
+**Why Bottom AppBar?**
+- Better ergonomics on larger devices
+- Modern Material 3 design pattern
+- Prevents content overlap with status bar
+- Consistent with Material Design 3 guidelines
 
 ### Material Buttons
 
@@ -191,6 +202,46 @@ Material 3 improves accessibility with:
 - Proper content descriptions for all images and icons
 - Logical focus order
 - Meaningful labels for interactive elements
+
+## System Window Insets
+
+To prevent content from being obscured by the status bar, navigation bar, and other system UI elements, all main screens use `android:fitsSystemWindows="true"`.
+
+### What is fitsSystemWindows?
+
+The `fitsSystemWindows` attribute tells the Android system to automatically apply padding to the view to account for system bars (status bar, navigation bar, etc.). This ensures that:
+
+- Content is never hidden behind the status bar
+- UI elements are properly positioned below system UI
+- The app looks polished on all device configurations
+- Edge-to-edge display works correctly on modern devices
+
+### Implementation
+
+All root layouts in the app include this attribute:
+
+```xml
+<com.shelbeely.opentransition.ui.home.HomeView 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+    <!-- Content -->
+</com.shelbeely.opentransition.ui.home.HomeView>
+```
+
+### Affected Screens
+
+The following screens have been updated with proper system insets handling:
+
+- Home screen
+- Settings screen
+- Gallery screen
+- Add/Edit Milestone screen
+- Assign Photo screen
+- All other main navigation screens
+
+This ensures consistent spacing and prevents UI overlap across the entire app.
 
 ## Migration Guide
 
