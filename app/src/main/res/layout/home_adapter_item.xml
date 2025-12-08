@@ -12,13 +12,11 @@
 
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.OpenTransition.Card.Photo"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:layout_marginStart="4dp"
-    android:layout_marginEnd="4dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="2dp"
-    app:cardBackgroundColor="@color/transparent_white_25">
+    android:layout_marginEnd="4dp">
 
     <com.shelbeely.opentransition.ui.widget.SquareImageView
         android:id="@+id/home_adapter_item_image"

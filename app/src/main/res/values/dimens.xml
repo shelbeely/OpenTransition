@@ -15,4 +15,5 @@
     <dimen name="spacer_grid_half">8dp</dimen>
     <dimen name="edge_margin">24dp</dimen>
     <dimen name="edge_margin_small">16dp</dimen>
+    <dimen name="floating_bottom_bar_clearance">88dp</dimen>
 </resources>

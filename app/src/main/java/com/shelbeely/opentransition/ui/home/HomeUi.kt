@@ -122,7 +122,7 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         super.onAttachedToWindow()
         
         // Find BottomAppBar from parent CoordinatorLayout
-        bottomAppBar = (parent as? android.view.ViewGroup)?.findViewById(R.id.home_bottom_app_bar)
+        bottomAppBar = (parent as? androidx.coordinatorlayout.widget.CoordinatorLayout)?.findViewById(R.id.home_bottom_app_bar)
         
         setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
