@@ -25,6 +25,7 @@
     <color name="purpleColorPrimary">#977cc2</color>
     <color name="purpleColorPrimaryDark">#6f5b8f</color>
     <color name="purpleColorAccent">#9ECCF6</color>
+    <color name="purpleColorSecondaryContainer">#d4e6f7</color>
 
     <color name="greenColorPrimaryLight">#4ecc84</color>
     <color name="greenColorPrimary">#3A9963</color>
