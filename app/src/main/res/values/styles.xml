@@ -68,11 +68,4 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3.Light">
         <item name="colorControlNormal">@android:color/white</item>
     </style>
-
-    <!-- Material 3 Photo Card Style -->
-    <style name="Widget.OpenTransition.Card.Photo" parent="Widget.Material3.CardView.Elevated">
-        <item name="cardCornerRadius">12dp</item>
-        <item name="cardElevation">2dp</item>
-        <item name="cardBackgroundColor">@color/transparent_white_25</item>
-    </style>
 </resources>

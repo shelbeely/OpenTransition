@@ -62,7 +62,7 @@ sealed class HomeUiState {
 }
 
 class HomeView(context: Context, attributeSet: AttributeSet) :
-    androidx.coordinatorlayout.widget.CoordinatorLayout(context, attributeSet) {
+    ConstraintLayout(context, attributeSet) {
     private val bottomAppBar: BottomAppBar by bindView(R.id.home_bottom_app_bar)
 
     private val day: TextView by bindView(R.id.home_day_title)
@@ -120,7 +120,6 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        
         setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             return@setOnTouchListener true
