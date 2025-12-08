@@ -134,8 +134,8 @@ To enable Apple sign-in:
 If you don't want to set up Twitter and Apple sign-in, you need to modify the app code:
 
 1. Open `app/src/main/java/com/shelbeely/opentransition/ui/settings/SettingsFragment.kt`
-2. Find the `showAuth()` function (around line 631)
-3. Remove or comment out the Twitter and Apple builder lines:
+2. Find the `showAuth()` function (starts at line 631)
+3. Comment out lines 636-637 (Twitter and Apple builders):
 
 ```kotlin
 private fun showAuth() {
@@ -143,8 +143,8 @@ private fun showAuth() {
     val providers = arrayListOf(
         AuthUI.IdpConfig.EmailBuilder().build(),
         AuthUI.IdpConfig.GoogleBuilder().build(),
-        // AuthUI.IdpConfig.TwitterBuilder().build(),  // Commented out
-        // AuthUI.IdpConfig.AppleBuilder().build()     // Commented out
+        // AuthUI.IdpConfig.TwitterBuilder().build(),  // Line 636: Commented out
+        // AuthUI.IdpConfig.AppleBuilder().build()     // Line 637: Commented out
     )
 
     mainActivity.signInLauncher.launch(
@@ -153,6 +153,12 @@ private fun showAuth() {
     )
 }
 ```
+
+!!! tip "File Location"
+    The exact file path from project root is:  
+    `app/src/main/java/com/shelbeely/opentransition/ui/settings/SettingsFragment.kt`
+    
+    Lines to modify: 636-637
 
 4. Rebuild the app:
    ```bash
@@ -469,15 +475,25 @@ For Google Sign-In, you need to add SHA-1 fingerprints:
 
 #### Get Debug Keystore SHA-1
 
+The debug keystore is included in the repository at `keys/debug-keystore.jks` for development convenience:
+
 ```bash
+# From the project root directory
 keytool -list -v -keystore keys/debug-keystore.jks -alias transtracks -storepass debugkey -keypass debugkey
 ```
+
+!!! info "Debug Keystore Location"
+    The keystore path is configured in `app/build.gradle` and is relative to the project root:
+    `${rootDir}/keys/debug-keystore.jks`
 
 #### Get Release Keystore SHA-1
 
 ```bash
 keytool -list -v -keystore keys/release-keystore.jks -alias transtracks
 ```
+
+!!! warning "Release Keystore"
+    The release keystore is NOT included in the repository. You need to create your own for production releases.
 
 #### Add to Firebase
 

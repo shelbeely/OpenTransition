@@ -83,9 +83,11 @@ Then rebuild:
 **Additional Requirements**:
 - Add SHA-1 fingerprint to Firebase (for Android)
   ```bash
+  # From project root directory
   keytool -list -v -keystore keys/debug-keystore.jks \
     -alias transtracks -storepass debugkey -keypass debugkey
   ```
+  Note: The debug keystore is included in the repository at `keys/debug-keystore.jks`
 
 ### Twitter Sign-In
 
