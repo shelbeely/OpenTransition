@@ -21,6 +21,7 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomappbar.BottomAppBar
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.ui.widget.SwipeGestureListener
@@ -62,8 +63,7 @@ sealed class HomeUiState {
 
 class HomeView(context: Context, attributeSet: AttributeSet) :
     ConstraintLayout(context, attributeSet) {
-    private val takePhoto: ImageButton by bindView(R.id.home_take_photo)
-    private val settings: ImageButton by bindView(R.id.home_settings)
+    private val bottomAppBar: BottomAppBar by bindView(R.id.home_bottom_app_bar)
 
     private val day: TextView by bindView(R.id.home_day_title)
 
@@ -84,7 +84,6 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     private val eventRelay: PublishRelay<HomeUiEvent> = PublishRelay.create()
     val events: Observable<HomeUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
         Observable.mergeArray(
-            settings.clicks().toV3().map { HomeUiEvent.Settings },
             previousRecord.clicks().toV3().map { HomeUiEvent.PreviousRecord },
             nextRecord.clicks().toV3().map { HomeUiEvent.NextRecord },
             milestones.clicks().toV3().map { HomeUiEvent.Milestones(date.toEpochDay()) },
@@ -126,7 +125,19 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
             return@setOnTouchListener true
         }
 
-        takePhoto.setOnClickListener { showPhotoSourceMenu() }
+        // Set up bottom app bar navigation icon (camera) click listener
+        bottomAppBar.setNavigationOnClickListener { showPhotoSourceMenu() }
+        
+        // Set up bottom app bar menu item (settings) click listener
+        bottomAppBar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.action_settings -> {
+                    eventRelay.accept(HomeUiEvent.Settings)
+                    true
+                }
+                else -> false
+            }
+        }
 
         faceRecyclerView.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL, false
@@ -182,7 +193,7 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     }
 
     private fun showPhotoSourceMenu(currentDate: LocalDate? = null, @Photo.Type type: Int? = null) {
-        val popup = PopupMenu(context, takePhoto)
+        val popup = PopupMenu(context, bottomAppBar)
         popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             when (menuItem.itemId) {
