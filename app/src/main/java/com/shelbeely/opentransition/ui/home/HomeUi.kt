@@ -63,7 +63,7 @@ sealed class HomeUiState {
 
 class HomeView(context: Context, attributeSet: AttributeSet) :
     androidx.constraintlayout.widget.ConstraintLayout(context, attributeSet) {
-    private val bottomAppBar: BottomAppBar by bindView(R.id.home_bottom_app_bar)
+    private var bottomAppBar: BottomAppBar? = null
 
     private val day: TextView by bindView(R.id.home_day_title)
 
@@ -120,16 +120,20 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        
+        // Find BottomAppBar from parent CoordinatorLayout
+        bottomAppBar = (parent as? android.view.ViewGroup)?.findViewById(R.id.home_bottom_app_bar)
+        
         setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             return@setOnTouchListener true
         }
 
         // Set up bottom app bar navigation icon (camera) click listener
-        bottomAppBar.setNavigationOnClickListener { showPhotoSourceMenu() }
+        bottomAppBar?.setNavigationOnClickListener { showPhotoSourceMenu() }
         
         // Set up bottom app bar menu item (settings) click listener
-        bottomAppBar.setOnMenuItemClickListener { menuItem ->
+        bottomAppBar?.setOnMenuItemClickListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.action_settings -> {
                     eventRelay.accept(HomeUiEvent.Settings)
@@ -193,7 +197,8 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     }
 
     private fun showPhotoSourceMenu(currentDate: LocalDate? = null, @Photo.Type type: Int? = null) {
-        val popup = PopupMenu(context, bottomAppBar)
+        val anchor = bottomAppBar ?: return
+        val popup = PopupMenu(context, anchor)
         popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             when (menuItem.itemId) {
