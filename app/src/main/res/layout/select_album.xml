@@ -12,7 +12,7 @@
 
 <com.shelbeely.opentransition.ui.selectphoto.selectalbum.AlbumView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    
+    android:background="@drawable/gradient_background"
     android:layout_height="match_parent"
     android:layout_width="match_parent">
 
@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:text="@string/select_album"
             android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            />
+            android:textColor="@color/white_text_selector" />
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView

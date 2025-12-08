@@ -17,23 +17,6 @@
         <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:fontFamily">@font/arvo</item>
-        <!-- Fallback colors when dynamic colors are not available -->
-        <item name="colorPrimary">@color/pinkColorPrimary</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/pinkColorPrimaryLight</item>
-        <item name="colorOnPrimaryContainer">@color/pinkColorPrimaryDark</item>
-        <item name="colorSecondary">@color/pinkColorAccent</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="colorSecondaryContainer">@color/pinkColorAccent</item>
-        <item name="colorOnSecondaryContainer">@color/white</item>
-        <item name="colorTertiary">@color/pinkColorTertiary</item>
-        <item name="colorOnTertiary">@color/white</item>
-        <item name="colorTertiaryContainer">@color/pinkColorTertiaryContainer</item>
-        <item name="colorOnTertiaryContainer">@color/pinkColorPrimaryDark</item>
-        <item name="colorError">@color/errorLight</item>
-        <item name="colorOnError">@color/onErrorLight</item>
-        <item name="colorErrorContainer">@color/errorContainerLight</item>
-        <item name="colorOnErrorContainer">@color/onErrorContainerLight</item>
     </style>
 
     <style name="BlueAppTheme" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
@@ -41,23 +24,6 @@
         <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:fontFamily">@font/arvo</item>
-        <!-- Fallback colors when dynamic colors are not available -->
-        <item name="colorPrimary">@color/blueColorPrimary</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/blueColorPrimaryLight</item>
-        <item name="colorOnPrimaryContainer">@color/blueColorPrimaryDark</item>
-        <item name="colorSecondary">@color/blueColorAccent</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="colorSecondaryContainer">@color/blueColorAccent</item>
-        <item name="colorOnSecondaryContainer">@color/white</item>
-        <item name="colorTertiary">@color/blueColorTertiary</item>
-        <item name="colorOnTertiary">@color/white</item>
-        <item name="colorTertiaryContainer">@color/blueColorTertiaryContainer</item>
-        <item name="colorOnTertiaryContainer">@color/blueColorPrimaryDark</item>
-        <item name="colorError">@color/errorLight</item>
-        <item name="colorOnError">@color/onErrorLight</item>
-        <item name="colorErrorContainer">@color/errorContainerLight</item>
-        <item name="colorOnErrorContainer">@color/onErrorContainerLight</item>
     </style>
 
     <style name="PurpleAppTheme" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
@@ -65,23 +31,6 @@
         <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:fontFamily">@font/arvo</item>
-        <!-- Fallback colors when dynamic colors are not available -->
-        <item name="colorPrimary">@color/purpleColorPrimary</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/purpleColorPrimaryLight</item>
-        <item name="colorOnPrimaryContainer">@color/purpleColorPrimaryDark</item>
-        <item name="colorSecondary">@color/purpleColorAccent</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="colorSecondaryContainer">@color/purpleColorAccent</item>
-        <item name="colorOnSecondaryContainer">@color/white</item>
-        <item name="colorTertiary">@color/purpleColorTertiary</item>
-        <item name="colorOnTertiary">@color/white</item>
-        <item name="colorTertiaryContainer">@color/purpleColorTertiaryContainer</item>
-        <item name="colorOnTertiaryContainer">@color/purpleColorPrimaryDark</item>
-        <item name="colorError">@color/errorLight</item>
-        <item name="colorOnError">@color/onErrorLight</item>
-        <item name="colorErrorContainer">@color/errorContainerLight</item>
-        <item name="colorOnErrorContainer">@color/onErrorContainerLight</item>
     </style>
 
     <style name="GreenAppTheme" parent="Theme.Material3.DynamicColors.Light.NoActionBar">
@@ -89,22 +38,5 @@
         <item name="actionModeCloseDrawable">@drawable/ic_close_black_24dp</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="android:fontFamily">@font/arvo</item>
-        <!-- Fallback colors when dynamic colors are not available -->
-        <item name="colorPrimary">@color/greenColorPrimary</item>
-        <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/greenColorPrimaryLight</item>
-        <item name="colorOnPrimaryContainer">@color/greenColorPrimaryDark</item>
-        <item name="colorSecondary">@color/greenColorAccent</item>
-        <item name="colorOnSecondary">@color/white</item>
-        <item name="colorSecondaryContainer">@color/greenColorAccent</item>
-        <item name="colorOnSecondaryContainer">@color/white</item>
-        <item name="colorTertiary">@color/greenColorTertiary</item>
-        <item name="colorOnTertiary">@color/white</item>
-        <item name="colorTertiaryContainer">@color/greenColorTertiaryContainer</item>
-        <item name="colorOnTertiaryContainer">@color/greenColorPrimaryDark</item>
-        <item name="colorError">@color/errorLight</item>
-        <item name="colorOnError">@color/onErrorLight</item>
-        <item name="colorErrorContainer">@color/errorContainerLight</item>
-        <item name="colorOnErrorContainer">@color/onErrorContainerLight</item>
     </style>
 </resources>
