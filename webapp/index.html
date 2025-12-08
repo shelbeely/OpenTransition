@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="OpenTransition - A transition tracking web application for transgender people">
+    <meta name="theme-color" content="#6200EE">
+    <title>OpenTransition</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="images/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="images/icon-512.png">
+    <link rel="apple-touch-icon" href="images/icon-192.png">
+    
+    <!-- Material Design Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- App Bar -->
+    <header class="app-bar">
+        <button class="menu-btn" id="menuBtn">
+            <i class="material-icons">menu</i>
+        </button>
+        <h1 class="app-title">OpenTransition</h1>
+        <button class="icon-btn" id="settingsBtn">
+            <i class="material-icons">settings</i>
+        </button>
+    </header>
+
+    <!-- Navigation Drawer -->
+    <nav class="nav-drawer" id="navDrawer">
+        <div class="nav-header">
+            <h2>OpenTransition</h2>
+        </div>
+        <ul class="nav-menu">
+            <li class="nav-item active" data-view="home">
+                <i class="material-icons">home</i>
+                <span>Home</span>
+            </li>
+            <li class="nav-item" data-view="gallery">
+                <i class="material-icons">photo_library</i>
+                <span>Gallery</span>
+            </li>
+            <li class="nav-item" data-view="milestones">
+                <i class="material-icons">flag</i>
+                <span>Milestones</span>
+            </li>
+            <li class="nav-item" data-view="settings">
+                <i class="material-icons">settings</i>
+                <span>Settings</span>
+            </li>
+            <li class="nav-item" data-view="about">
+                <i class="material-icons">info</i>
+                <span>About</span>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home View -->
+        <div id="homeView" class="view active">
+            <div class="welcome-section">
+                <h2>Welcome to OpenTransition</h2>
+                <p>Track your journey with photos and milestones</p>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-card" id="addPhotoBtn">
+                    <i class="material-icons">add_a_photo</i>
+                    <span>Add Photo</span>
+                </button>
+                <button class="action-card" id="addMilestoneBtn">
+                    <i class="material-icons">add</i>
+                    <span>Add Milestone</span>
+                </button>
+            </div>
+
+            <div class="stats-section">
+                <div class="stat-card">
+                    <h3 id="photoCount">0</h3>
+                    <p>Photos</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="milestoneCount">0</h3>
+                    <p>Milestones</p>
+                </div>
+            </div>
+
+            <div class="recent-section">
+                <h3>Recent Photos</h3>
+                <div id="recentPhotos" class="photo-grid"></div>
+            </div>
+        </div>
+
+        <!-- Gallery View -->
+        <div id="galleryView" class="view">
+            <div class="view-header">
+                <h2>Photo Gallery</h2>
+                <div class="filter-buttons">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="face">Face</button>
+                    <button class="filter-btn" data-filter="body">Body</button>
+                </div>
+            </div>
+            <div id="galleryGrid" class="photo-grid"></div>
+        </div>
+
+        <!-- Milestones View -->
+        <div id="milestonesView" class="view">
+            <div class="view-header">
+                <h2>Milestones</h2>
+                <button class="fab" id="fabAddMilestone">
+                    <i class="material-icons">add</i>
+                </button>
+            </div>
+            <div id="milestonesList" class="milestones-list"></div>
+        </div>
+
+        <!-- Settings View -->
+        <div id="settingsView" class="view">
+            <h2>Settings</h2>
+            <div class="settings-section">
+                <h3>Privacy</h3>
+                <div class="setting-item">
+                    <label for="enableLock">Enable App Lock</label>
+                    <input type="checkbox" id="enableLock">
+                </div>
+                <div class="setting-item" id="lockPinSection" style="display: none;">
+                    <label for="lockPin">PIN Code</label>
+                    <input type="password" id="lockPin" maxlength="4" pattern="\d{4}" placeholder="Enter 4-digit PIN">
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Data Management</h3>
+                <button class="setting-btn" id="exportDataBtn">
+                    <i class="material-icons">download</i>
+                    <span>Export Data</span>
+                </button>
+                <button class="setting-btn" id="importDataBtn">
+                    <i class="material-icons">upload</i>
+                    <span>Import Data</span>
+                </button>
+                <button class="setting-btn danger" id="clearDataBtn">
+                    <i class="material-icons">delete_forever</i>
+                    <span>Clear All Data</span>
+                </button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Theme</h3>
+                <div class="setting-item">
+                    <label for="themeSelect">App Theme</label>
+                    <select id="themeSelect">
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="auto">Auto (System)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- About View -->
+        <div id="aboutView" class="view">
+            <h2>About OpenTransition</h2>
+            <div class="about-content">
+                <p><strong>Version:</strong> 1.0.0 (Web)</p>
+                <p>OpenTransition is a transition tracking application made specifically for transgender people, focusing on photo tracking and milestone management.</p>
+                <p>This web version provides the same core features as the Android app, with all data stored locally on your device for maximum privacy.</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>📸 Photo tracking (face, body, custom areas)</li>
+                    <li>🎯 Milestone management</li>
+                    <li>🖼️ Gallery view with filtering</li>
+                    <li>🔒 Privacy-focused with app lock</li>
+                    <li>💾 Export and import your data</li>
+                    <li>📱 Works offline as a Progressive Web App</li>
+                </ul>
+
+                <h3>Privacy</h3>
+                <p>All your photos and data are stored locally on your device. Nothing is uploaded to any server unless you explicitly choose to export your data.</p>
+
+                <h3>License</h3>
+                <p>OpenTransition is free and open source software licensed under GPL v3.</p>
+                <p>&copy; 2018-2024 OpenTransition Contributors</p>
+                
+                <div class="about-links">
+                    <a href="https://github.com/shelbeely/OpenTransition" target="_blank" rel="noopener">
+                        <i class="material-icons">code</i>
+                        View on GitHub
+                    </a>
+                    <a href="https://shelbeely.github.io/OpenTransition" target="_blank" rel="noopener">
+                        <i class="material-icons">article</i>
+                        Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Overlay for drawer -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Photo Dialog -->
+    <dialog id="photoDialog" class="dialog">
+        <div class="dialog-header">
+            <h3>Add Photo</h3>
+            <button class="close-btn" onclick="document.getElementById('photoDialog').close()">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+        <div class="dialog-content">
+            <div class="photo-input-section">
+                <input type="file" id="photoInput" accept="image/*" capture="environment">
+                <label for="photoInput" class="photo-input-label">
+                    <i class="material-icons">add_a_photo</i>
+                    <span>Choose or Take Photo</span>
+                </label>
+                <div id="photoPreview" class="photo-preview"></div>
+            </div>
+            <div class="form-group">
+                <label for="photoType">Photo Type</label>
+                <select id="photoType">
+                    <option value="face">Face</option>
+                    <option value="body">Body</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="photoDate">Date</label>
+                <input type="date" id="photoDate">
+            </div>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn-secondary" onclick="document.getElementById('photoDialog').close()">Cancel</button>
+            <button class="btn-primary" id="savePhotoBtn">Save Photo</button>
+        </div>
+    </dialog>
+
+    <!-- Milestone Dialog -->
+    <dialog id="milestoneDialog" class="dialog">
+        <div class="dialog-header">
+            <h3 id="milestoneDialogTitle">Add Milestone</h3>
+            <button class="close-btn" onclick="document.getElementById('milestoneDialog').close()">
+                <i class="material-icons">close</i>
+            </button>
+        </div>
+        <div class="dialog-content">
+            <div class="form-group">
+                <label for="milestoneTitle">Title</label>
+                <input type="text" id="milestoneTitle" required>
+            </div>
+            <div class="form-group">
+                <label for="milestoneDescription">Description</label>
+                <textarea id="milestoneDescription" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="milestoneDate">Date</label>
+                <input type="date" id="milestoneDate">
+            </div>
+        </div>
+        <div class="dialog-actions">
+            <button class="btn-secondary" onclick="document.getElementById('milestoneDialog').close()">Cancel</button>
+            <button class="btn-primary" id="saveMilestoneBtn">Save Milestone</button>
+        </div>
+    </dialog>
+
+    <!-- Lock Screen -->
+    <div id="lockScreen" class="lock-screen" style="display: none;">
+        <div class="lock-content">
+            <i class="material-icons lock-icon">lock</i>
+            <h2>Enter PIN</h2>
+            <div class="pin-input">
+                <input type="password" id="unlockPin" maxlength="4" pattern="\d{4}" inputmode="numeric" autocomplete="off">
+            </div>
+            <button class="btn-primary" id="unlockBtn">Unlock</button>
+        </div>
+    </div>
+
+    <!-- Toast for notifications -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Scripts -->
+    <script src="js/db.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/sw-register.js"></script>
+</body>
+</html>
