@@ -68,6 +68,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/add_milestone_title_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:hint="@string/add_milestone_title_hint"
@@ -107,7 +108,7 @@
 
             <Button
                 android:id="@+id/add_milestone_date"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:gravity="end"
@@ -141,6 +142,7 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/add_milestone_description_layout"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:hint="@string/add_milestone_description_hint"
@@ -170,7 +172,7 @@
 
     <Button
         android:id="@+id/add_milestone_save"
-        style="@style/Base.Widget.AppCompat.Button.Colored"
+        style="@style/Widget.Material3.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"

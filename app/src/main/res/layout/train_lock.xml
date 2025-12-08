@@ -72,6 +72,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/lock_code_layout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -93,7 +94,7 @@
 
     <Button
         android:id="@+id/lock_go"
-        style="@style/Widget.AppCompat.Button.Colored"
+        style="@style/Widget.Material3.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"

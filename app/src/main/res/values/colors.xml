@@ -31,6 +31,24 @@
     <color name="greenColorPrimaryDark">#276642</color>
     <color name="greenColorAccent">#57acd4</color>
 
+    <!-- Material 3 Tertiary Colors -->
+    <color name="pinkColorTertiary">#b8a5c6</color>
+    <color name="pinkColorTertiaryContainer">#ddd4e6</color>
+    <color name="blueColorTertiary">#b5c7d9</color>
+    <color name="blueColorTertiaryContainer">#dae4ed</color>
+    <color name="purpleColorTertiary">#a3b5c9</color>
+    <color name="purpleColorTertiaryContainer">#d1dce8</color>
+    <color name="greenColorTertiary">#6ba988</color>
+    <color name="greenColorTertiaryContainer">#c4e4d5</color>
+
+    <!-- Material 3 Surface and Error Colors -->
+    <color name="surfaceLight">#fef7ff</color>
+    <color name="surfaceVariantLight">#e7e0ec</color>
+    <color name="errorLight">#ba1a1a</color>
+    <color name="errorContainerLight">#ffdad6</color>
+    <color name="onErrorLight">#ffffff</color>
+    <color name="onErrorContainerLight">#410002</color>
+
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
     <color name="black_30">#4D000000</color>
