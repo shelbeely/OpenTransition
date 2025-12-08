@@ -20,7 +20,7 @@
         <item name="colorOnPrimaryContainer">@color/pinkColorPrimaryLight</item>
         <item name="colorSecondary">@color/pinkColorAccent</item>
         <item name="colorOnSecondary">@color/black</item>
-        <item name="colorSecondaryContainer">@color/blueColorPrimaryDark</item>
+        <item name="colorSecondaryContainer">@color/pinkColorPrimaryDark</item>
         <item name="colorOnSecondaryContainer">@color/pinkColorAccent</item>
     </style>
 
@@ -31,7 +31,7 @@
         <item name="colorOnPrimaryContainer">@color/blueColorPrimaryLight</item>
         <item name="colorSecondary">@color/blueColorAccent</item>
         <item name="colorOnSecondary">@color/black</item>
-        <item name="colorSecondaryContainer">@color/pinkColorPrimaryDark</item>
+        <item name="colorSecondaryContainer">@color/blueColorPrimaryDark</item>
         <item name="colorOnSecondaryContainer">@color/blueColorAccent</item>
     </style>
 
