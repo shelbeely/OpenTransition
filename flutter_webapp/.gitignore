@@ -1,0 +1,43 @@
+# Flutter/Dart specific
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+flutter_*.png
+
+# IntelliJ
+*.iml
+.idea/
+
+# Android Studio
+*.iml
+.android/
+.gradle/
+local.properties
+gradle.properties
+*.jks
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Web
+web/flutter_service_worker.js
+web/flutter.js
+
+# Coverage
+coverage/
+
+# Exceptions
+!**/ios/**/default.mode1v3
+!**/ios/**/default.mode2v3
+!**/ios/**/default.pbxuser
+!**/ios/**/default.perspectivev3
