@@ -1,19 +1,19 @@
-/* Material 3 Design Tokens - Android App Purple Theme */
+/* Material 3 Design Tokens - Clean Purple Theme (No Gradients) */
 :root {
     /* Material 3 Color System - Light Theme (Purple) */
-    --md-sys-color-primary: #977cc2;
+    --md-sys-color-primary: #6750A4;
     --md-sys-color-on-primary: #FFFFFF;
-    --md-sys-color-primary-container: #be9df5;
-    --md-sys-color-on-primary-container: #6f5b8f;
+    --md-sys-color-primary-container: #EADDFF;
+    --md-sys-color-on-primary-container: #21005D;
     
     --md-sys-color-secondary: #625B71;
     --md-sys-color-on-secondary: #FFFFFF;
     --md-sys-color-secondary-container: #E8DEF8;
     --md-sys-color-on-secondary-container: #1D192B;
     
-    --md-sys-color-tertiary: #9ECCF6;
+    --md-sys-color-tertiary: #7D5260;
     --md-sys-color-on-tertiary: #FFFFFF;
-    --md-sys-color-tertiary-container: #D4E7F6;
+    --md-sys-color-tertiary-container: #FFD8E4;
     --md-sys-color-on-tertiary-container: #31111D;
     
     --md-sys-color-error: #B3261E;
@@ -21,11 +21,11 @@
     --md-sys-color-error-container: #F9DEDC;
     --md-sys-color-on-error-container: #410E0B;
     
-    /* Purple gradient background like Android app */
-    --md-sys-color-background: linear-gradient(225deg, #977cc2 0%, #be9df5 50%, #9ECCF6 100%);
+    /* Clean surface backgrounds - no gradients */
+    --md-sys-color-background: #FEF7FF;
     --md-sys-color-on-background: #1D1B20;
     
-    --md-sys-color-surface: #FFFFFF;
+    --md-sys-color-surface: #FEF7FF;
     --md-sys-color-on-surface: #1D1B20;
     --md-sys-color-surface-variant: #E7E0EC;
     --md-sys-color-on-surface-variant: #49454F;
@@ -33,15 +33,16 @@
     --md-sys-color-outline: #79747E;
     --md-sys-color-outline-variant: #CAC4D0;
     
-    --md-sys-color-inverse-surface: #E6E0E9;
-    --md-sys-color-inverse-on-surface: #322F35;
-    --md-sys-color-inverse-primary: #977cc2;
+    --md-sys-color-inverse-surface: #322F35;
+    --md-sys-color-inverse-on-surface: #F5EFF7;
+    --md-sys-color-inverse-primary: #D0BCFF;
     
-    --md-sys-color-surface-container-lowest: rgba(255, 255, 255, 0.95);
-    --md-sys-color-surface-container-low: rgba(255, 255, 255, 0.85);
-    --md-sys-color-surface-container: rgba(255, 255, 255, 0.75);
-    --md-sys-color-surface-container-high: rgba(255, 255, 255, 0.65);
-    --md-sys-color-surface-container-highest: rgba(255, 255, 255, 0.55);
+    /* Material 3 Surface Container Tonal Surfaces */
+    --md-sys-color-surface-container-lowest: #FFFFFF;
+    --md-sys-color-surface-container-low: #F7F2FA;
+    --md-sys-color-surface-container: #F3EDF7;
+    --md-sys-color-surface-container-high: #ECE6F0;
+    --md-sys-color-surface-container-highest: #E6E0E9;
     
     /* Material 3 Elevation */
     --md-sys-elevation-level0: none;
@@ -131,22 +132,21 @@
 
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(225deg, #977cc2 0%, #be9df5 50%, #9ECCF6 100%);
-    background-attachment: fixed;
+    background-color: var(--md-sys-color-background);
     color: var(--on-background);
     overflow-x: hidden;
     min-height: 100vh;
 }
 
-/* App Bar - Material 3 Top App Bar with Purple Theme */
+/* App Bar - Material 3 Top App Bar (Surface) */
 .app-bar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     height: 64px;
-    background-color: var(--md-sys-color-primary);
-    color: var(--md-sys-color-on-primary);
+    background-color: var(--md-sys-color-surface);
+    color: var(--md-sys-color-on-surface);
     display: flex;
     align-items: center;
     padding: 0 4px 0 4px;
@@ -157,7 +157,7 @@ body {
 .menu-btn {
     background: none;
     border: none;
-    color: var(--md-sys-color-on-primary);
+    color: var(--md-sys-color-on-surface-variant);
     cursor: pointer;
     padding: 12px;
     margin: 0 4px;
@@ -171,7 +171,7 @@ body {
 }
 
 .menu-btn:hover {
-    background-color: rgba(255, 255, 255, 0.12);
+    background-color: var(--md-sys-color-secondary-container);
 }
 
 .app-title {
@@ -180,13 +180,13 @@ body {
     font-weight: 400;
     letter-spacing: 0;
     margin-left: 8px;
-    color: var(--md-sys-color-on-primary);
+    color: var(--md-sys-color-on-surface);
 }
 
 .icon-btn {
     background: none;
     border: none;
-    color: var(--md-sys-color-on-primary);
+    color: var(--md-sys-color-on-surface-variant);
     cursor: pointer;
     padding: 12px;
     margin: 0 4px;
@@ -200,7 +200,7 @@ body {
 }
 
 .icon-btn:hover {
-    background-color: rgba(255, 255, 255, 0.12);
+    background-color: var(--md-sys-color-secondary-container);
 }
 
 /* Navigation Drawer - Material 3 Modal Navigation Drawer */
@@ -332,10 +332,9 @@ body {
     margin-bottom: 24px;
 }
 
-/* Material 3 Cards - Semi-transparent white like Android */
+/* Material 3 Cards - Clean Surface Design */
 .action-card {
-    background-color: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
+    background-color: var(--md-sys-color-surface-container-high);
     border: none;
     border-radius: var(--md-sys-shape-corner-medium);
     padding: 24px;
@@ -349,7 +348,7 @@ body {
 }
 
 .action-card:hover {
-    background-color: rgba(255, 255, 255, 0.35);
+    background-color: var(--md-sys-color-surface-container-highest);
     box-shadow: var(--md-sys-elevation-level2);
     transform: translateY(-2px);
 }
@@ -379,8 +378,7 @@ body {
 }
 
 .stat-card {
-    background-color: rgba(255, 255, 255, 0.25);
-    backdrop-filter: blur(10px);
+    background-color: var(--md-sys-color-surface-container);
     border-radius: var(--md-sys-shape-corner-medium);
     padding: 24px;
     text-align: center;
