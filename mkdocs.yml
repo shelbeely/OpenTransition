@@ -83,6 +83,7 @@ nav:
       - Building the App: getting-started/building.md
     - Architecture:
       - Overview: architecture/overview.md
+      - Flutter Migration Assessment: architecture/flutter-migration.md
       - Data Layer: architecture/data-layer.md
       - Domain Layer: architecture/domain-layer.md
       - UI Layer: architecture/ui-layer.md
