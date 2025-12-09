@@ -1,5 +1,11 @@
 // Main application logic for OpenTransition Web App
 
+// Constants
+const PHOTO_TYPE_FACE = 'face';
+const PHOTO_TYPE_BODY = 'body';
+const ANDROID_PHOTO_TYPE_FACE = 0;
+const ANDROID_PHOTO_TYPE_BODY = 1;
+
 class OpenTransitionApp {
     constructor() {
         this.currentView = 'home';
@@ -554,9 +560,9 @@ class OpenTransitionApp {
         }
 
         try {
-            // Load JSZip library dynamically
+            // Check if JSZip is available (loaded from CDN in HTML)
             if (typeof JSZip === 'undefined') {
-                await this.loadJSZip();
+                throw new Error('JSZip library not loaded. Please refresh the page and try again.');
             }
 
             const arrayBuffer = await file.arrayBuffer();
@@ -612,7 +618,7 @@ class OpenTransitionApp {
                             id: androidPhoto.id,
                             timestamp: androidPhoto.timestamp,
                             epochDay: androidPhoto.epochDay,
-                            type: androidPhoto.type === 0 ? 'face' : 'body',
+                            type: androidPhoto.type === ANDROID_PHOTO_TYPE_FACE ? PHOTO_TYPE_FACE : PHOTO_TYPE_BODY,
                             dataUrl: dataUrl
                         };
                         webData.photos.push(webPhoto);
@@ -664,17 +670,6 @@ class OpenTransitionApp {
             reader.onloadend = () => resolve(reader.result);
             reader.onerror = reject;
             reader.readAsDataURL(blob);
-        });
-    }
-
-    async loadJSZip() {
-        // Load JSZip library from CDN
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Failed to load JSZip library'));
-            document.head.appendChild(script);
         });
     }
 
