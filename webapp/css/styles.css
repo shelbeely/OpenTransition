@@ -1030,3 +1030,681 @@ dialog::backdrop {
         justify-content: center;
     }
 }
+
+/* ============================================
+   MAXIMAL MATERIAL 3 COMPONENTS
+   Following https://m3.material.io/ guidelines
+   ============================================ */
+
+/* Extended FAB - Material 3 */
+.fab-extended {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    min-width: 80px;
+    height: 56px;
+    border-radius: var(--md-sys-shape-corner-large);
+    background-color: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+    border: none;
+    box-shadow: var(--md-sys-elevation-level3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
+    z-index: 90;
+}
+
+.fab-extended:hover {
+    box-shadow: var(--md-sys-elevation-level4);
+}
+
+.fab-extended:active {
+    box-shadow: var(--md-sys-elevation-level3);
+}
+
+.fab-extended i {
+    font-size: 24px;
+}
+
+/* Small FAB */
+.fab-small {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--md-sys-shape-corner-medium);
+    background-color: var(--md-sys-color-tertiary-container);
+    color: var(--md-sys-color-on-tertiary-container);
+    border: none;
+    box-shadow: var(--md-sys-elevation-level3);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
+}
+
+.fab-small:hover {
+    box-shadow: var(--md-sys-elevation-level4);
+}
+
+.fab-small i {
+    font-size: 24px;
+}
+
+/* Material 3 Chips */
+.chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+/* Filter Chip */
+.chip-filter {
+    height: 32px;
+    padding: 0 16px;
+    border-radius: var(--md-sys-shape-corner-small);
+    border: 1px solid var(--md-sys-color-outline);
+    background-color: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chip-filter:hover {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+.chip-filter.selected {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    border-color: transparent;
+    box-shadow: var(--md-sys-elevation-level1);
+}
+
+.chip-filter i {
+    font-size: 18px;
+}
+
+/* Input Chip */
+.chip-input {
+    height: 32px;
+    padding: 0 4px 0 12px;
+    border-radius: var(--md-sys-shape-corner-small);
+    border: 1px solid var(--md-sys-color-outline);
+    background-color: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chip-input .chip-remove {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.chip-input .chip-remove:hover {
+    background-color: var(--md-sys-color-on-surface-variant);
+    color: var(--md-sys-color-surface);
+}
+
+.chip-input .chip-remove i {
+    font-size: 14px;
+}
+
+/* Segmented Buttons - Material 3 */
+.segmented-button-group {
+    display: flex;
+    border-radius: 20px;
+    border: 1px solid var(--md-sys-color-outline);
+    overflow: hidden;
+    height: 40px;
+    margin-bottom: 16px;
+}
+
+.segmented-button {
+    flex: 1;
+    background-color: transparent;
+    color: var(--md-sys-color-on-surface);
+    border: none;
+    border-right: 1px solid var(--md-sys-color-outline);
+    padding: 0 12px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.1px;
+    transition: all 0.2s cubic-bezier(0.2, 0.0, 0, 1.0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 48px;
+}
+
+.segmented-button:last-child {
+    border-right: none;
+}
+
+.segmented-button:hover {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+.segmented-button.selected {
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.segmented-button i {
+    font-size: 18px;
+}
+
+/* Progress Indicators - Material 3 */
+.progress-linear {
+    width: 100%;
+    height: 4px;
+    background-color: var(--md-sys-color-surface-variant);
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-linear-bar {
+    height: 100%;
+    background-color: var(--md-sys-color-primary);
+    transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.progress-linear-indeterminate .progress-linear-bar {
+    width: 30%;
+    animation: progress-indeterminate 2s infinite cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+@keyframes progress-indeterminate {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(400%);
+    }
+}
+
+.progress-circular {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 4px solid var(--md-sys-color-surface-variant);
+    border-top-color: var(--md-sys-color-primary);
+    animation: progress-spin 1s linear infinite;
+}
+
+@keyframes progress-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.progress-circular-small {
+    width: 24px;
+    height: 24px;
+    border-width: 3px;
+}
+
+/* Badges - Material 3 */
+.badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 8px;
+    background-color: var(--md-sys-color-error);
+    color: var(--md-sys-color-on-error);
+    font-size: 11px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+.badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background-color: var(--md-sys-color-error);
+    padding: 0;
+    min-width: 6px;
+}
+
+.badge-large {
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    font-size: 12px;
+    padding: 0 6px;
+}
+
+/* Material 3 Lists */
+.list-item {
+    min-height: 56px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-radius: var(--md-sys-shape-corner-none);
+}
+
+.list-item:hover {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+.list-item-leading {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.list-item-leading i {
+    font-size: 24px;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.list-item-leading img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.list-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.list-item-headline {
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    color: var(--md-sys-color-on-surface);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.list-item-supporting {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 0.25px;
+    color: var(--md-sys-color-on-surface-variant);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-top: 4px;
+}
+
+.list-item-trailing {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.list-item-trailing .meta {
+    font-size: 12px;
+    color: var(--md-sys-color-on-surface-variant);
+    letter-spacing: 0.4px;
+}
+
+/* Two-line list item */
+.list-item-two-line {
+    min-height: 72px;
+}
+
+/* Three-line list item */
+.list-item-three-line {
+    min-height: 88px;
+    padding: 12px 16px;
+}
+
+.list-item-three-line .list-item-supporting {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Dividers - Material 3 */
+.divider {
+    height: 1px;
+    background-color: var(--md-sys-color-outline-variant);
+    margin: 0;
+}
+
+.divider-inset {
+    margin-left: 56px;
+}
+
+.divider-middle {
+    margin: 0 16px;
+}
+
+/* Search Bar - Material 3 */
+.search-bar {
+    height: 56px;
+    border-radius: 28px;
+    background-color: var(--md-sys-color-surface-container-high);
+    box-shadow: var(--md-sys-elevation-level3);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 16px;
+    margin-bottom: 16px;
+    transition: background-color 0.2s;
+}
+
+.search-bar:focus-within {
+    background-color: var(--md-sys-color-surface-container-highest);
+}
+
+.search-bar input {
+    flex: 1;
+    border: none;
+    background: none;
+    outline: none;
+    font-size: 16px;
+    color: var(--md-sys-color-on-surface);
+    letter-spacing: 0.5px;
+}
+
+.search-bar input::placeholder {
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.search-bar i {
+    color: var(--md-sys-color-on-surface-variant);
+    cursor: pointer;
+}
+
+.search-bar i:hover {
+    color: var(--md-sys-color-on-surface);
+}
+
+/* Icon Buttons - Material 3 Variants */
+.icon-button-filled {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-button-filled:hover {
+    box-shadow: var(--md-sys-elevation-level1);
+}
+
+.icon-button-tonal {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-button-tonal:hover {
+    box-shadow: var(--md-sys-elevation-level1);
+}
+
+.icon-button-outlined {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    border: 1px solid var(--md-sys-color-outline);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-button-outlined:hover {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+.icon-button-standard {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: transparent;
+    color: var(--md-sys-color-on-surface-variant);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.icon-button-standard:hover {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+/* Bottom Navigation - Material 3 */
+.bottom-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background-color: var(--md-sys-color-surface-container);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    box-shadow: 0px -1px 0px 0px var(--md-sys-color-outline-variant);
+    z-index: 100;
+    padding: 0 8px;
+}
+
+.bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 12px 12px 16px 12px;
+    border-radius: var(--md-sys-shape-corner-medium);
+    transition: background-color 0.2s;
+    min-width: 64px;
+    max-width: 120px;
+    flex: 1;
+    position: relative;
+}
+
+.bottom-nav-item:hover {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+.bottom-nav-item.active {
+    background-color: var(--md-sys-color-secondary-container);
+}
+
+.bottom-nav-item i {
+    font-size: 24px;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.bottom-nav-item.active i {
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.bottom-nav-item .label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.bottom-nav-item.active .label {
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+/* Bottom Sheet - Material 3 */
+.bottom-sheet {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: var(--md-sys-color-surface-container-low);
+    border-radius: var(--md-sys-shape-corner-extra-large) var(--md-sys-shape-corner-extra-large) 0 0;
+    box-shadow: var(--md-sys-elevation-level1);
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 200;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.bottom-sheet.open {
+    transform: translateY(0);
+}
+
+.bottom-sheet-handle {
+    width: 32px;
+    height: 4px;
+    background-color: var(--md-sys-color-on-surface-variant);
+    border-radius: 2px;
+    margin: 12px auto;
+    opacity: 0.4;
+}
+
+.bottom-sheet-content {
+    padding: 0 16px 24px 16px;
+}
+
+/* State Layers - Material 3 */
+.state-layer {
+    position: relative;
+    overflow: hidden;
+}
+
+.state-layer::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: currentColor;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+}
+
+.state-layer:hover::before {
+    opacity: 0.08;
+}
+
+.state-layer:focus::before {
+    opacity: 0.12;
+}
+
+.state-layer:active::before {
+    opacity: 0.12;
+}
+
+/* Motion Tokens - Material 3 */
+.motion-emphasized {
+    transition-timing-function: cubic-bezier(0.2, 0.0, 0, 1.0);
+}
+
+.motion-standard {
+    transition-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1.0);
+}
+
+.motion-decelerate {
+    transition-timing-function: cubic-bezier(0.0, 0.0, 0.2, 1.0);
+}
+
+.motion-accelerate {
+    transition-timing-function: cubic-bezier(0.4, 0.0, 1.0, 1.0);
+}
+
+.duration-short {
+    transition-duration: 100ms;
+}
+
+.duration-medium {
+    transition-duration: 250ms;
+}
+
+.duration-long {
+    transition-duration: 400ms;
+}
+
+.duration-extra-long {
+    transition-duration: 600ms;
+}
+
+/* Responsive adjustments for maximal M3 */
+@media (max-width: 768px) {
+    .main-content {
+        margin-bottom: 80px; /* Space for bottom navigation */
+    }
+    
+    .fab-extended {
+        bottom: 96px; /* Above bottom navigation */
+    }
+}
+
+@media (min-width: 768px) {
+    .bottom-navigation {
+        display: none; /* Hide on desktop, use drawer instead */
+    }
+    
+    .search-bar {
+        max-width: 600px;
+    }
+}
