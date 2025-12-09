@@ -28,6 +28,7 @@ python3 -m http.server 8000
 - 🔒 PIN-based app lock
 - 💾 Data export/import
 - 🌙 Light/Dark/Auto themes
+- 📱 **Import Android app backups** (.ttbackup files)
 
 ✅ **Web-Specific Benefits:**
 - Works on any device (Windows, Mac, Linux, iOS, Android)
@@ -35,6 +36,7 @@ python3 -m http.server 8000
 - Offline support via Service Worker
 - 100% local data storage (privacy-first)
 - Automatic backups via export
+- **Seamless migration from Android app**
 
 ## Architecture
 
@@ -119,11 +121,17 @@ Upload the `webapp/` directory to any static hosting service:
 | Gallery View | ✅ | ✅ |
 | App Lock | ✅ | ✅ (PIN only) |
 | Data Export | ✅ | ✅ |
+| **Import Android Backups** | N/A | ✅ |
 | Offline Support | ✅ | ✅ |
 | Firebase Sync | ✅ | ❌ |
 | Camera Integration | ✅ Native | ✅ Web API |
 | Photo Comparison | ✅ | 📋 Future |
 | Cloud Backup | ✅ | ❌ (Manual export) |
+
+**Migration Path:** Users can easily migrate from the Android app to the web app by:
+1. Creating a backup in the Android app (Settings → Export)
+2. Transferring the `.ttbackup` file to their device
+3. Importing it in the web app (Settings → Import Data)
 
 ## Development
 

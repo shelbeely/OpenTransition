@@ -514,23 +514,29 @@ class OpenTransitionApp {
     async importData() {
         const input = document.createElement('input');
         input.type = 'file';
-        input.accept = 'application/json';
+        input.accept = 'application/json,.ttbackup,.zip';
         
         input.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
 
             try {
-                const text = await file.text();
-                const data = JSON.parse(text);
-                
-                if (confirm('This will replace all existing data. Are you sure?')) {
-                    await db.importData(data);
-                    this.showToast('Data imported successfully');
-                    await this.loadData();
+                // Check if it's a ZIP/ttbackup file (Android backup) or JSON (web backup)
+                if (file.name.endsWith('.ttbackup') || file.name.endsWith('.zip')) {
+                    await this.importAndroidBackup(file);
+                } else {
+                    // Web app JSON format
+                    const text = await file.text();
+                    const data = JSON.parse(text);
                     
-                    if (this.currentView === 'home') {
-                        await this.loadHome();
+                    if (confirm('This will replace all existing data. Are you sure?')) {
+                        await db.importData(data);
+                        this.showToast('Data imported successfully');
+                        await this.loadData();
+                        
+                        if (this.currentView === 'home') {
+                            await this.loadHome();
+                        }
                     }
                 }
             } catch (error) {
@@ -540,6 +546,136 @@ class OpenTransitionApp {
         };
         
         input.click();
+    }
+
+    async importAndroidBackup(file) {
+        if (!confirm('This will replace all existing data with the Android app backup. Are you sure?')) {
+            return;
+        }
+
+        try {
+            // Load JSZip library dynamically
+            if (typeof JSZip === 'undefined') {
+                await this.loadJSZip();
+            }
+
+            const arrayBuffer = await file.arrayBuffer();
+            const zip = await JSZip.loadAsync(arrayBuffer);
+            
+            // Extract data.json from the zip
+            const dataJsonFile = zip.file('data.json');
+            if (!dataJsonFile) {
+                throw new Error('Invalid backup file: data.json not found');
+            }
+
+            const dataJsonText = await dataJsonFile.async('text');
+            const androidData = JSON.parse(dataJsonText);
+
+            // Convert Android format to web format
+            const webData = await this.convertAndroidToWebFormat(androidData, zip);
+
+            // Import the converted data
+            await db.importData(webData);
+            this.showToast('Android backup imported successfully');
+            await this.loadData();
+            
+            if (this.currentView === 'home') {
+                await this.loadHome();
+            }
+        } catch (error) {
+            console.error('Android backup import error:', error);
+            this.showToast('Error importing Android backup: ' + error.message);
+        }
+    }
+
+    async convertAndroidToWebFormat(androidData, zip) {
+        const webData = {
+            version: 1,
+            exportDate: new Date().toISOString(),
+            photos: [],
+            milestones: [],
+            settings: {}
+        };
+
+        // Convert photos
+        if (androidData.photos && Array.isArray(androidData.photos)) {
+            for (const androidPhoto of androidData.photos) {
+                try {
+                    // Get the image file from the zip
+                    const imageFile = zip.file(androidPhoto.fileName);
+                    if (imageFile) {
+                        const imageBlob = await imageFile.async('blob');
+                        const dataUrl = await this.blobToDataUrl(imageBlob);
+
+                        // Convert Android photo format to web format
+                        const webPhoto = {
+                            id: androidPhoto.id,
+                            timestamp: androidPhoto.timestamp,
+                            epochDay: androidPhoto.epochDay,
+                            type: androidPhoto.type === 0 ? 'face' : 'body',
+                            dataUrl: dataUrl
+                        };
+                        webData.photos.push(webPhoto);
+                    }
+                } catch (error) {
+                    console.error('Error converting photo:', error);
+                }
+            }
+        }
+
+        // Convert milestones
+        if (androidData.milestones && Array.isArray(androidData.milestones)) {
+            for (const androidMilestone of androidData.milestones) {
+                const webMilestone = {
+                    id: androidMilestone.id,
+                    timestamp: androidMilestone.timestamp,
+                    epochDay: androidMilestone.epochDay,
+                    title: androidMilestone.title,
+                    description: androidMilestone.description || ''
+                };
+                webData.milestones.push(webMilestone);
+            }
+        }
+
+        // Convert settings (if available)
+        if (androidData.settings) {
+            // Map Android settings to web settings
+            if (androidData.settings.theme) {
+                webData.settings.theme = this.mapAndroidTheme(androidData.settings.theme);
+            }
+        }
+
+        return webData;
+    }
+
+    mapAndroidTheme(androidTheme) {
+        // Map Android theme values to web theme values
+        const themeMap = {
+            'ORIGINAL': 'light',
+            'DARK': 'dark',
+            'SYSTEM_DEFAULT': 'auto'
+        };
+        return themeMap[androidTheme] || 'light';
+    }
+
+    async blobToDataUrl(blob) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    }
+
+    async loadJSZip() {
+        // Load JSZip library from CDN
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Failed to load JSZip library'));
+            document.head.appendChild(script);
+        });
     }
 
     async clearData() {

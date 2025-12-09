@@ -147,12 +147,15 @@
                 </button>
                 <button class="setting-btn" id="importDataBtn">
                     <i class="material-icons">upload</i>
-                    <span>Import Data</span>
+                    <span>Import Data (Web or Android Backup)</span>
                 </button>
                 <button class="setting-btn danger" id="clearDataBtn">
                     <i class="material-icons">delete_forever</i>
                     <span>Clear All Data</span>
                 </button>
+                <p style="font-size: 12px; color: rgba(0,0,0,0.6); margin-top: 8px;">
+                    💡 You can import backups (.ttbackup files) from the Android app!
+                </p>
             </div>
 
             <div class="settings-section">
@@ -184,6 +187,7 @@
                     <li>🔒 Privacy-focused with app lock</li>
                     <li>💾 Export and import your data</li>
                     <li>📱 Works offline as a Progressive Web App</li>
+                    <li>🔄 Import backups from the Android app</li>
                 </ul>
 
                 <h3>Privacy</h3>
@@ -289,6 +293,7 @@
     <div id="toast" class="toast"></div>
 
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="js/db.js"></script>
     <script src="js/app.js"></script>
     <script src="js/sw-register.js"></script>
