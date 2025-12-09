@@ -501,20 +501,105 @@ class OpenTransitionApp {
 
     async exportData() {
         try {
+            // Check if JSZip is available
+            if (typeof JSZip === 'undefined') {
+                throw new Error('JSZip library not loaded. Please refresh the page and try again.');
+            }
+
             const data = await db.exportData();
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            
+            // Create ZIP file in Android .ttbackup format
+            const zip = new JSZip();
+            
+            // Convert web format to Android format for data.json
+            const androidData = {
+                settings: {},
+                photos: [],
+                milestones: []
+            };
+
+            // Convert photos to Android format and add image files to ZIP
+            if (data.photos && Array.isArray(data.photos)) {
+                for (const webPhoto of data.photos) {
+                    try {
+                        // Convert type back to Android format (0 = face, 1 = body)
+                        const androidType = webPhoto.type === PHOTO_TYPE_FACE ? ANDROID_PHOTO_TYPE_FACE : ANDROID_PHOTO_TYPE_BODY;
+                        
+                        // Generate filename for the photo
+                        const fileName = `${webPhoto.id}.jpg`;
+                        
+                        // Add photo metadata to data.json
+                        androidData.photos.push({
+                            id: webPhoto.id,
+                            timestamp: webPhoto.timestamp,
+                            epochDay: webPhoto.epochDay,
+                            type: androidType,
+                            fileName: fileName
+                        });
+
+                        // Convert Data URL to blob and add to ZIP
+                        if (webPhoto.dataUrl) {
+                            const response = await fetch(webPhoto.dataUrl);
+                            const blob = await response.blob();
+                            zip.file(fileName, blob);
+                        }
+                    } catch (error) {
+                        console.error('Error converting photo:', error);
+                    }
+                }
+            }
+
+            // Convert milestones to Android format (already compatible)
+            if (data.milestones && Array.isArray(data.milestones)) {
+                androidData.milestones = data.milestones.map(milestone => ({
+                    id: milestone.id,
+                    timestamp: milestone.timestamp,
+                    epochDay: milestone.epochDay,
+                    title: milestone.title,
+                    description: milestone.description || ''
+                }));
+            }
+
+            // Add settings if any
+            if (data.settings && data.settings.theme) {
+                androidData.settings.theme = this.mapWebThemeToAndroid(data.settings.theme);
+            }
+
+            // Add data.json to ZIP
+            const dataJson = JSON.stringify(androidData);
+            zip.file('data.json', dataJson);
+
+            // Generate ZIP file
+            const zipBlob = await zip.generateAsync({ 
+                type: 'blob',
+                compression: 'DEFLATE',
+                compressionOptions: { level: 6 }
+            });
+
+            // Download the .ttbackup file
+            const url = URL.createObjectURL(zipBlob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `opentransition-backup-${new Date().toISOString().split('T')[0]}.json`;
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').split('T').join('_').substring(0, 19);
+            a.download = `${timestamp}.ttbackup`;
             a.click();
             URL.revokeObjectURL(url);
-            this.showToast('Data exported successfully');
+            
+            this.showToast('Backup exported successfully as .ttbackup');
         } catch (error) {
             console.error('Export error:', error);
-            this.showToast('Error exporting data');
+            this.showToast('Error exporting data: ' + error.message);
         }
+    }
+
+    mapWebThemeToAndroid(webTheme) {
+        // Map web theme values to Android theme values
+        const themeMap = {
+            'light': 'ORIGINAL',
+            'dark': 'DARK',
+            'auto': 'SYSTEM_DEFAULT'
+        };
+        return themeMap[webTheme] || 'ORIGINAL';
     }
 
     async importData() {

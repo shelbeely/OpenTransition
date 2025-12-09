@@ -65,27 +65,25 @@ To host this web app:
 
 #### Export Data
 1. Go to Settings
-2. Click "Export Data"
-3. Save the JSON file to a safe location
+2. Click "Export Data (.ttbackup format)"
+3. Save the `.ttbackup` file to a safe location
+
+**The web app now exports in the same .ttbackup format used by the Android app!**
 
 #### Import Data
 
-**From Web App Backup:**
+**From Web App or Android App Backup:**
 1. Go to Settings
 2. Click "Import Data"
-3. Select your previously exported JSON file
+3. Select your `.ttbackup` file (from either web or Android)
 
-**From Android App Backup:**
-1. Export your data from the Android app (creates a `.ttbackup` file)
-2. Transfer the `.ttbackup` file to your device
-3. In the web app, go to Settings
-4. Click "Import Data (Web or Android Backup)"
-5. Select the `.ttbackup` file
-6. The web app will automatically extract and convert your Android backup
+The web app automatically detects and imports `.ttbackup` files from either platform.
 
-The web app automatically detects whether you're importing a web backup (JSON) or an Android backup (`.ttbackup` ZIP file) and handles the conversion appropriately.
-
-**Note:** When importing Android backups, all photos are converted and stored in the browser's local storage. Large photo collections may take a few moments to import.
+**Backup Format Compatibility:**
+- Both web and Android apps use the same `.ttbackup` format (ZIP file)
+- Contains `data.json` with metadata and image files
+- Fully compatible in both directions
+- Easy migration between platforms
 
 #### Clear Data
 1. Go to Settings
