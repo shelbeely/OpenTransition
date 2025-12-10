@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright © 2018 TransTracks. All rights reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <color name="pinkColorPrimaryLight">#ffbde4</color>
+    <color name="pinkColorPrimary">#E4A9CC</color>
+    <color name="pinkColorPrimaryDark">#b0829e</color>
+    <color name="pinkColorAccent">#9ECCF6</color>
+
+    <color name="blueColorPrimaryLight">#a3d3ff</color>
+    <color name="blueColorPrimary">#9ECCF6</color>
+    <color name="blueColorPrimaryDark">#7ca0c2</color>
+    <color name="blueColorAccent">#E4A9CC</color>
+
+    <color name="purpleColorPrimaryLight">#be9df5</color>
+    <color name="purpleColorPrimary">#977cc2</color>
+    <color name="purpleColorPrimaryDark">#6f5b8f</color>
+    <color name="purpleColorAccent">#9ECCF6</color>
+
+    <color name="greenColorPrimaryLight">#4ecc84</color>
+    <color name="greenColorPrimary">#3A9963</color>
+    <color name="greenColorPrimaryDark">#276642</color>
+    <color name="greenColorAccent">#57acd4</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="black_30">#4D000000</color>
+    <color name="darkGrey">#9e9e9e</color>
+    <color name="transparent">#00000000</color>
+    <color name="transparent_white_25">#40ffffff</color>
+    <color name="transparent_white_90">#ccffffff</color>
+
+    <color name="disabled_white">#eaeaea</color>
+    <color name="disabled_transparent_white_90">#cceaeaea</color>
+</resources>

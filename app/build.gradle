@@ -1,0 +1,187 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'io.realm.kotlin'
+    id 'androidx.navigation.safeargs.kotlin'
+    id 'kotlin-parcelize'
+
+    id 'com.google.gms.google-services' //Should be second last
+    id 'com.google.firebase.crashlytics' // Should be last
+}
+
+plugins.withId("com.android.application") {
+    android.buildTypes.debug.ext.enableCrashlytics = false
+}
+
+def major = 1
+def minor = 3
+
+def getVersionCode = { ->
+    def envBuildNumber = System.getenv("BUILD_NUMBER")?.toInteger() ?: 0
+    def baseBuildNumber = 25
+    return baseBuildNumber + (major * 100) + minor + envBuildNumber
+}
+
+def getVersionName = { ->
+    return "$major.$minor.${getVersionCode()}"
+}
+
+android {
+    compileSdk 36
+    
+    defaultConfig {
+        applicationId "com.shelbeely.opentransition"
+        minSdkVersion 21
+        targetSdkVersion 36
+        versionCode getVersionCode()
+        versionName getVersionName()
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs {
+        def debugKey = file("${rootDir.getAbsolutePath()}/keys/debug-keystore.jks")
+        debug {
+            storeFile = debugKey
+            storePassword = "debugkey"
+            keyAlias = "transtracks"
+            keyPassword = "debugkey"
+        }
+        release {
+            def releaseKey = file("${rootDir.getAbsolutePath()}/keys/release-keystore.jks")
+            storeFile = releaseKey.exists() ? releaseKey : debugKey
+            storePassword = System.getenv("STORE_PASS") ?: "debugkey"
+            keyAlias = System.getenv("KEY_ALIAS") ?: "transtracks"
+            keyPassword = System.getenv("KEY_PASS") ?: "debugkey"
+        }
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    buildTypes {
+        buildTypes.each {
+            it.resValue 'string', 'ADS_APP_ID', getSecretString('ADS_APP_ID')
+            it.buildConfigField 'String', 'CODE_SALT', '"' + getSecretString('CODE_SALT') + '"'
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+
+            //Test Ad Ids
+            it.resValue 'string', 'ADS_GALLERY_AD_ID', "ca-app-pub-3940256099942544/9214589741"
+            it.resValue 'string', 'ADS_HOME_AD_ID', "ca-app-pub-3940256099942544/9214589741"
+            it.resValue 'string', 'ADS_MILESTONES_AD_ID', "ca-app-pub-3940256099942544/9214589741"
+            it.resValue 'string', 'ADS_SETTINGS_AD_ID', "ca-app-pub-3940256099942544/9214589741"
+        }
+
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+            //Real Ad Ids
+            it.resValue 'string', 'ADS_GALLERY_AD_ID', getSecretString('ADS_GALLERY_AD_ID')
+            it.resValue 'string', 'ADS_HOME_AD_ID', getSecretString('ADS_HOME_AD_ID')
+            it.resValue 'string', 'ADS_MILESTONES_AD_ID', getSecretString('ADS_MILESTONES_AD_ID')
+            it.resValue 'string', 'ADS_SETTINGS_AD_ID', getSecretString('ADS_SETTINGS_AD_ID')
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+    namespace 'com.shelbeely.opentransition'
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.0.3'
+
+    implementation 'androidx.activity:activity-ktx:1.7.2'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+
+    def arch_version = "2.2.0"
+    testImplementation "androidx.arch.core:core-testing:$arch_version"
+
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.core:core-ktx:1.10.1'
+
+    def lifecycle_version = "2.6.2"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:$lifecycle_version"
+
+    implementation 'androidx.recyclerview:recyclerview:1.3.2'
+    implementation 'androidx.exifinterface:exifinterface:1.3.6'
+
+    implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
+    androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
+
+    implementation 'com.google.android.gms:play-services-ads:22.4.0'
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    implementation 'com.firebaseui:firebase-ui-auth:8.0.2'
+
+    implementation platform('com.google.firebase:firebase-bom:32.3.1')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-firestore-ktx'
+
+    implementation 'com.google.android.material:material:1.12.0'
+
+    ext.rx_binding_version = '3.1.0'
+    implementation "com.jakewharton.rxbinding3:rxbinding:$rx_binding_version"
+    implementation "com.jakewharton.rxbinding3:rxbinding-recyclerview:$rx_binding_version"
+    implementation "com.jakewharton.rxbinding3:rxbinding-material:$rx_binding_version"
+    implementation "com.jakewharton.rxbinding3:rxbinding-appcompat:$rx_binding_version"
+
+    implementation 'com.jakewharton.rxrelay3:rxrelay:3.0.1'
+
+    //noinspection GradleDependency 2.8 is newer than 2.71828 but the Maven is messed up
+    implementation 'com.squareup.picasso:picasso:2.8'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
+
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.8'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
+
+    implementation "io.realm.kotlin:library-base:$realm_version"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3'
+
+    testImplementation 'junit:junit:4.13.2'
+
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+String getSecretString(String key) {
+    Properties props = new Properties()
+    props.load(new FileInputStream(file("$rootDir/secrets.properties")))
+    return props[key]
+}
+
+def setGitHubOutput = task setGitHubOutput(type: Exec) {
+    workingDir "${buildDir}"
+    commandLine 'sh', '-c', "echo \"VERSION_NAME=${getVersionName()}\" >> \"\$GITHUB_OUTPUT\""
+    doLast {
+        println "Output VERSION_NAME set to '${getVersionName()}'"
+    }
+}
+
+afterEvaluate {
+    bundleRelease.configure { finalizedBy setGitHubOutput }
+}
