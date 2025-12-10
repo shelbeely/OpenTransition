@@ -57,6 +57,8 @@ OpenTransition puts **you in control**. Every photo, every milestone, every mome
 
 OpenTransition is completely **free to use** with optional ads that support development. It's also **open source**, meaning the community can review the code, contribute features, and ensure your privacy is respected.
 
+**Privacy Policy:** https://shelbeely.github.io/OpenTransition/privacy-policy/
+
 ### ✨ Perfect For:
 
 - Tracking hormone therapy (HRT) progress
@@ -103,10 +105,11 @@ transgender, trans, transition, HRT, hormone therapy, progress photos, photo tra
 
 ## Content Rating
 
-- Teen (age 13+)
+- Expected: Teen/Everyone-level based on the Google Play content rating questionnaire (no violence, no sexual content, no user-generated content sharing)
 
 ## Target Audience
 
+- Adults (18+), not directed to children
 - Transgender individuals
 - People undergoing gender transition
 - LGBTQ+ community members
@@ -154,7 +157,7 @@ Visit our documentation: https://shelbeely.github.io/OpenTransition
 GitHub Issues: https://github.com/shelbeely/OpenTransition/issues
 
 **Contact:**
-For privacy inquiries or support questions, please open an issue on GitHub.
+For privacy inquiries or support questions, email **privacy@shelbeely.com** or open an issue on GitHub.
 
 ---
 

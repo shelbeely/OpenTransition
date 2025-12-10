@@ -64,6 +64,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Privacy Policy: privacy-policy.md
   - User Guide:
     - Getting Started: user-guide/getting-started.md
     - Features Overview: user-guide/features.md
