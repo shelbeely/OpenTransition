@@ -17,24 +17,26 @@
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background">
 
-    <com.google.android.material.appbar.MaterialToolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/single_photo_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="?attr/homeAsUpIndicator">
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:theme="@style/AppTheme.PopupOverlay">
 
-        <com.google.android.material.textview.MaterialTextView
+        <TextView
             android:id="@+id/single_photo_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/photo_details"
-            android:textAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/white_text_selector" />
-    </com.google.android.material.appbar.MaterialToolbar>
+    </androidx.appcompat.widget.Toolbar>
 
     <ImageView
         android:id="@+id/single_photo_image"
@@ -57,7 +59,7 @@
 
     <TextView
         android:id="@+id/single_photo_details"
-        style="@style/TextAppearance.Material3.TitleMedium"
+        style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center"
