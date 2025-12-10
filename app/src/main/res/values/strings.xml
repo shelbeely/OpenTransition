@@ -307,6 +307,7 @@
     <string name="ai_model_label">Model:</string>
     <string name="ai_model_hint">gpt-3.5-turbo</string>
     <string name="ai_configure">Configure AI</string>
+    <string name="ai_configuration_saved">AI configuration saved</string>
     <string name="ai_photo_description">Generate Photo Description</string>
     <string name="ai_progress_insights">View Progress Insights</string>
     <string name="ai_milestone_suggestions">Get Milestone Suggestions</string>

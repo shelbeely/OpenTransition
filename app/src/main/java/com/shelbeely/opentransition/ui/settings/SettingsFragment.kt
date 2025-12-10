@@ -730,71 +730,65 @@ class SettingsFragment : Fragment(R.layout.settings) {
         val view = view ?: return
         val context = context ?: return
 
-        val dialogView = layoutInflater.inflate(android.R.layout.simple_list_item_2, null).apply {
-            val layout = android.widget.LinearLayout(context).apply {
-                orientation = android.widget.LinearLayout.VERTICAL
-                setPadding(50, 50, 50, 50)
-            }
-
-            val apiKeyInput = com.google.android.material.textfield.TextInputEditText(context).apply {
-                hint = getString(R.string.ai_api_key_hint)
-                setText(SettingsManager.getAiApiKey())
-                inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            }
-
-            val baseUrlInput = com.google.android.material.textfield.TextInputEditText(context).apply {
-                hint = getString(R.string.ai_api_base_url_hint)
-                setText(SettingsManager.getAiApiBaseUrl())
-                inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI
-            }
-
-            val modelInput = com.google.android.material.textfield.TextInputEditText(context).apply {
-                hint = getString(R.string.ai_model_hint)
-                setText(SettingsManager.getAiModel())
-            }
-
-            layout.addView(android.widget.TextView(context).apply {
-                text = getString(R.string.ai_api_key_label)
-                setTextColor(resources.getColor(android.R.color.white, null))
-            })
-            layout.addView(apiKeyInput)
-
-            layout.addView(android.widget.TextView(context).apply {
-                text = getString(R.string.ai_api_base_url_label)
-                setTextColor(resources.getColor(android.R.color.white, null))
-                setPadding(0, 40, 0, 0)
-            })
-            layout.addView(baseUrlInput)
-
-            layout.addView(android.widget.TextView(context).apply {
-                text = getString(R.string.ai_model_label)
-                setTextColor(resources.getColor(android.R.color.white, null))
-                setPadding(0, 40, 0, 0)
-            })
-            layout.addView(modelInput)
-
-            (this as android.view.ViewGroup).addView(layout)
+        val layout = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(50, 50, 50, 50)
         }
+
+        val apiKeyInput = com.google.android.material.textfield.TextInputEditText(context).apply {
+            id = android.view.View.generateViewId()
+            hint = getString(R.string.ai_api_key_hint)
+            setText(SettingsManager.getAiApiKey())
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+        }
+
+        val baseUrlInput = com.google.android.material.textfield.TextInputEditText(context).apply {
+            id = android.view.View.generateViewId()
+            hint = getString(R.string.ai_api_base_url_hint)
+            setText(SettingsManager.getAiApiBaseUrl())
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI
+        }
+
+        val modelInput = com.google.android.material.textfield.TextInputEditText(context).apply {
+            id = android.view.View.generateViewId()
+            hint = getString(R.string.ai_model_hint)
+            setText(SettingsManager.getAiModel())
+        }
+
+        layout.addView(android.widget.TextView(context).apply {
+            text = getString(R.string.ai_api_key_label)
+            setTextColor(resources.getColor(android.R.color.white, null))
+        })
+        layout.addView(apiKeyInput)
+
+        layout.addView(android.widget.TextView(context).apply {
+            text = getString(R.string.ai_api_base_url_label)
+            setTextColor(resources.getColor(android.R.color.white, null))
+            setPadding(0, 40, 0, 0)
+        })
+        layout.addView(baseUrlInput)
+
+        layout.addView(android.widget.TextView(context).apply {
+            text = getString(R.string.ai_model_label)
+            setTextColor(resources.getColor(android.R.color.white, null))
+            setPadding(0, 40, 0, 0)
+        })
+        layout.addView(modelInput)
 
         androidx.appcompat.app.AlertDialog.Builder(context)
             .setTitle(R.string.ai_configure)
-            .setView(dialogView)
+            .setView(layout)
             .setPositiveButton(R.string.update) { _, _ ->
-                val apiKeyInput = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(0)
-                val baseUrlInput = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(1)
-                val modelInput = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(2)
-
-                val layout = (dialogView as android.view.ViewGroup).getChildAt(0) as android.widget.LinearLayout
-                val apiKey = (layout.getChildAt(1) as com.google.android.material.textfield.TextInputEditText).text.toString()
-                val baseUrl = (layout.getChildAt(3) as com.google.android.material.textfield.TextInputEditText).text.toString()
-                val model = (layout.getChildAt(5) as com.google.android.material.textfield.TextInputEditText).text.toString()
+                val apiKey = apiKeyInput.text.toString()
+                val baseUrl = baseUrlInput.text.toString()
+                val model = modelInput.text.toString()
 
                 SettingsManager.setAiApiKey(apiKey)
                 SettingsManager.setAiApiBaseUrl(baseUrl.ifEmpty { "https://api.openai.com/v1" })
                 SettingsManager.setAiModel(model.ifEmpty { "gpt-3.5-turbo" })
 
                 com.google.android.material.snackbar.Snackbar.make(
-                    view, "AI configuration updated", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+                    view, R.string.ai_configuration_saved, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
                 ).show()
             }
             .setNegativeButton(R.string.cancel, null)
