@@ -11,7 +11,14 @@
 package com.shelbeely.opentransition.ui.settings
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
 import android.util.AttributeSet
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.databinding.SettingsBinding
@@ -163,7 +170,63 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
 
         binding.settingsAppVersion.text = content.appVersion
 
-        binding.settingsCopyright.text = content.copyright
+        // Make copyright text clickable with links
+        val copyrightText = content.copyright
+        val spannableString = SpannableString(copyrightText)
+        
+        // Find and make "TransTracks" clickable
+        val transTracksStart = copyrightText.indexOf("TransTracks")
+        if (transTracksStart >= 0) {
+            val transTracksEnd = transTracksStart + "TransTracks".length
+            spannableString.setSpan(
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/TransTracks/TransTracks"))
+                        context.startActivity(intent)
+                    }
+                },
+                transTracksStart,
+                transTracksEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        
+        // Find and make "Shelbeely" clickable
+        val shelBeelyStart = copyrightText.indexOf("Shelbeely")
+        if (shelBeelyStart >= 0) {
+            val shelBeelyEnd = shelBeelyStart + "Shelbeely".length
+            spannableString.setSpan(
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/shelbeely"))
+                        context.startActivity(intent)
+                    }
+                },
+                shelBeelyStart,
+                shelBeelyEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        
+        // Find and make "OpenTransition contributors" clickable
+        val openTransitionStart = copyrightText.indexOf("OpenTransition contributors")
+        if (openTransitionStart >= 0) {
+            val openTransitionEnd = openTransitionStart + "OpenTransition contributors".length
+            spannableString.setSpan(
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/shelbeely/OpenTransition/graphs/contributors"))
+                        context.startActivity(intent)
+                    }
+                },
+                openTransitionStart,
+                openTransitionEnd,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        
+        binding.settingsCopyright.text = spannableString
+        binding.settingsCopyright.movementMethod = LinkMovementMethod.getInstance()
     }
 
     private fun displayUserDetails(user: SettingsUIUserDetails) {

@@ -71,7 +71,7 @@ OpenTransition is a fork of TransTracks and maintains the same GPL v3 license.
 
 ```
 Original Copyright (C) 2018 - 2021 TransTracks
-Fork modifications and rebranding by the OpenTransition contributors
+Fork modifications and rebranding (C) 2025 Shelbeely and OpenTransition contributors
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

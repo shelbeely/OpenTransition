@@ -265,7 +265,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
             .subscribe {
                 val activity = activity ?: return@subscribe
 
-                val webpage = Uri.parse("https://transtracks.app/contributing/")
+                val webpage = Uri.parse("https://github.com/shelbeely/OpenTransition")
                 val intent = Intent(Intent.ACTION_VIEW, webpage)
                 if (intent.resolveActivity(activity.packageManager) != null) {
                     startActivity(intent)
@@ -276,7 +276,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
             .subscribe {
                 val activity = activity ?: return@subscribe
 
-                val webpage = Uri.parse("https://transtracks.app/privacy-policy/")
+                val webpage = Uri.parse("https://shelbeely.github.io/OpenTransition/user-guide/privacy/")
                 val intent = Intent(Intent.ACTION_VIEW, webpage)
                 if (intent.resolveActivity(activity.packageManager) != null) {
                     startActivity(intent)
