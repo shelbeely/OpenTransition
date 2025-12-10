@@ -106,7 +106,7 @@ jobs:
 
     steps:
       - name: Download APK artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.1.3
         with:
           name: transtracks-release-apk
           path: ./dist
