@@ -209,7 +209,7 @@ button.setOnClickListener {
         spring.stiffness = SpringForce.STIFFNESS_LOW
         spring.dampingRatio = SpringForce.DAMPING_RATIO_LOW_BOUNCY
     }.start()
-    // Similar for SCALE_Y
+    // Apply same SpringAnimation for SCALE_Y property
 }
 ```
 
