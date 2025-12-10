@@ -1,3 +1,8 @@
+---
+name: documentation
+description: Ensures project documentation remains accurate and up-to-date whenever code changes are made
+---
+
 # Documentation Maintenance Agent
 
 ## Purpose

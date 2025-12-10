@@ -1,3 +1,8 @@
+---
+name: material-design-3
+description: Specializes in migrating Android applications from Material Design 2 to Material Design 3 (Material You) using MDC-Android with incremental updates
+---
+
 # Material Design 3 Migration Agent
 
 ## Purpose
