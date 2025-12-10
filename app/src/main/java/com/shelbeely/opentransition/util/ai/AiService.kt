@@ -87,25 +87,25 @@ object AiService {
             .post(requestBody.toString().toRequestBody("application/json".toMediaType()))
             .build()
 
-        val response = client.newCall(request).execute()
-        
-        if (!response.isSuccessful) {
-            throw IOException("API request failed: ${response.code} ${response.message}")
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) {
+                throw IOException("API request failed: ${response.code} ${response.message}")
+            }
+
+            val responseBody = response.body?.string() 
+                ?: throw IOException("Empty response body")
+
+            val jsonResponse = JSONObject(responseBody)
+            val choices = jsonResponse.getJSONArray("choices")
+            
+            if (choices.length() == 0) {
+                throw IOException("No response choices returned")
+            }
+
+            return@withContext choices.getJSONObject(0)
+                .getJSONObject("message")
+                .getString("content")
         }
-
-        val responseBody = response.body?.string() 
-            ?: throw IOException("Empty response body")
-
-        val jsonResponse = JSONObject(responseBody)
-        val choices = jsonResponse.getJSONArray("choices")
-        
-        if (choices.length() == 0) {
-            throw IOException("No response choices returned")
-        }
-
-        choices.getJSONObject(0)
-            .getJSONObject("message")
-            .getString("content")
     }
 
     /**

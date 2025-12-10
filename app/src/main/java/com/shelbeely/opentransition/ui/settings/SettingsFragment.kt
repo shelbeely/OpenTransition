@@ -739,7 +739,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
             id = android.view.View.generateViewId()
             hint = getString(R.string.ai_api_key_hint)
             setText(SettingsManager.getAiApiKey())
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
         }
 
         val baseUrlInput = com.google.android.material.textfield.TextInputEditText(context).apply {
