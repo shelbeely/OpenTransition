@@ -118,7 +118,7 @@
     <string name="lock_description">Require a password to access the app</string>
 
     <string name="about_transtracks_title">About OpenTransition</string>
-    <string name="about_transtracks_description">OpenTransition is a community-driven fork focused on helping people document their transition journey privately and securely. We welcome contributions and feedback to make this app better for everyone.</string>
+    <string name="about_transtracks_description">OpenTransition is a community-driven fork maintained by Shelbeely, focused on helping people document their transition journey privately and securely. We welcome contributions and feedback to make this app better for everyone.</string>
     <string name="contribute">Contribute</string>
 
     <string name="select_theme">Select Theme</string>
