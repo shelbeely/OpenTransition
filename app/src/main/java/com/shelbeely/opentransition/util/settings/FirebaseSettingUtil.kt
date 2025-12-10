@@ -168,7 +168,8 @@ class FirebaseSettingUtil {
                             }
 
                             currentAndroidVersion, incorrectPasswordCount, saveToFirebase,
-                            showAccountWarning, userLastSeen -> {
+                            showAccountWarning, userLastSeen, enableAiFeatures, aiApiKey,
+                            aiApiBaseUrl, aiModel -> {
                                 //No-op
                             }
                         }

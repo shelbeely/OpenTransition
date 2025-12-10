@@ -189,7 +189,8 @@ object SettingsConflictDialog {
                     }
 
                     currentAndroidVersion, incorrectPasswordCount, saveToFirebase,
-                    showAccountWarning, showWelcome, userLastSeen -> throw IllegalArgumentException(
+                    showAccountWarning, showWelcome, userLastSeen,
+                    enableAiFeatures, aiApiKey, aiApiBaseUrl, aiModel -> throw IllegalArgumentException(
                         "This settings should not be in conflict because they don't get synced"
                     )
                 }

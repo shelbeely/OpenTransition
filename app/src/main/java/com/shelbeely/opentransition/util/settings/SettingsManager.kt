@@ -353,7 +353,8 @@ object SettingsManager {
                             showAds -> value is Boolean && value != showAds()
 
                             saveToFirebase, showAccountWarning, showWelcome, userLastSeen,
-                            currentAndroidVersion, incorrectPasswordCount -> false
+                            currentAndroidVersion, incorrectPasswordCount, enableAiFeatures,
+                            aiApiKey, aiApiBaseUrl, aiModel -> false
                         }
                     }.map { (key, value) -> Key.valueOf(key) to value }
 
