@@ -114,7 +114,7 @@
     <string name="lock_delay_label">Lock Delay:</string>
     <string name="app_version_label">App Version:</string>
     <string name="privacy_policy">Privacy Policy</string>
-    <string name="copyright">© 2018 - %1$s by OpenTransition, All rights reserved</string>
+    <string name="copyright">© 2018 - 2021 TransTracks, 2025 - %1$s OpenTransition contributors</string>
     <string name="lock_description">Require a password to access the app</string>
 
     <string name="about_transtracks_title">About OpenTransition</string>
