@@ -27,6 +27,7 @@ This is a customized fork of the original TransTracks application, rebranded and
 - 📸 **Photo Tracking** - Document your transition with organized photos (face, body, custom areas)
 - 🎯 **Milestone Management** - Record and celebrate important events
 - 🖼️ **Gallery View** - Browse and compare your progress photos
+- 🤖 **AI Features (Optional)** - Get AI-powered insights, photo descriptions, and milestone suggestions
 - 🔒 **Privacy First** - App lock, disguised mode, and local storage
 - 💾 **Data Control** - Export, backup, and sync on your terms
 - 🎨 **Customizable** - Multiple themes and personalization options

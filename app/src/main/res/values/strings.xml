@@ -295,4 +295,30 @@
     <string name="milestone_updated">Milestone updated</string>
     <string name="confirm_delete_milestone">Deleting this milestone will remove it permanently.</string>
     <string name="error_deleting_milestone">Error deleting milestone</string>
+
+    <!-- AI Features -->
+    <string name="ai_features">AI Features</string>
+    <string name="ai_features_description">Enable optional AI-powered features using an OpenAI-compatible API</string>
+    <string name="enable_ai_features">Enable AI Features:</string>
+    <string name="ai_api_key_label">API Key:</string>
+    <string name="ai_api_key_hint">Enter your OpenAI-compatible API key</string>
+    <string name="ai_api_base_url_label">API Base URL:</string>
+    <string name="ai_api_base_url_hint">https://api.openai.com/v1</string>
+    <string name="ai_model_label">Model:</string>
+    <string name="ai_model_hint">gpt-3.5-turbo</string>
+    <string name="ai_configure">Configure AI</string>
+    <string name="ai_configuration_saved">AI configuration saved</string>
+    <string name="ai_photo_description">Generate Photo Description</string>
+    <string name="ai_progress_insights">View Progress Insights</string>
+    <string name="ai_milestone_suggestions">Get Milestone Suggestions</string>
+    <string name="ai_compare_photos">Compare Photos with AI</string>
+    <string name="ai_generating">Generating AI response…</string>
+    <string name="ai_error">AI Error</string>
+    <string name="ai_error_message">Unable to generate AI response. Please check your API configuration.</string>
+    <string name="ai_no_api_key">Please configure your AI API key in settings first.</string>
+    <string name="ai_description_title">AI Photo Description</string>
+    <string name="ai_insights_title">Progress Insights</string>
+    <string name="ai_suggestions_title">Milestone Suggestions</string>
+    <string name="ai_comparison_title">Photo Comparison</string>
+    <string name="ai_privacy_notice">AI features are optional and require your own API key. Your data is sent to the AI service you configure.</string>
 </resources>

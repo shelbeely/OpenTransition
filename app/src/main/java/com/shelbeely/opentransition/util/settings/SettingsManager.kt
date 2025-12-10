@@ -221,6 +221,36 @@ object SettingsManager {
     }
     //endregion
 
+    //region AI Features
+    fun getEnableAiFeatures(): Boolean = PrefUtil.getBoolean(enableAiFeatures, false)
+
+    fun setEnableAiFeatures(enabled: Boolean) {
+        PrefUtil.setBoolean(enableAiFeatures, enabled)
+        userSettingsUpdatedRelay.accept(Unit)
+    }
+
+    fun getAiApiKey(): String = PrefUtil.getString(aiApiKey, "")!!
+
+    fun setAiApiKey(key: String) {
+        PrefUtil.setString(aiApiKey, key)
+        userSettingsUpdatedRelay.accept(Unit)
+    }
+
+    fun getAiApiBaseUrl(): String = PrefUtil.getString(aiApiBaseUrl, "https://api.openai.com/v1")!!
+
+    fun setAiApiBaseUrl(url: String) {
+        PrefUtil.setString(aiApiBaseUrl, url)
+        userSettingsUpdatedRelay.accept(Unit)
+    }
+
+    fun getAiModel(): String = PrefUtil.getString(aiModel, "gpt-3.5-turbo")!!
+
+    fun setAiModel(model: String) {
+        PrefUtil.setString(aiModel, model)
+        userSettingsUpdatedRelay.accept(Unit)
+    }
+    //endregion
+
     //region User last seen
     fun getUserLastSeen(): Long = PrefUtil.getLong(userLastSeen, System.currentTimeMillis())!!
 
@@ -323,7 +353,8 @@ object SettingsManager {
                             showAds -> value is Boolean && value != showAds()
 
                             saveToFirebase, showAccountWarning, showWelcome, userLastSeen,
-                            currentAndroidVersion, incorrectPasswordCount -> false
+                            currentAndroidVersion, incorrectPasswordCount, enableAiFeatures,
+                            aiApiKey, aiApiBaseUrl, aiModel -> false
                         }
                     }.map { (key, value) -> Key.valueOf(key) to value }
 
@@ -363,7 +394,7 @@ object SettingsManager {
         enableCrashReports -> getEnableCrashReports()
 
         currentAndroidVersion, incorrectPasswordCount, saveToFirebase, showAccountWarning,
-        userLastSeen -> null
+        userLastSeen, enableAiFeatures, aiApiKey, aiApiBaseUrl, aiModel -> null
     }
 
     fun saveToFirebase(): Boolean = PrefUtil.getBoolean(saveToFirebase, false)
@@ -384,7 +415,11 @@ object SettingsManager {
         theme,
         userLastSeen,
         enableAnalytics,
-        enableCrashReports
+        enableCrashReports,
+        enableAiFeatures,
+        aiApiKey,
+        aiApiBaseUrl,
+        aiModel
     }
 }
 

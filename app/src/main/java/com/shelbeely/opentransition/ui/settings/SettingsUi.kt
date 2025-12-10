@@ -51,6 +51,8 @@ sealed class SettingsUiEvent {
     object Export : SettingsUiEvent()
     object ToggleAnalytics : SettingsUiEvent()
     object ToggleCrashReports : SettingsUiEvent()
+    object ToggleAiFeatures : SettingsUiEvent()
+    object ConfigureAi : SettingsUiEvent()
     object Contribute : SettingsUiEvent()
     object PrivacyPolicy : SettingsUiEvent()
 }
@@ -64,7 +66,8 @@ sealed class SettingsUiState {
         val userDetails: SettingsUIUserDetails?, val startDate: LocalDate, val theme: String,
         val lockMode: String, val enableLockDelay: Boolean, val lockDelay: String,
         val appVersion: String, val copyright: String,
-        val enableAnalytics: Boolean, val enableCrashReports: Boolean
+        val enableAnalytics: Boolean, val enableCrashReports: Boolean,
+        val enableAiFeatures: Boolean
     ) : SettingsUiState()
 
     data class Loading(val content: Content, val overallProgress: Int, val stepProgress: Int) :
@@ -96,6 +99,9 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
                 .filter { userAction }.map { SettingsUiEvent.ToggleAnalytics },
             binding.settingsCrashReports.checkedChanges().toV3()
                 .filter { userAction }.map { SettingsUiEvent.ToggleCrashReports },
+            binding.settingsAiFeatures.checkedChanges().toV3()
+                .filter { userAction }.map { SettingsUiEvent.ToggleAiFeatures },
+            binding.settingsAiConfigure.clicks().toV3().map { SettingsUiEvent.ConfigureAi },
             binding.settingsContribute.clicks().toV3().map { SettingsUiEvent.Contribute },
             binding.settingsPrivacyPolicy.clicks().toV3().map { SettingsUiEvent.PrivacyPolicy }
         )
@@ -167,6 +173,8 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
 
         binding.settingsAnalytics.isChecked = content.enableAnalytics
         binding.settingsCrashReports.isChecked = content.enableCrashReports
+        binding.settingsAiFeatures.isChecked = content.enableAiFeatures
+        binding.settingsAiConfigure.visibility = if (content.enableAiFeatures) View.VISIBLE else View.GONE
 
         binding.settingsAppVersion.text = content.appVersion
 

@@ -261,6 +261,14 @@ class SettingsFragment : Fragment(R.layout.settings) {
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleCrashReports>()
             .subscribe { SettingsManager.toggleEnableCrashReports(requireActivity()) }
 
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleAiFeatures>()
+            .subscribe { 
+                SettingsManager.setEnableAiFeatures(!SettingsManager.getEnableAiFeatures())
+            }
+
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ConfigureAi>()
+            .subscribe { showAiConfigurationDialog() }
+
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.Contribute>()
             .subscribe {
                 val activity = activity ?: return@subscribe
@@ -717,6 +725,75 @@ class SettingsFragment : Fragment(R.layout.settings) {
             .setNegativeButton(R.string.no, null)
             .show()
     }
+
+    private fun showAiConfigurationDialog() {
+        val view = view ?: return
+        val context = context ?: return
+
+        val layout = android.widget.LinearLayout(context).apply {
+            orientation = android.widget.LinearLayout.VERTICAL
+            setPadding(50, 50, 50, 50)
+        }
+
+        val apiKeyInput = com.google.android.material.textfield.TextInputEditText(context).apply {
+            id = android.view.View.generateViewId()
+            hint = getString(R.string.ai_api_key_hint)
+            setText(SettingsManager.getAiApiKey())
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
+        }
+
+        val baseUrlInput = com.google.android.material.textfield.TextInputEditText(context).apply {
+            id = android.view.View.generateViewId()
+            hint = getString(R.string.ai_api_base_url_hint)
+            setText(SettingsManager.getAiApiBaseUrl())
+            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI
+        }
+
+        val modelInput = com.google.android.material.textfield.TextInputEditText(context).apply {
+            id = android.view.View.generateViewId()
+            hint = getString(R.string.ai_model_hint)
+            setText(SettingsManager.getAiModel())
+        }
+
+        layout.addView(android.widget.TextView(context).apply {
+            text = getString(R.string.ai_api_key_label)
+            setTextColor(resources.getColor(android.R.color.white, null))
+        })
+        layout.addView(apiKeyInput)
+
+        layout.addView(android.widget.TextView(context).apply {
+            text = getString(R.string.ai_api_base_url_label)
+            setTextColor(resources.getColor(android.R.color.white, null))
+            setPadding(0, 40, 0, 0)
+        })
+        layout.addView(baseUrlInput)
+
+        layout.addView(android.widget.TextView(context).apply {
+            text = getString(R.string.ai_model_label)
+            setTextColor(resources.getColor(android.R.color.white, null))
+            setPadding(0, 40, 0, 0)
+        })
+        layout.addView(modelInput)
+
+        androidx.appcompat.app.AlertDialog.Builder(context)
+            .setTitle(R.string.ai_configure)
+            .setView(layout)
+            .setPositiveButton(R.string.update) { _, _ ->
+                val apiKey = apiKeyInput.text.toString()
+                val baseUrl = baseUrlInput.text.toString()
+                val model = modelInput.text.toString()
+
+                SettingsManager.setAiApiKey(apiKey)
+                SettingsManager.setAiApiBaseUrl(baseUrl.ifEmpty { "https://api.openai.com/v1" })
+                SettingsManager.setAiModel(model.ifEmpty { "gpt-3.5-turbo" })
+
+                com.google.android.material.snackbar.Snackbar.make(
+                    view, R.string.ai_configuration_saved, com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
+                ).show()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
 }
 
 fun settingsResultsToStates(context: Context) =
@@ -738,7 +815,8 @@ fun settingsResultsToStates(context: Context) =
                     R.string.copyright, Calendar.getInstance().get(Calendar.YEAR).toString()
                 ),
                 enableAnalytics = content.enableAnalytics,
-                enableCrashReports = content.enableCrashReports
+                enableCrashReports = content.enableCrashReports,
+                enableAiFeatures = content.enableAiFeatures
             )
         }
 
