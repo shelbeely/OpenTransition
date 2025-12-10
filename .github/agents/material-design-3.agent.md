@@ -128,7 +128,7 @@ Making things larger, bolder, and more colorful paradoxically improves usability
 
 ### Official Documentation
 - **Main M3 Site**: https://m3.material.io/
-- **M3 Expressive Overview**: https://m3.material.io/foundations/design-tokens/overview
+- **M3 Design Tokens**: https://m3.material.io/foundations/design-tokens/overview
 - **M3 for Android (MDC-Android)**: https://m3.material.io/develop/android/mdc-android
 - **Motion & Spring Animations**: https://m3.material.io/styles/motion/overview
 - **Typography Expressive**: https://m3.material.io/styles/typography/overview
@@ -163,7 +163,7 @@ Use this template for tracking migration progress:
 ### Phase 2: Dependencies & Theme Base
 - [ ] Update Material library to latest stable (1.13.0+)
 - [ ] Verify theme parent uses Theme.Material3.*
-- [ ] Add AndroidX DynamicAnimation library for spring animations
+- [ ] Add AndroidX DynamicAnimation library: `implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'`
 - [ ] Update compileSdk and targetSdk if needed
 - [ ] Test basic app launch after dependency update
 
@@ -269,12 +269,12 @@ Update ONE component type at a time, testing after each:
 - [ ] Consider bold surface colors instead of neutral backgrounds
 - [ ] Test elevated components appearance
 
-### Phase 8: Dynamic Color (Optional - Android 12+)
+### Phase 9: Dynamic Color (Optional - Android 12+)
 - [ ] Add support for dynamic color
 - [ ] Test on Android 12+ devices
 - [ ] Ensure fallback colors work on older Android versions
 
-### Phase 9: Final Validation
+### Phase 10: Final Validation
 - [ ] Test all screens visually
 - [ ] Test all themes/color variants
 - [ ] Test on multiple Android versions (21+)
@@ -465,6 +465,12 @@ textInputLayout.editText?.setOnFocusChangeListener { view, hasFocus ->
     <color name="sunshine_yellow">#FFD60A</color>
     <color name="hot_pink">#FF006E</color>
     <color name="tangerine">#FB5607</color>
+    
+    <!-- Note: Always verify WCAG contrast ratios (min 4.5:1 for text, 3:1 for large text)
+         when using vibrant colors. Pair with appropriate on-color variants:
+         - On vibrant surfaces: use very light or very dark text colors
+         - Test with accessibility tools to ensure sufficient contrast
+    -->
 </resources>
 ```
 
@@ -734,7 +740,9 @@ recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             layoutManager.findLastVisibleItemPosition().let { last ->
                 for (i in first..last) {
                     recyclerView.findViewHolderForAdapterPosition(i)?.itemView?.apply {
-                        if (alpha == 0f) {
+                        // Check if item hasn't been animated yet (using tag)
+                        if (getTag(R.id.animated_tag) == null) {
+                            setTag(R.id.animated_tag, true)
                             alpha = 0f
                             translationY = 100f
                             animateWithSpring(DynamicAnimation.ALPHA, 1f)
