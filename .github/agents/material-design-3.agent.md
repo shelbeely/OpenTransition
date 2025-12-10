@@ -151,609 +151,207 @@ Making things larger, bolder, and more colorful paradoxically improves usability
 
 ## Migration Checklist Template
 
-Use this template for tracking migration progress:
+### Foundation
+- [ ] Audit Material components, theme files, colors, screens
+- [ ] Update Material library to 1.13.0+, add DynamicAnimation library
+- [ ] Test basic app launch
 
-### Phase 1: Foundation & Analysis
-- [ ] Audit all Material components in use (layouts and code)
-- [ ] Check current Material library version
-- [ ] Identify all theme files and color definitions
-- [ ] List all screens/features that use Material components
-- [ ] Document current visual appearance (screenshots)
+### Color System
+- [ ] Define M3 color roles (primary, secondary, tertiary + containers/on-colors, surface, background, error, outline)
+- [ ] Update theme variants, replace hardcoded colors, test themes
 
-### Phase 2: Dependencies & Theme Base
-- [ ] Update Material library to latest stable (1.13.0+)
-- [ ] Verify theme parent uses Theme.Material3.*
-- [ ] Add AndroidX DynamicAnimation library: `implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'`
-- [ ] Update compileSdk and targetSdk if needed
-- [ ] Test basic app launch after dependency update
+### Motion & Animation (Expressive Priority)
+- [ ] Replace animations with SpringAnimation (stiffness + damping)
+- [ ] Add overshoot to interactions, test and validate
 
-### Phase 3: Color System Migration
-- [ ] Create M3 color scheme using Material Theme Builder or manual definition
-- [ ] Define all M3 color roles:
-  - [ ] Primary, onPrimary, primaryContainer, onPrimaryContainer
-  - [ ] Secondary, onSecondary, secondaryContainer, onSecondaryContainer
-  - [ ] Tertiary, onTertiary, tertiaryContainer, onTertiaryContainer
-  - [ ] Error, onError, errorContainer, onErrorContainer
-  - [ ] Background, onBackground
-  - [ ] Surface, onSurface, surfaceVariant, onSurfaceVariant
-  - [ ] Outline, outlineVariant
-  - [ ] SurfaceTint, inverseSurface, inverseOnSurface, inversePrimary
-- [ ] Update all theme variants with new color system
-- [ ] Replace hardcoded colors with color roles where appropriate
-- [ ] Test all themes for visual correctness
+### Components (Update ONE at a time)
+- [ ] **Buttons**: M3 styles, larger targets (60-80dp), spring animations, hierarchy
+- [ ] **TextInputLayout**: Expressive shapes, spring focus transitions
+- [ ] **MaterialButtonToggleGroup**: M3 styling
+- [ ] **Snackbar**: Verify M3 styling
+- [ ] **Progress Indicators**: Migrate to LinearProgressIndicator
+- [ ] **Dialogs**: Update themes
+- [ ] **Cards**: MaterialCardView with M3 styling
+- [ ] **Other Components**: Update incrementally
 
-### Phase 4: Motion & Animation (M3 Expressive Priority)
-- [ ] **Implement Spring-Based Animations**
-  - [ ] Replace standard animations with SpringAnimation
-  - [ ] Configure stiffness and damping for playful bounce
-  - [ ] Add overshoot to button presses and transitions
-  - [ ] Implement spatial awareness in list animations
-  - [ ] Test on all interactive elements
-  - [ ] Visual validation and recording of animations
+### Typography (Expressive Priority)
+- [ ] Define expressive scale with emphasized variants, variable fonts
+- [ ] Create editorial layouts with hero headlines, update theme
 
-### Phase 5: Component-by-Component Updates
-Update ONE component type at a time, testing after each:
+### Shape Theme (Expressive Priority)
+- [ ] Expand shapes (pills, starbursts, organic), implement morphing
+- [ ] Use AnimatedVectorDrawable for transitions
 
-- [ ] **Buttons (MaterialButton)** - M3 Expressive Priority
-  - [ ] Update to M3 button styles with larger touch targets (60-80dp)
-  - [ ] Make primary buttons bold and prominent ("Big and Bouncy")
-  - [ ] Add spring animations to button presses with overshoot
-  - [ ] Consider morphing shapes for state changes
-  - [ ] Review button hierarchy (primary = hero size, secondary = medium, tertiary = text)
-  - [ ] Update all button instances
-  - [ ] Test all screens with buttons
-  - [ ] Visual validation and animation recording
-
-- [ ] **TextInputLayout**
-  - [ ] Choose style: FilledBox (default) or OutlinedBox with expressive shapes
-  - [ ] Consider using organic/pill shapes instead of standard rounded rectangles
-  - [ ] Add spring animations to focus/unfocus transitions
-  - [ ] Update all instances in layouts
-  - [ ] Test all screens with text inputs
-  - [ ] Visual validation and screenshots
-
-- [ ] **MaterialButtonToggleGroup**
-  - [ ] Update styling for M3
-  - [ ] Test toggle functionality
-  - [ ] Visual validation
-
-- [ ] **Snackbar**
-  - [ ] Verify M3 styling is applied automatically
-  - [ ] Test on all screens that show snackbars
-  - [ ] Visual validation
-
-- [ ] **ProgressBar / Progress Indicators**
-  - [ ] Migrate to LinearProgressIndicator (M3 component)
-  - [ ] Update styling
-  - [ ] Test loading states
-  - [ ] Visual validation
-
-- [ ] **Dialogs**
-  - [ ] Update dialog themes to M3
-  - [ ] Test all dialogs in the app
-  - [ ] Visual validation
-
-- [ ] **Cards (if used)**
-  - [ ] Update CardView to MaterialCardView with M3 styling
-  - [ ] Test all screens with cards
-  - [ ] Visual validation
-
-- [ ] **Other Components**
-  - [ ] List any other Material components in use
-  - [ ] Update one at a time
-  - [ ] Test and validate
-
-### Phase 6: Typography - Editorial Style (M3 Expressive Priority)
-- [ ] Define M3 Expressive typography scale with emphasized variants
-- [ ] Add variable font support for dynamic weight/width adjustments
-- [ ] Create magazine-like editorial layouts with bold, large headlines
-- [ ] Use typography as the primary container for information (hero headlines)
-- [ ] Update theme with expressive typography definitions
-- [ ] Make key headlines large and impactful (displayLarge, headlineLarge emphasized)
-- [ ] Review and update text styles in layouts
-- [ ] Test text rendering on all screens
-- [ ] Ensure hierarchy through type, not just spacing
-
-### Phase 7: Shape Theme - Morphic & Organic (M3 Expressive Priority)
-- [ ] Expand shape library beyond rounded rectangles (pills, starbursts, organic blobs)
-- [ ] Define shape theme with diverse shape families
-- [ ] Implement shape morphing for state changes (e.g., play → pause button)
-- [ ] Use shapes for emphasis and visual interest
-- [ ] Apply morphing animations using AnimatedVectorDrawable
-- [ ] Test visual appearance and shape transitions
-- [ ] Ensure continuity in shape transformations
-
-### Phase 8: Elevation & Surface Tints
-- [ ] Review elevation values (M3 uses less elevation)
-- [ ] Configure surface tint colors with vibrant options
-- [ ] Consider bold surface colors instead of neutral backgrounds
-- [ ] Test elevated components appearance
-
-### Phase 9: Dynamic Color (Optional - Android 12+)
-- [ ] Add support for dynamic color
-- [ ] Test on Android 12+ devices
-- [ ] Ensure fallback colors work on older Android versions
-
-### Phase 10: Final Validation
-- [ ] Test all screens visually
-- [ ] Test all themes/color variants
-- [ ] Test on multiple Android versions (21+)
-- [ ] Test on different screen sizes
-- [ ] Document any intentional visual changes
-- [ ] Update screenshots in documentation
+### Final Steps
+- [ ] Configure elevation and surface tints (vibrant options)
+- [ ] Add dynamic color support (Android 12+, with fallbacks)
+- [ ] Test all screens, themes, Android versions, screen sizes
+- [ ] Update documentation and screenshots
 
 ## Component Update Guidelines - M3 Expressive
 
 ### MaterialButton - Expressive Style
 
-**M3 Expressive Button Principles:**
-- **Big and Bouncy**: Use larger touch targets (60-80dp minimum for primary actions)
-- **Spring Animations**: Add overshoot/bounce on press
-- **Bold Visual Hierarchy**: Make primary buttons hero-sized and prominent
-- **Shape Morphing**: Consider morphing between states
+**Principles**: Big & Bouncy (60-80dp targets), Spring Animations, Bold Hierarchy, Shape Morphing
 
 ```xml
-<!-- Filled Hero Button (primary action - LARGE) -->
+<!-- Hero (80dp), Tonal (64dp), Text (48dp) -->
 <com.google.android.material.button.MaterialButton
     style="@style/Widget.Material3.Button"
-    android:layout_width="wrap_content"
-    android:layout_height="80dp"
-    android:minHeight="80dp"
-    android:textSize="24sp"
-    android:paddingHorizontal="32dp"
-    ...>
-    
-<!-- Filled Tonal Button (secondary - MEDIUM) -->
-<com.google.android.material.button.MaterialButton
-    style="@style/Widget.Material3.Button.TonalButton"
-    android:layout_height="64dp"
-    android:minHeight="64dp"
-    ...>
-    
-<!-- Text Button (tertiary - NORMAL) -->
-<com.google.android.material.button.MaterialButton
-    style="@style/Widget.Material3.Button.TextButton"
-    android:layout_height="48dp"
-    ...>
+    android:layout_height="80dp" />
 ```
 
-**Button Animation (Kotlin):**
+**Spring Animation:**
 ```kotlin
 button.setOnClickListener {
-    // Create spring animation with overshoot
-    val scaleX = SpringAnimation(button, DynamicAnimation.SCALE_X, 1f).apply {
+    button.scaleX = 0.9f; button.scaleY = 0.9f
+    SpringAnimation(button, DynamicAnimation.SCALE_X, 1f).apply {
         spring.stiffness = SpringForce.STIFFNESS_LOW
         spring.dampingRatio = SpringForce.DAMPING_RATIO_LOW_BOUNCY
-    }
-    val scaleY = SpringAnimation(button, DynamicAnimation.SCALE_Y, 1f).apply {
-        spring.stiffness = SpringForce.STIFFNESS_LOW
-        spring.dampingRatio = SpringForce.DAMPING_RATIO_LOW_BOUNCY
-    }
-    
-    // Shrink then bounce back
-    button.scaleX = 0.9f
-    button.scaleY = 0.9f
-    scaleX.start()
-    scaleY.start()
-    
-    // Perform action
+    }.start()
+    // Similar for SCALE_Y
 }
 ```
 
-**Button Selection Guide (M3 Expressive):**
-- **Hero action**: Large filled button (80dp height, bold text)
-- **Primary action**: Medium filled button (64dp height)
-- **Secondary action**: Tonal button (64dp height)
-- **Tertiary action**: Text button (48dp height)
-- All buttons should have spring animations
-
 ### TextInputLayout - Expressive Style
 
-**M3 Expressive Input Principles:**
-- **Organic Shapes**: Consider pill shapes or custom organic forms
-- **Spring Transitions**: Animate focus/unfocus with spring physics
-- **Bold Labels**: Use larger, bolder label typography
+**Principles**: Organic Shapes (pills, custom forms), Spring Transitions, Bold Labels
 
 ```xml
-<!-- Filled with Expressive Shape -->
 <com.google.android.material.textfield.TextInputLayout
     style="@style/Widget.Material3.TextInputLayout.FilledBox"
-    app:shapeAppearance="@style/ShapeAppearance.Material3.LargeComponent.Pill"
-    ...>
-    
-<!-- Outlined with Custom Organic Shape -->
-<com.google.android.material.textfield.TextInputLayout
-    style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-    app:shapeAppearance="@style/ShapeAppearance.Custom.Organic"
-    ...>
+    app:shapeAppearance="@style/ShapeAppearance.Material3.LargeComponent.Pill" />
 ```
 
-**Input Animation (Kotlin):**
+**Focus Animation:**
 ```kotlin
 textInputLayout.editText?.setOnFocusChangeListener { view, hasFocus ->
-    val scaleX = SpringAnimation(view, DynamicAnimation.SCALE_X, if (hasFocus) 1.05f else 1f)
-    val scaleY = SpringAnimation(view, DynamicAnimation.SCALE_Y, if (hasFocus) 1.05f else 1f)
-    
-    scaleX.spring.apply {
-        stiffness = SpringForce.STIFFNESS_MEDIUM
-        dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
-    }
-    scaleY.spring.apply {
-        stiffness = SpringForce.STIFFNESS_MEDIUM
-        dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
-    }
-    
-    scaleX.start()
-    scaleY.start()
+    SpringAnimation(view, DynamicAnimation.SCALE_X, if (hasFocus) 1.05f else 1f).apply {
+        spring.stiffness = SpringForce.STIFFNESS_MEDIUM
+        spring.dampingRatio = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
+    }.start()
 }
 
 ### Progress Indicators
 
-**Migration:**
 ```xml
-<!-- Old M2 -->
-<ProgressBar
-    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-    
-<!-- New M3 -->
+<!-- M3: Use LinearProgressIndicator -->
 <com.google.android.material.progressindicator.LinearProgressIndicator
-    style="@style/Widget.Material3.LinearProgressIndicator"
+    style="@style/Widget.Material3.LinearProgressIndicator" />
 ```
 
 ## Color System Guidelines - M3 Expressive
 
-### M3 Expressive Color Philosophy
+**Philosophy**: Vibrant & Unafraid - use bold colors that create emotional impact, not just harmonious pastels.
 
-**Vibrant & Unafraid**: Move beyond harmonious pastels to create emotional impact through bold, vibrant colors.
+**Principles**: Tonal Freedom (colors can clash for energy), Bold Surface Colors, Emotional Color Coding, Higher Contrast
 
-**Key Principles:**
-- **Tonal Freedom**: Use colors that might traditionally clash to create energy
-- **Bold Surface Colors**: Flood backgrounds with strong colors to differentiate sections emotionally
-- **Emotional Color Coding**: Different sections have different "vibes"
-- **Higher Contrast**: More vibrant than standard M3's wallpaper-derived tones
+**Color Roles**: surface/surfaceVariant (can be vibrant, not neutral), primary/secondary/tertiary (bold, high impact), each with Container/On variants
 
-### M3 Expressive Color Roles
-
-**Surface Colors (Bold & Vibrant):**
-- `surface`: Can be vibrant colored backgrounds, not just neutral
-- `surfaceVariant`: Use contrasting bold colors for differentiation
-- `surfaceContainer`: Consider strong color fills for emotional sections
-- `surfaceTint`: Use for elevation with vibrant tints
-
-**Key Colors (High Contrast):**
-- `primary`: Bold, vibrant brand color (not muted)
-- `secondary`: Contrasting supporting color (can clash slightly for energy)
-- `tertiary`: Accent color with high impact
-- Each has corresponding `Container` and `On` variants with sufficient contrast
-
-**Emotional Color Sections:**
+**Examples**:
 ```xml
-<!-- Example: Calm section -->
+<!-- Emotional sections with vibrant surfaces -->
 <style name="Theme.App.Section.Calm">
     <item name="colorSurface">@color/sage_green</item>
-    <item name="colorOnSurface">@color/forest_green</item>
 </style>
 
-<!-- Example: Alert section -->
-<style name="Theme.App.Section.Alert">
-    <item name="colorSurface">@color/vibrant_terracotta</item>
-    <item name="colorOnSurface">@color/deep_crimson</item>
-</style>
+<!-- Vibrant colors: electric_blue #00B4D8, vibrant_coral #FF6B6B, neon_green #06FFA5 -->
+<!-- Always verify WCAG contrast ratios (4.5:1 text, 3:1 large text) -->
 
-<!-- Example: Energetic section -->
-<style name="Theme.App.Section.Energy">
-    <item name="colorSurface">@color/electric_blue</item>
-    <item name="colorOnSurface">@color/midnight_blue</item>
-</style>
-```
-
-### Expressive Color Examples
-
-```xml
-<resources>
-    <!-- Vibrant Primary Colors -->
-    <color name="electric_blue">#00B4D8</color>
-    <color name="vibrant_coral">#FF6B6B</color>
-    <color name="neon_green">#06FFA5</color>
-    
-    <!-- Bold Surface Colors -->
-    <color name="sage_green">#84A98C</color>
-    <color name="vibrant_terracotta">#E76F51</color>
-    <color name="deep_purple">#7209B7</color>
-    
-    <!-- High Contrast Accents -->
-    <color name="sunshine_yellow">#FFD60A</color>
-    <color name="hot_pink">#FF006E</color>
-    <color name="tangerine">#FB5607</color>
-    
-    <!-- Note: Always verify WCAG contrast ratios (min 4.5:1 for text, 3:1 for large text)
-         when using vibrant colors. Pair with appropriate on-color variants:
-         - On vibrant surfaces: use very light or very dark text colors
-         - Test with accessibility tools to ensure sufficient contrast
-    -->
-</resources>
-```
-
-### Dynamic Color (Material You) with Expressive Boost
-
-```xml
+<!-- Dynamic Color with boost -->
 <style name="AppTheme" parent="Theme.Material3.DynamicColors.Light">
-    <!-- Dynamic colors from wallpaper -->
-    <!-- Override with more vibrant versions -->
     <item name="colorPrimary">@color/primary_vibrant</item>
-    <item name="colorSecondary">@color/secondary_bold</item>
-    <!-- Fallback for older Android -->
 </style>
 ```
 
 ## Testing Strategy
 
-### After Each Component Update:
-1. **Build and run** the app
-2. **Navigate to all screens** that use the updated component
-3. **Test all interactions** (click, type, scroll, etc.)
-4. **Take screenshots** of before/after for comparison
-5. **Test all theme variants** (Pink, Blue, Purple, Green in this app)
-6. **Test on multiple Android versions** if possible
-7. **Document any visual differences** or issues
-8. **Commit changes** with clear description
+**After Each Component**: Build, test all screens/interactions/themes, take screenshots, document issues, commit
 
-### Visual Validation Checklist:
-- [ ] Component appears correctly styled
-- [ ] Colors match M3 color roles
-- [ ] Animations and transitions work
-- [ ] Text is readable with proper contrast
-- [ ] Touch targets are at least 48dp
-- [ ] Component states (pressed, disabled, etc.) work correctly
-- [ ] No layout shifts or broken layouts
-- [ ] Icons and images display correctly
+**Visual Validation**: Correct styling, M3 colors, animations work, readable text, 48dp+ touch targets, states work, no layout breaks
 
 ## Common Migration Issues
 
-### Issue 1: Color Not Applying
-**Problem**: Component not using theme colors
-**Solution**: Ensure you're using M3-specific styles and color attributes (e.g., `colorPrimary` instead of hardcoded colors)
-
-### Issue 2: Button Style Not Changing
-**Problem**: Button still looks like M2
-**Solution**: Explicitly set style attribute with M3 button style, check theme inheritance
-
-### Issue 3: TextInputLayout Corner Radius
-**Problem**: Text fields have wrong corner radius
-**Solution**: Override shape theme for small components or use explicit cornerRadius
-
-### Issue 4: Elevation Not Showing
-**Problem**: Elevated components appear flat
-**Solution**: M3 uses surface tint instead of shadows, configure `surfaceTint` color
-
-### Issue 5: Dynamic Color Not Working
-**Problem**: Dynamic colors not appearing on Android 12+
-**Solution**: Ensure theme uses `Theme.Material3.DynamicColors.*` parent, check Android version check
+1. **Color Not Applying**: Use M3 styles and color attributes (colorPrimary), not hardcoded
+2. **Button Style**: Explicitly set M3 button style, check theme inheritance
+3. **Corner Radius**: Override shape theme or use explicit cornerRadius
+4. **Elevation**: M3 uses surface tint instead of shadows
+5. **Dynamic Color**: Use Theme.Material3.DynamicColors.* parent, check Android version
 
 ## Working with Existing Code
 
-### This App Specific Notes:
-- **App uses**: Traditional View system, XML layouts
-- **Current version**: `com.google.android.material:material:1.12.0`
-- **Theme base**: Already using `Theme.Material3.Light.NoActionBar`
-- **Themes**: Four color variants (Pink, Blue, Purple, Green) - perfect for expressive color coding
-- **Components in use**: TextInputLayout, MaterialButton, MaterialButtonToggleGroup, Snackbar, ProgressBar
+**App**: View system, XML layouts, Material 1.12.0, Theme.Material3.Light.NoActionBar, 4 themes (Pink/Blue/Purple/Green)
+**Components**: TextInputLayout, MaterialButton, MaterialButtonToggleGroup, Snackbar, ProgressBar
 
-### Migration Order for This App (M3 Expressive):
-1. Update Material library to 1.13.0+ and add DynamicAnimation library
-2. Implement spring animation foundation (create utility classes/extensions)
-3. Migrate color system to expressive vibrant colors (enhance all 4 themes with bold, emotional colors)
-4. Update MaterialButton with expressive styles (big & bouncy, spring animations, hero sizing)
-5. Add spring animations to all button interactions
-6. Update TextInputLayout with expressive shapes and spring transitions
-7. Enhance typography to editorial style with emphasized variants and larger heroes
-8. Implement shape morphing where applicable (play/pause, expand/collapse)
-9. Update MaterialButtonToggleGroup with expressive styling
-10. Update ProgressBar to LinearProgressIndicator with spring-based animations
-11. Update Snackbar with bouncy entrance animations
-12. Update dialogs with morphing shapes and spring transitions
-13. Apply bold surface colors to different app sections for emotional coding
-14. Final pass: ensure all transitions use spring physics with overshoot
+**Migration Order**: Update libs → Spring animation foundation → Vibrant colors → Buttons (big & bouncy) → TextInputLayout → Typography → Shape morphing → Other components → Surface colors → Final spring physics pass
 
-## Validation Commands
+## Validation & Documentation
 
-```bash
-# Build the app
-./gradlew assembleDebug
+**Commands**: `./gradlew assembleDebug`, `./gradlew test`
 
-# Run tests
-./gradlew test
+**Update Docs**: dependencies.md, ui-layer.md, screenshots, README.md
 
-# Check for dependency updates
-./gradlew dependencyUpdates
-
-# Generate APK for manual testing
-./gradlew assembleDebug
-# APK location: app/build/outputs/apk/debug/
-```
-
-## Documentation Updates Required
-
-After migration, update:
-- [ ] `docs/development/dependencies.md` - Note Material 3 migration
-- [ ] `docs/architecture/ui-layer.md` - Update to reflect M3 usage
-- [ ] Any user-facing documentation with screenshots
-- [ ] `README.md` if visual changes are significant
-
-## Best Practices - M3 Expressive
+## Best Practices
 
 ### ✅ Do:
-- **Prioritize Emotion**: Make the interface feel like a friend, not just a tool
-- **Use Spring Physics**: Replace all easing curves with spring animations (stiffness + damping)
-- **Go Big**: Make primary actions hero-sized (60-80dp) for glanceability and accessibility
-- **Be Bold with Color**: Use vibrant, high-contrast colors that create emotional vibes
-- **Morph Shapes**: Implement shape transformations for state changes to maintain continuity
-- **Editorial Typography**: Use large, bold headlines as primary information containers
-- **Add Overshoot**: Ensure all interactive elements have playful bounce
-- **Test Animations**: Record and review all spring animations for feel
-- Update ONE component type at a time
-- Test thoroughly after each change
-- Take screenshots AND record animations for comparison
-- Test all theme variants with expressive color schemes
-- Document visual AND motion changes in commit messages
-- Keep changes in small, reviewable commits
+- Prioritize emotion, use spring physics (not easing curves), go big (60-80dp), bold colors, morph shapes, editorial typography, add overshoot
+- Update ONE component at a time, test thoroughly, take screenshots AND record animations
+- Test all themes, document changes, small commits
 
 ### ❌ Don't:
-- **Use Standard Easing**: Avoid ease-in/ease-out curves; always use spring physics
-- **Be Timid with Color**: Don't stick to safe, neutral palettes
-- **Make Everything Small**: Avoid compact, dense layouts
-- **Skip Motion**: Don't create static interfaces; add bounce and playfulness
-- **Use Only Rounded Rectangles**: Explore the full shape library (35+ shapes)
-- Update all components at once
-- Skip testing after changes
-- Use hardcoded colors instead of theme attributes
-- Make all buttons the same size (breaks visual hierarchy and "big & bouncy" principle)
-- Forget to test different Android versions
-- Change component behavior (only enhance visual/motion experience)
-- Break existing functionality
+- Use standard easing, timid colors, small/dense layouts, static interfaces, only rounded rectangles
+- Update all at once, skip testing, hardcode colors, same-size buttons, break functionality
 
-## Questions to Ask Before Each Update
+**Questions**: Which screens? Visual hierarchy? Accessibility? Edge cases? Screenshots ready?
 
-1. "Which screens use this component?"
-2. "What is the visual hierarchy? (Which actions are primary/secondary/tertiary?)"
-3. "Does this change maintain accessibility standards?"
-4. "Are there any edge cases or special states to test?"
-5. "Do I have before/after screenshots for comparison?"
+**Reporting**: State component, affected screens, visual changes, include screenshots, update checklist
 
-## Communication
+## Typography & Shape Examples
 
-When reporting progress:
-- Clearly state which component was updated
-- Note which screens were affected
-- Mention any visual changes or issues found
-- Include screenshots if significant visual changes
-- Update the migration checklist
-
-## Typography Examples - Editorial Style
-
-### Expressive Typography Scale
+**Typography** (Editorial, large, bold):
 ```xml
 <style name="TextAppearance.App.DisplayLarge" parent="TextAppearance.Material3.DisplayLarge">
-    <item name="fontFamily">@font/display_variable</item>
     <item name="android:textSize">64sp</item>
     <item name="android:fontWeight">900</item>
 </style>
-
-<style name="TextAppearance.App.HeadlineLarge.Emphasized" parent="TextAppearance.Material3.HeadlineLarge">
-    <item name="fontFamily">@font/headline_bold</item>
-    <item name="android:textSize">48sp</item>
-    <item name="android:fontWeight">800</item>
-    <item name="android:letterSpacing">-0.02</item>
-</style>
-
-<style name="TextAppearance.App.Editorial.Hero">
-    <item name="fontFamily">@font/editorial_display</item>
-    <item name="android:textSize">56sp</item>
-    <item name="android:fontWeight">700</item>
-    <item name="android:lineHeight">60sp</item>
-</style>
 ```
 
-### Shape Examples - Organic & Morphic
+**Shapes** (Pill, Organic):
 ```xml
-<!-- Pill Shape -->
 <style name="ShapeAppearance.App.Pill" parent="ShapeAppearance.Material3.LargeComponent">
-    <item name="cornerFamily">rounded</item>
     <item name="cornerSize">50%</item>
 </style>
-
-<!-- Organic Blob Shape -->
-<style name="ShapeAppearance.App.Organic" parent="ShapeAppearance.Material3.MediumComponent">
-    <item name="cornerFamily">rounded</item>
+<style name="ShapeAppearance.App.Organic">
     <item name="cornerSizeTopLeft">24dp</item>
     <item name="cornerSizeTopRight">48dp</item>
     <item name="cornerSizeBottomLeft">48dp</item>
     <item name="cornerSizeBottomRight">24dp</item>
 </style>
-
-<!-- Starburst (using custom drawable) -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <!-- Use custom path for starburst points -->
-</shape>
 ```
 
 ## Spring Animation Utilities
 
-### Kotlin Extension for Easy Spring Animations
 ```kotlin
-// SpringAnimationUtils.kt
-fun View.animateWithSpring(
-    property: DynamicAnimation.ViewProperty,
-    targetValue: Float,
+// Extension for spring animations
+fun View.animateWithSpring(property: DynamicAnimation.ViewProperty, targetValue: Float,
     stiffness: Float = SpringForce.STIFFNESS_MEDIUM,
-    dampingRatio: Float = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
-): SpringAnimation {
-    return SpringAnimation(this, property, targetValue).apply {
-        spring.stiffness = stiffness
-        spring.dampingRatio = dampingRatio
-        start()
-    }
-}
+    dampingRatio: Float = SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY) =
+    SpringAnimation(this, property, targetValue).apply {
+        spring.stiffness = stiffness; spring.dampingRatio = dampingRatio
+    }.start()
 
 fun View.bounceOnClick(onClick: () -> Unit) {
     setOnClickListener {
-        // Shrink
-        scaleX = 0.9f
-        scaleY = 0.9f
-        
-        // Bounce back with spring
-        animateWithSpring(DynamicAnimation.SCALE_X, 1f, 
-            stiffness = SpringForce.STIFFNESS_LOW,
-            dampingRatio = SpringForce.DAMPING_RATIO_LOW_BOUNCY)
-        animateWithSpring(DynamicAnimation.SCALE_Y, 1f,
-            stiffness = SpringForce.STIFFNESS_LOW, 
-            dampingRatio = SpringForce.DAMPING_RATIO_LOW_BOUNCY)
-        
-        // Perform action with delay for animation
+        scaleX = 0.9f; scaleY = 0.9f
+        animateWithSpring(DynamicAnimation.SCALE_X, 1f, SpringForce.STIFFNESS_LOW, 
+            SpringForce.DAMPING_RATIO_LOW_BOUNCY)
+        animateWithSpring(DynamicAnimation.SCALE_Y, 1f, SpringForce.STIFFNESS_LOW,
+            SpringForce.DAMPING_RATIO_LOW_BOUNCY)
         postDelayed({ onClick() }, 100)
     }
 }
 
-fun View.overshootTranslation(
-    property: DynamicAnimation.ViewProperty,
-    targetValue: Float
-) {
-    animateWithSpring(property, targetValue,
-        stiffness = SpringForce.STIFFNESS_LOW,
-        dampingRatio = SpringForce.DAMPING_RATIO_LOW_BOUNCY)
-}
-```
-
-### Usage Examples
-```kotlin
-// Button with bounce
-button.bounceOnClick {
-    // Handle click
-}
-
-// List item entrance with overshoot
-recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        // Animate newly visible items with spring
-        layoutManager.findFirstVisibleItemPosition().let { first ->
-            layoutManager.findLastVisibleItemPosition().let { last ->
-                for (i in first..last) {
-                    recyclerView.findViewHolderForAdapterPosition(i)?.itemView?.apply {
-                        // Check if item hasn't been animated yet (using tag)
-                        if (getTag(R.id.animated_tag) == null) {
-                            setTag(R.id.animated_tag, true)
-                            alpha = 0f
-                            translationY = 100f
-                            animateWithSpring(DynamicAnimation.ALPHA, 1f)
-                            overshootTranslation(DynamicAnimation.TRANSLATION_Y, 0f)
-                        }
-                    }
-                }
-            }
-        }
-    }
-})
+// Usage: button.bounceOnClick { /* action */ }
 ```
 
 ## Remember
