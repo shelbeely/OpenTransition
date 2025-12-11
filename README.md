@@ -65,6 +65,15 @@ We welcome contributions! If you'd like to help improve OpenTransition:
 - Translations/localization
 - UI/UX improvements
 
+## 👥 Contributors
+
+We are grateful to everyone who has contributed to OpenTransition! Here are our code contributors:
+
+- copilot-swe-agent[bot]: 4 commits (80.0%)
+- Shelbee Johnson: 1 commits (20.0%)
+
+View all contributors on [GitHub](https://github.com/shelbeely/OpenTransition/graphs/contributors).
+
 ## License
 
 OpenTransition is a fork of TransTracks and maintains the same GPL v3 license.

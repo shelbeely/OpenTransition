@@ -38,6 +38,3 @@ release-keystore.jks
 # MkDocs
 site/
 .cache/
-
-# Kotlin
-.kotlin/
