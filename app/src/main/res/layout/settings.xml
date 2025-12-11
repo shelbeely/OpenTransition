@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/settings"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textAppearance="@style/TextAppearance.Material3.HeadlineLarge"
             android:textColor="@color/white_text_selector" />
     </androidx.appcompat.widget.Toolbar>
 
@@ -57,7 +57,7 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/TextAppearance.AppCompat.Title"
+                style="@style/TextAppearance.Material3.HeadlineMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -71,7 +71,7 @@
 
             <TextView
                 android:id="@+id/settings_account_description"
-                style="@style/TextAppearance.AppCompat.Caption"
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -91,7 +91,7 @@
 
                 <TextView
                     android:id="@+id/settings_account_name_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/account_name_label"
@@ -99,13 +99,14 @@
 
                 <Button
                     android:id="@+id/settings_account_name"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="56dp"
                     android:layout_marginStart="@dimen/spacer_grid_half"
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector"
                     tools:text="User Name" />
             </LinearLayout>
@@ -120,7 +121,7 @@
 
                 <TextView
                     android:id="@+id/settings_account_email_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/account_email_label"
@@ -128,13 +129,14 @@
 
                 <Button
                     android:id="@+id/settings_account_email"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="56dp"
                     android:layout_marginStart="@dimen/spacer_grid_half"
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector"
                     tools:text="User Email" />
             </LinearLayout>
@@ -152,21 +154,25 @@
 
                 <Button
                     android:id="@+id/settings_account_sign_in"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingHorizontal="24dp"
                     android:text="@string/sign_in"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:textSize="16sp" />
 
                 <Button
                     android:id="@+id/settings_account_change_password"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingHorizontal="24dp"
                     android:text="@string/change_password"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:textSize="16sp" />
 
                 <Space
                     android:id="@+id/settings_account_logged_in_button_space_1"
@@ -176,12 +182,14 @@
 
                 <Button
                     android:id="@+id/settings_account_delete_account"
-                    style="@style/Widget.AppCompat.Button"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingHorizontal="24dp"
                     android:text="@string/delete_account"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:textSize="16sp" />
 
                 <Space
                     android:id="@+id/settings_account_logged_in_button_space_2"
@@ -191,12 +199,14 @@
 
                 <Button
                     android:id="@+id/settings_account_sign_out"
-                    style="@style/Widget.AppCompat.Button"
+                    style="@style/Widget.Material3.Button.OutlinedButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingHorizontal="24dp"
                     android:text="@string/sign_out"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:textSize="16sp" />
 
                 <Space
                     android:layout_width="0dp"
@@ -221,7 +231,7 @@
 
                 <TextView
                     android:id="@+id/settings_start_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/start_date_label"
@@ -229,15 +239,16 @@
 
                 <Button
                     android:id="@+id/settings_start_date"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="56dp"
                     android:layout_marginStart="@dimen/spacer_grid_half"
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector"
                     tools:text="15/08/2017" />
             </LinearLayout>
@@ -251,7 +262,7 @@
 
                 <TextView
                     android:id="@+id/settings_theme_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/theme_label"
@@ -259,15 +270,16 @@
 
                 <Button
                     android:id="@+id/settings_theme"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="56dp"
                     android:layout_marginStart="@dimen/spacer_grid_half"
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector"
                     tools:text="Blue" />
             </LinearLayout>
@@ -281,7 +293,7 @@
 
                 <TextView
                     android:id="@+id/settings_lock_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
@@ -293,14 +305,15 @@
 
                 <Button
                     android:id="@+id/settings_lock"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="56dp"
                     android:layout_marginStart="@dimen/spacer_grid_half"
                     android:gravity="end|center_vertical"
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -310,7 +323,7 @@
 
                 <TextView
                     android:id="@+id/settings_lock_description"
-                    style="@style/TextAppearance.AppCompat.Caption"
+                    style="@style/TextAppearance.Material3.BodySmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/lock_description"
@@ -329,7 +342,7 @@
 
                 <TextView
                     android:id="@+id/settings_lock_delay_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:enabled="false"
@@ -338,16 +351,17 @@
 
                 <Button
                     android:id="@+id/settings_lock_delay"
-                    style="@style/Widget.AppCompat.Button.Borderless"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:minHeight="56dp"
                     android:layout_marginStart="@dimen/spacer_grid_half"
                     android:layout_weight="1"
                     android:enabled="false"
                     android:gravity="end|center_vertical"
                     android:paddingTop="@dimen/spacer_grid_half"
                     android:paddingBottom="@dimen/spacer_grid_half"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector"
                     tools:text="Instant" />
             </LinearLayout>
@@ -372,7 +386,7 @@
 
                 <TextView
                     android:id="@+id/settings_data_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/data_label"
@@ -385,12 +399,14 @@
 
                 <Button
                     android:id="@+id/settings_import"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingHorizontal="24dp"
                     android:text="@string/_import"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:textSize="16sp" />
 
                 <Space
                     android:layout_width="0dp"
@@ -399,12 +415,14 @@
 
                 <Button
                     android:id="@+id/settings_export"
-                    style="@style/Widget.AppCompat.Button.Colored"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:minHeight="64dp"
+                    android:paddingHorizontal="24dp"
                     android:text="@string/export"
                     android:textAllCaps="false"
-                    android:textColor="@color/white" />
+                    android:textSize="16sp" />
 
                 <Space
                     android:layout_width="0dp"
@@ -420,11 +438,11 @@
                 android:importantForAccessibility="no"
                 android:src="@drawable/fading_line" />
 
-            <androidx.appcompat.widget.SwitchCompat
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/settings_analytics"
-                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="64dp"
                 android:layout_weight="1"
                 android:paddingStart="@dimen/spacer_grid"
                 android:paddingTop="@dimen/spacer_grid_half"
@@ -432,14 +450,14 @@
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/anonymous_analytics"
                 android:textAlignment="textStart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/white_text_selector" />
 
-            <androidx.appcompat.widget.SwitchCompat
+            <com.google.android.material.materialswitch.MaterialSwitch
                 android:id="@+id/settings_crash_reports"
-                style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="64dp"
                 android:layout_weight="1"
                 android:paddingStart="@dimen/spacer_grid"
                 android:paddingTop="@dimen/spacer_grid_half"
@@ -447,7 +465,7 @@
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/anonymous_crash_reports"
                 android:textAlignment="textStart"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/white_text_selector" />
 
             <ImageView
@@ -460,7 +478,7 @@
 
             <TextView
                 android:id="@+id/settings_about_title"
-                style="@style/TextAppearance.AppCompat.Title"
+                style="@style/TextAppearance.Material3.HeadlineMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -474,7 +492,7 @@
 
             <TextView
                 android:id="@+id/settings_about_description"
-                style="@style/TextAppearance.AppCompat.Medium"
+                style="@style/TextAppearance.Material3.BodyMedium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
@@ -486,16 +504,17 @@
 
             <Button
                 android:id="@+id/settings_contribute"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="60dp"
                 android:gravity="center"
                 android:paddingStart="@dimen/spacer_grid"
                 android:paddingTop="@dimen/spacer_grid_half"
                 android:paddingEnd="@dimen/spacer_grid"
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/contribute"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/white_text_selector" />
 
             <ImageView
@@ -517,7 +536,7 @@
 
                 <TextView
                     android:id="@+id/settings_app_version_label"
-                    style="@style/TextAppearance.AppCompat.Title"
+                    style="@style/TextAppearance.Material3.TitleMedium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/app_version_label"
@@ -530,23 +549,24 @@
                     android:layout_marginStart="@dimen/spacer_grid_half"
                     android:layout_weight="1"
                     android:gravity="end|center_vertical"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                     android:textColor="@color/white_text_selector"
                     tools:text="1.0.0 (8)" />
             </LinearLayout>
 
             <Button
                 android:id="@+id/settings_privacy_policy"
-                style="@style/Widget.AppCompat.Button.Borderless"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="60dp"
                 android:gravity="center"
                 android:paddingStart="@dimen/spacer_grid"
                 android:paddingTop="@dimen/spacer_grid_half"
                 android:paddingEnd="@dimen/spacer_grid"
                 android:paddingBottom="@dimen/spacer_grid_half"
                 android:text="@string/privacy_policy"
-                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
                 android:textColor="@color/white_text_selector" />
 
             <Space
@@ -564,7 +584,7 @@
                 android:paddingTop="@dimen/spacer_grid_half"
                 android:paddingEnd="@dimen/spacer_grid"
                 android:paddingBottom="@dimen/spacer_grid_half"
-                android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                android:textAppearance="@style/TextAppearance.Material3.BodySmall"
                 android:textColor="@color/white_text_selector"
                 tools:text="@string/copyright" />
         </LinearLayout>
@@ -580,19 +600,21 @@
         android:visibility="gone">
 
         <TextView
-            style="@style/TextAppearance.AppCompat.Title"
+            style="@style/TextAppearance.Material3.TitleMedium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/creating_backup_file"
             android:textColor="@color/transparent_white_90_text_selector" />
 
-        <ProgressBar
+        <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/settings_loading_progress"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            style="@style/Widget.Material3.LinearProgressIndicator"
             android:layout_width="match_parent"
-            android:layout_height="64dp"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/spacer_grid"
             android:indeterminate="false"
-            android:max="100" />
+            android:max="100"
+            app:trackCornerRadius="8dp"
+            app:trackThickness="8dp" />
     </LinearLayout>
 </com.shelbeely.opentransition.ui.settings.SettingsView>
