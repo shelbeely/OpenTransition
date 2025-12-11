@@ -53,6 +53,7 @@ sealed class SettingsUiEvent {
     object ToggleCrashReports : SettingsUiEvent()
     object Contribute : SettingsUiEvent()
     object PrivacyPolicy : SettingsUiEvent()
+    object ViewContributors : SettingsUiEvent()
 }
 
 data class SettingsUIUserDetails(
@@ -74,6 +75,8 @@ sealed class SettingsUiState {
 class SettingsView(context: Context, attributeSet: AttributeSet) :
     ConstraintLayout(context, attributeSet) {
     private lateinit var binding: SettingsBinding
+
+    private val contributorsSubject = io.reactivex.rxjava3.subjects.PublishSubject.create<SettingsUiEvent>()
 
     val events: Observable<SettingsUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
         Observable.mergeArray(
@@ -97,7 +100,8 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
             binding.settingsCrashReports.checkedChanges().toV3()
                 .filter { userAction }.map { SettingsUiEvent.ToggleCrashReports },
             binding.settingsContribute.clicks().toV3().map { SettingsUiEvent.Contribute },
-            binding.settingsPrivacyPolicy.clicks().toV3().map { SettingsUiEvent.PrivacyPolicy }
+            binding.settingsPrivacyPolicy.clicks().toV3().map { SettingsUiEvent.PrivacyPolicy },
+            contributorsSubject
         )
     }
 
@@ -215,8 +219,7 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
             spannableString.setSpan(
                 object : ClickableSpan() {
                     override fun onClick(widget: View) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/shelbeely/OpenTransition/graphs/contributors"))
-                        context.startActivity(intent)
+                        contributorsSubject.onNext(SettingsUiEvent.ViewContributors)
                     }
                 },
                 openTransitionStart,

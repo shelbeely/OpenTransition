@@ -282,6 +282,9 @@ class SettingsFragment : Fragment(R.layout.settings) {
                     startActivity(intent)
                 }
             }
+
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ViewContributors>()
+            .subscribe { showContributorsDialog(view) }
     }
 
     override fun onDetach() {
@@ -715,6 +718,38 @@ class SettingsFragment : Fragment(R.layout.settings) {
                 dialog.dismiss()
             }
             .setNegativeButton(R.string.no, null)
+            .show()
+    }
+
+    private fun showContributorsDialog(view: View) {
+        val contributors = com.shelbeely.opentransition.util.ContributorsUtil.getContributors()
+        
+        val message = buildString {
+            append(view.getString(R.string.contributors_description))
+            append("\n\n")
+            for (contributor in contributors) {
+                append(view.getString(
+                    R.string.contributor_percentage,
+                    contributor.name,
+                    contributor.commits,
+                    contributor.percentage
+                ))
+                append("\n")
+            }
+        }
+
+        AlertDialog.Builder(view.context)
+            .setTitle(R.string.contributors_title)
+            .setMessage(message.trim())
+            .setPositiveButton(R.string.ok, null)
+            .setNeutralButton(R.string.view_on_github) { dialog, _ ->
+                val intent = Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://github.com/shelbeely/OpenTransition/graphs/contributors")
+                )
+                startActivity(intent)
+                dialog.dismiss()
+            }
             .show()
     }
 }
