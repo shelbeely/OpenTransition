@@ -133,6 +133,7 @@ fun View.springOnFocus() {
 /**
  * Spring reveal animation - element springs into view
  * Perfect for hero moments and emphasizing important content
+ * Uses only SpringAnimation for consistency
  */
 fun View.springReveal(delay: Long = 0) {
     alpha = 0f
@@ -140,7 +141,13 @@ fun View.springReveal(delay: Long = 0) {
     scaleY = 0.8f
     
     postDelayed({
-        animate().alpha(1f).setDuration(300).start()
+        // Use SpringAnimation for alpha as well for consistency
+        animateWithSpring(
+            DynamicAnimation.ALPHA,
+            1f,
+            SpringForce.STIFFNESS_MEDIUM,
+            SpringForce.DAMPING_RATIO_MEDIUM_BOUNCY
+        )
         
         animateWithSpring(
             DynamicAnimation.SCALE_X,
