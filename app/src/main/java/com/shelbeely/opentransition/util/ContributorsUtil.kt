@@ -22,13 +22,21 @@ data class Contributor(
 /**
  * Utility object to manage contributor information
  * 
- * Note: This data should be updated periodically to reflect current contribution statistics.
- * To update, run: git shortlog -sn --all
+ * Note: This data should be updated manually when significant contributions are made.
+ * To generate updated statistics, run: 
+ *   git shortlog -sn --all | awk '{total+=$1; lines[NR]=$0} END {for(i=1; i<=NR; i++) {split(lines[i], a, " "); commits=a[1]; name=""; for(j=2; j<=length(a); j++) name=name" "a[j]; percent=(commits/total*100); printf "Contributor(\"%s\", %d, %.1f),\n", name, commits, percent}}'
+ * 
+ * The data is intentionally hardcoded rather than calculated at runtime because:
+ * - Git is not available in the Android runtime environment
+ * - Contributor statistics change infrequently and don't need dynamic calculation
+ * - This provides a simple, maintainable solution without external dependencies
  */
 object ContributorsUtil {
     
     /**
      * Returns the list of contributors sorted by contribution percentage (descending)
+     * 
+     * Data is current as of commit 2ea6fef (December 2025)
      */
     fun getContributors(): List<Contributor> {
         val contributors = listOf(
