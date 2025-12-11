@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright © 2018-2023 TransTracks. All rights reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <!-- Material Design 3 Expressive Shape Styles -->
+    <!-- Organic, morphing shapes beyond basic rounded rectangles -->
+    
+    <!-- Pill shapes - Fully rounded ends for buttons and chips -->
+    <style name="ShapeAppearance.App.Pill" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">50%</item>
+    </style>
+    
+    <style name="ShapeAppearance.App.PillSmall" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">50%</item>
+    </style>
+    
+    <!-- Organic shapes - Asymmetric for visual interest -->
+    <style name="ShapeAppearance.App.OrganicLarge" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSizeTopLeft">32dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">16dp</item>
+        <item name="cornerSizeBottomRight">32dp</item>
+    </style>
+    
+    <style name="ShapeAppearance.App.OrganicMedium" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSizeTopLeft">24dp</item>
+        <item name="cornerSizeTopRight">8dp</item>
+        <item name="cornerSizeBottomLeft">8dp</item>
+        <item name="cornerSizeBottomRight">24dp</item>
+    </style>
+    
+    <style name="ShapeAppearance.App.OrganicSmall" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">4dp</item>
+        <item name="cornerSizeBottomLeft">4dp</item>
+        <item name="cornerSizeBottomRight">16dp</item>
+    </style>
+    
+    <!-- Blob shapes - Highly rounded, playful -->
+    <style name="ShapeAppearance.App.Blob" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSizeTopLeft">48dp</item>
+        <item name="cornerSizeTopRight">32dp</item>
+        <item name="cornerSizeBottomLeft">36dp</item>
+        <item name="cornerSizeBottomRight">44dp</item>
+    </style>
+    
+    <!-- Expressive button shapes -->
+    <style name="ShapeAppearance.App.Button" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">20dp</item>
+    </style>
+    
+    <style name="ShapeAppearance.App.ButtonPill" parent="ShapeAppearance.Material3.LargeComponent">
+        <item name="cornerSize">50%</item>
+    </style>
+    
+    <!-- Card shapes with personality -->
+    <style name="ShapeAppearance.App.Card" parent="ShapeAppearance.Material3.MediumComponent">
+        <item name="cornerSizeTopLeft">24dp</item>
+        <item name="cornerSizeTopRight">24dp</item>
+        <item name="cornerSizeBottomLeft">16dp</item>
+        <item name="cornerSizeBottomRight">16dp</item>
+    </style>
+    
+    <!-- Progress indicator with expressive shape -->
+    <style name="ShapeAppearance.App.ProgressIndicator" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerSize">8dp</item>
+    </style>
+</resources>

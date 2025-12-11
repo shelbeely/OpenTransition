@@ -29,6 +29,8 @@ import com.shelbeely.opentransition.util.gone
 import com.shelbeely.opentransition.util.toFullDateString
 import com.shelbeely.opentransition.util.toV3
 import com.shelbeely.opentransition.util.visible
+import com.shelbeely.opentransition.util.bounceOnClick
+import com.shelbeely.opentransition.util.springReveal
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.widget.checkedChanges
@@ -120,6 +122,38 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
         binding.settingsLockLabel.setOnClickListener { binding.settingsLock.performClick() }
         binding.settingsLockDescription.setOnClickListener { binding.settingsLock.performClick() }
         binding.settingsLockDelayLabel.setOnClickListener { binding.settingsLockDelay.performClick() }
+        
+        // Apply M3 Expressive spring animations to buttons for bouncy, delightful interactions
+        applySpringAnimationsToButtons()
+    }
+    
+    /**
+     * Apply Material Design 3 Expressive spring animations to all interactive buttons
+     * Creates bouncy, playful feedback following "Big and Bouncy" principle
+     */
+    private fun applySpringAnimationsToButtons() {
+        // Primary action buttons - bigger bounce for emphasis
+        binding.settingsAccountSignIn.bounceOnClick { /* handled by event stream */ }
+        binding.settingsAccountChangePassword.bounceOnClick { /* handled by event stream */ }
+        binding.settingsImport.bounceOnClick { /* handled by event stream */ }
+        binding.settingsExport.bounceOnClick { /* handled by event stream */ }
+        
+        // Secondary action buttons
+        binding.settingsAccountDeleteAccount.bounceOnClick { /* handled by event stream */ }
+        binding.settingsAccountSignOut.bounceOnClick { /* handled by event stream */ }
+        
+        // Text buttons - subtle bounce
+        binding.settingsAccountName.bounceOnClick { /* handled by event stream */ }
+        binding.settingsAccountEmail.bounceOnClick { /* handled by event stream */ }
+        binding.settingsStartDate.bounceOnClick { /* handled by event stream */ }
+        binding.settingsTheme.bounceOnClick { /* handled by event stream */ }
+        binding.settingsLock.bounceOnClick { /* handled by event stream */ }
+        binding.settingsLockDelay.bounceOnClick { /* handled by event stream */ }
+        binding.settingsContribute.bounceOnClick { /* handled by event stream */ }
+        binding.settingsPrivacyPolicy.bounceOnClick { /* handled by event stream */ }
+        
+        // Apply spring reveal animation to section headers for editorial feel
+        binding.settingsTitle.springReveal(delay = 50)
     }
 
     fun display(state: SettingsUiState) {

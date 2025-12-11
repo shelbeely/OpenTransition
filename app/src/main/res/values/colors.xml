@@ -11,25 +11,29 @@
   -->
 
 <resources>
-    <color name="pinkColorPrimaryLight">#ffbde4</color>
-    <color name="pinkColorPrimary">#E4A9CC</color>
-    <color name="pinkColorPrimaryDark">#b0829e</color>
-    <color name="pinkColorAccent">#9ECCF6</color>
+    <!-- M3 Expressive: Enhanced vibrant pink theme -->
+    <color name="pinkColorPrimaryLight">#FFB3E5</color>
+    <color name="pinkColorPrimary">#FF85D4</color>
+    <color name="pinkColorPrimaryDark">#E665B8</color>
+    <color name="pinkColorAccent">#70C8FF</color>
 
-    <color name="blueColorPrimaryLight">#a3d3ff</color>
-    <color name="blueColorPrimary">#9ECCF6</color>
-    <color name="blueColorPrimaryDark">#7ca0c2</color>
-    <color name="blueColorAccent">#E4A9CC</color>
+    <!-- M3 Expressive: Enhanced vibrant blue theme -->
+    <color name="blueColorPrimaryLight">#85CDFF</color>
+    <color name="blueColorPrimary">#4DB8FF</color>
+    <color name="blueColorPrimaryDark">#2A9FE6</color>
+    <color name="blueColorAccent">#FF85D4</color>
 
-    <color name="purpleColorPrimaryLight">#be9df5</color>
-    <color name="purpleColorPrimary">#977cc2</color>
-    <color name="purpleColorPrimaryDark">#6f5b8f</color>
-    <color name="purpleColorAccent">#9ECCF6</color>
+    <!-- M3 Expressive: Enhanced vibrant purple theme -->
+    <color name="purpleColorPrimaryLight">#C7A3FF</color>
+    <color name="purpleColorPrimary">#A875FF</color>
+    <color name="purpleColorPrimaryDark">#8956E0</color>
+    <color name="purpleColorAccent">#70C8FF</color>
 
-    <color name="greenColorPrimaryLight">#4ecc84</color>
-    <color name="greenColorPrimary">#3A9963</color>
-    <color name="greenColorPrimaryDark">#276642</color>
-    <color name="greenColorAccent">#57acd4</color>
+    <!-- M3 Expressive: Enhanced vibrant green theme -->
+    <color name="greenColorPrimaryLight">#5FE694</color>
+    <color name="greenColorPrimary">#2DD36F</color>
+    <color name="greenColorPrimaryDark">#1AB759</color>
+    <color name="greenColorAccent">#4DB8FF</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
