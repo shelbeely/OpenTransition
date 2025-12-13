@@ -299,7 +299,8 @@ class CameraActivity : AppCompatActivity() {
     private fun updateTimerIcon() {
         val iconRes = when (timerSeconds) {
             3 -> R.drawable.ic_timer_3
-            5, 10 -> R.drawable.ic_timer_3  // We'll use same icon for now
+            5 -> R.drawable.ic_timer_5
+            10 -> R.drawable.ic_timer_10
             else -> R.drawable.ic_timer_off
         }
         btnTimer.setImageResource(iconRes)
