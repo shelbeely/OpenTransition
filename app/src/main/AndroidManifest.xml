@@ -158,6 +158,11 @@
             </intent-filter>
         </activity-alias>
 
+        <activity
+            android:name=".ui.camera.CameraActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar" />
+
         <activity-alias
             android:name=".MainActivityTrain"
             android:enabled="false"
