@@ -124,11 +124,8 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         
-        // Apply window insets selectively to avoid double padding
-        // Top insets go to toolbar to position it below status bar
-        toolbar.applySystemBarInsets(left = false, top = true, right = false, bottom = false)
-        // Bottom insets go to bottom recycler view to avoid navigation bar
-        bodyRecyclerView.applySystemBarInsets(left = false, top = false, right = false, bottom = true)
+        // Apply window insets for system bars
+        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
         
         setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
