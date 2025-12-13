@@ -37,6 +37,10 @@ import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import kotterknife.bindView
 import java.time.LocalDate
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updateLayoutParams
+import androidx.constraintlayout.widget.ConstraintLayout.LayoutParams
 
 sealed class HomeUiEvent {
     object Settings : HomeUiEvent()
@@ -124,8 +128,27 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         
-        // Apply window insets for system bars
-        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
+        // Apply window insets properly for ConstraintLayout
+        // Apply as margins to toolbar (top edge) and padding to bottom recycler view (bottom edge)
+        ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            
+            // Apply top inset as top margin to toolbar
+            toolbar.updateLayoutParams<LayoutParams> {
+                topMargin = 16.dpToPx() + insets.top
+            }
+            
+            // Apply bottom inset as bottom padding to bottom recycler view
+            bodyRecyclerView.setPadding(
+                bodyRecyclerView.paddingLeft,
+                bodyRecyclerView.paddingTop,
+                bodyRecyclerView.paddingRight,
+                12.dpToPx() + insets.bottom
+            )
+            
+            windowInsets
+        }
+        ViewCompat.requestApplyInsets(this)
         
         setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
@@ -150,6 +173,10 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         bodyRecyclerView.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL, false
         )
+    }
+    
+    private fun Int.dpToPx(): Int {
+        return (this * context.resources.displayMetrics.density).toInt()
     }
 
     fun display(state: HomeUiState) {
