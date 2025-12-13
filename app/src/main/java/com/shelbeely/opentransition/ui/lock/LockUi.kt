@@ -19,6 +19,7 @@ import android.widget.ImageView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.toV3
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.widget.editorActions
 import com.squareup.picasso.Picasso
@@ -56,6 +57,10 @@ class LockView(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        
+        // Apply window insets for system bars
+        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
+        
         if (background != null && !isInEditMode) {
             Picasso.get()
                 .load(R.drawable.train_track_background)

@@ -29,6 +29,7 @@ import com.shelbeely.opentransition.util.nullAllElements
 import com.shelbeely.opentransition.util.setVisibleOrInvisible
 import com.shelbeely.opentransition.util.toFullDateString
 import com.shelbeely.opentransition.util.toV3
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
@@ -121,6 +122,10 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        
+        // Apply window insets for system bars
+        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
+        
         setOnTouchListener { _, event ->
             gestureDetector.onTouchEvent(event)
             return@setOnTouchListener true

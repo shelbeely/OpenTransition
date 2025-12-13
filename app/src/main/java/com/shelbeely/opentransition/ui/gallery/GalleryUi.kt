@@ -34,6 +34,7 @@ import com.shelbeely.opentransition.util.setGone
 import com.shelbeely.opentransition.util.setVisible
 import com.shelbeely.opentransition.util.toV3
 import com.shelbeely.opentransition.util.visible
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
@@ -99,6 +100,9 @@ class GalleryView(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
+        // Apply window insets for system bars
+        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
 
         toolbar.inflateMenu(R.menu.gallery)
         toolbar.setOnMenuItemClickListener { item ->
