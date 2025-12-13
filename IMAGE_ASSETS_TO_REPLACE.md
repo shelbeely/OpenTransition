@@ -90,7 +90,7 @@ These files define how the adaptive icons are composed. You typically don't need
   - **Format:** JPG
   - **Purpose:** Background image for the train-themed lock screen
   - **Current Design:** Photo of railroad/train tracks
-  - **Usage:** Used in `res/layout/train_lock.xml` as the lock screen background
+  - **Usage:** Used in `app/src/main/res/layout/train_lock.xml` as the lock screen background
   - **What to Replace:** Replace with your custom background image for the alternative lock screen theme
   - **Notes:** This image should be high resolution to support various screen sizes and densities
 
@@ -155,8 +155,8 @@ The app does NOT use PNG mipmap files for different densities (mdpi, hdpi, xhdpi
 Beyond the files listed above, you may also want to customize:
 
 - **App Name:** `app/src/main/res/values/strings.xml` - Change the `app_name` string
-- **Theme Colors:** `app/src/main/res/values/colors.xml` - Modify brand colors
-- **Gradient Backgrounds:** `app/src/main/res/drawable/gradient_background.xml` - Uses theme colors dynamically
+- **Theme Colors:** `app/src/main/res/values/colors.xml` - Modify brand colors (primary, accent, etc.)
+- **Gradient Backgrounds:** `app/src/main/res/drawable/gradient_background.xml` - This file dynamically references theme colors from `colors.xml`, so update your colors there rather than modifying this file directly
 
 ### Documentation Screenshots
 
