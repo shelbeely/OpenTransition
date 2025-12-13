@@ -158,6 +158,20 @@ Beyond the files listed above, you may also want to customize:
 - **Theme Colors:** `app/src/main/res/values/colors.xml` - Modify brand colors
 - **Gradient Backgrounds:** `app/src/main/res/drawable/gradient_background.xml` - Uses theme colors dynamically
 
+### Documentation Screenshots
+
+The `docs/` folder contains screenshots used in the project documentation (e.g., `docs/Screenshot_20251206-141719.png`). These are not part of the app's compiled assets but may appear in:
+- GitHub Pages documentation
+- README files
+- Guides and tutorials
+
+If you're rebranding the entire project, you may want to:
+1. Take new screenshots of your customized app
+2. Replace the documentation screenshots with your own
+3. Update any references in markdown files
+
+**Note:** Documentation screenshots are optional and don't affect the compiled app.
+
 ## Verification Checklist
 
 After replacing all assets, verify:
