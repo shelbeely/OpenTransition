@@ -20,10 +20,10 @@ import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.NonNull
 import androidx.annotation.StringRes
-import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.shelbeely.opentransition.R
 
 @ColorInt
 fun View.getColor(@ColorRes colorRes: Int): Int = when {
@@ -97,7 +97,9 @@ fun View.applySystemBarInsets(
     bottom: Boolean = true,
     applyPadding: Boolean = true
 ) {
-    val initialPadding = recordInitialPadding()
+    // Store initial padding in view tag if not already stored
+    val initialPadding = getTag(R.id.initial_padding_tag) as? InitialPadding
+        ?: recordInitialPadding().also { setTag(R.id.initial_padding_tag, it) }
     
     ViewCompat.setOnApplyWindowInsetsListener(this) { view, windowInsets ->
         val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
