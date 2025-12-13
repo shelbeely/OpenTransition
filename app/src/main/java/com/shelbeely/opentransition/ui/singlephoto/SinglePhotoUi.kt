@@ -18,6 +18,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.toV3
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.jakewharton.rxbinding3.appcompat.itemClicks
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.squareup.picasso.Picasso
@@ -63,6 +64,10 @@ class SinglePhotoView(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        
+        // Apply window insets for system bars
+        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
+        
         toolbar.inflateMenu(R.menu.single_photo)
     }
 

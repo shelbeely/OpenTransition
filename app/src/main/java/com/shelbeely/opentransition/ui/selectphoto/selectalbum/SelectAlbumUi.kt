@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.isNotDisposed
 import com.shelbeely.opentransition.util.toV3
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
@@ -51,6 +52,13 @@ class AlbumView(
     }
 
     private var albumClickDisposable: Disposable = Disposable.disposed()
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        
+        // Apply window insets for system bars
+        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
+    }
 
     fun display(state: SelectAlbumUiState) {
         when (state) {

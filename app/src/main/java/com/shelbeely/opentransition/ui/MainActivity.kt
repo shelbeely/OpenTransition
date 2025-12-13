@@ -18,6 +18,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.view.WindowCompat
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia.VisualMediaType
@@ -89,6 +90,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Enable edge-to-edge display for proper window insets handling
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setTheme(SettingsManager.getTheme().styleRes())
 

@@ -31,6 +31,7 @@ import com.shelbeely.opentransition.util.toV3
 import com.shelbeely.opentransition.util.visible
 import com.shelbeely.opentransition.util.bounceOnClick
 import com.shelbeely.opentransition.util.springReveal
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxbinding3.widget.checkedChanges
@@ -114,6 +115,9 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+
+        // Apply window insets for system bars
+        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
 
         binding.settingsAccountNameLabel.setOnClickListener { binding.settingsAccountName.performClick() }
         binding.settingsAccountEmailLabel.setOnClickListener { binding.settingsAccountEmail.performClick() }
