@@ -17,6 +17,7 @@ import android.os.Handler
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -32,6 +33,7 @@ import com.shelbeely.opentransition.ui.addeditmilestone.AddEditMilestoneUiEvent.
 import com.shelbeely.opentransition.ui.addeditmilestone.AddEditMilestoneUiEvent.TitleUpdated
 import com.shelbeely.opentransition.util.AnalyticsUtil
 import com.shelbeely.opentransition.util.Event
+import com.shelbeely.opentransition.util.GeminiNanoManager
 import com.shelbeely.opentransition.util.dismissIfShowing
 import com.shelbeely.opentransition.util.isNotDisposed
 import com.shelbeely.opentransition.util.ofType
@@ -43,6 +45,7 @@ import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
@@ -221,6 +224,95 @@ class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
 
                 Snackbar.make(view, messageRes, Snackbar.LENGTH_LONG).show()
                 findNavController().popBackStack()
+            }
+
+        // AI Proofread button handler
+        viewDisposables += sharedEvents.ofType<AddEditMilestoneUiEvent.AiProofread>()
+            .subscribe { _ ->
+                val currentText = view.getDescriptionText()
+                if (currentText.isEmpty()) {
+                    Snackbar.make(view, R.string.ai_empty_text, Snackbar.LENGTH_SHORT).show()
+                    return@subscribe
+                }
+
+                lifecycleScope.launch {
+                    try {
+                        val geminiManager = GeminiNanoManager.getInstance(requireContext())
+                        
+                        if (!geminiManager.isProofreadingAvailable()) {
+                            Snackbar.make(view, R.string.ai_not_available, Snackbar.LENGTH_LONG).show()
+                            return@launch
+                        }
+
+                        Snackbar.make(view, R.string.ai_processing, Snackbar.LENGTH_SHORT).show()
+                        
+                        val result = geminiManager.proofread(currentText)
+                        result.onSuccess { proofreadText ->
+                            view.setDescriptionText(proofreadText)
+                            Snackbar.make(view, R.string.ai_text_updated, Snackbar.LENGTH_SHORT).show()
+                        }.onFailure { error ->
+                            Snackbar.make(view, R.string.ai_error, Snackbar.LENGTH_LONG).show()
+                        }
+                    } catch (e: Exception) {
+                        Snackbar.make(view, R.string.ai_error, Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+
+        // AI Improve button handler - shows style selection dialog
+        viewDisposables += sharedEvents.ofType<AddEditMilestoneUiEvent.AiImprove>()
+            .subscribe { _ ->
+                val currentText = view.getDescriptionText()
+                if (currentText.isEmpty()) {
+                    Snackbar.make(view, R.string.ai_empty_text, Snackbar.LENGTH_SHORT).show()
+                    return@subscribe
+                }
+
+                // Show style selection dialog
+                val styles = arrayOf(
+                    getString(R.string.ai_style_formal),
+                    getString(R.string.ai_style_casual),
+                    getString(R.string.ai_style_shorter),
+                    getString(R.string.ai_style_longer)
+                )
+
+                AlertDialog.Builder(view.context)
+                    .setTitle(R.string.ai_choose_style)
+                    .setItems(styles) { dialog, which ->
+                        dialog.dismiss()
+                        
+                        lifecycleScope.launch {
+                            try {
+                                val geminiManager = GeminiNanoManager.getInstance(requireContext())
+                                
+                                if (!geminiManager.isRewritingAvailable()) {
+                                    Snackbar.make(view, R.string.ai_not_available, Snackbar.LENGTH_LONG).show()
+                                    return@launch
+                                }
+
+                                Snackbar.make(view, R.string.ai_processing, Snackbar.LENGTH_SHORT).show()
+                                
+                                val result = when (which) {
+                                    0 -> geminiManager.rewriteFormal(currentText)
+                                    1 -> geminiManager.rewriteCasual(currentText)
+                                    2 -> geminiManager.rewriteShorter(currentText)
+                                    3 -> geminiManager.rewriteLonger(currentText)
+                                    else -> return@launch
+                                }
+                                
+                                result.onSuccess { improvedText ->
+                                    view.setDescriptionText(improvedText)
+                                    Snackbar.make(view, R.string.ai_text_updated, Snackbar.LENGTH_SHORT).show()
+                                }.onFailure { error ->
+                                    Snackbar.make(view, R.string.ai_error, Snackbar.LENGTH_LONG).show()
+                                }
+                            } catch (e: Exception) {
+                                Snackbar.make(view, R.string.ai_error, Snackbar.LENGTH_LONG).show()
+                            }
+                        }
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
             }
     }
 

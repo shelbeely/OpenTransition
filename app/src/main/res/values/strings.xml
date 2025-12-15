@@ -314,4 +314,21 @@
     <string name="milestone_updated">Milestone updated</string>
     <string name="confirm_delete_milestone">Deleting this milestone will remove it permanently.</string>
     <string name="error_deleting_milestone">Error deleting milestone</string>
+    
+    <!-- AI Assistance -->
+    <string name="ai_assistance_label">AI Assistance (On-Device):</string>
+    <string name="ai_proofread">✓ Proofread</string>
+    <string name="ai_improve">✨ Improve</string>
+    <string name="ai_processing">Processing…</string>
+    <string name="ai_not_available">AI features not available on this device</string>
+    <string name="ai_error">AI processing failed. Please try again.</string>
+    <string name="ai_empty_text">Please enter some text first</string>
+    <string name="ai_text_updated">Text improved with AI</string>
+    <string name="ai_choose_style">Choose improvement style:</string>
+    <string name="ai_style_formal">More Formal</string>
+    <string name="ai_style_casual">More Casual</string>
+    <string name="ai_style_shorter">Make Shorter</string>
+    <string name="ai_style_longer">Make Longer</string>
+    <string name="image_description_generated">Image description generated</string>
+    <string name="image_description_error">Failed to generate image description</string>
 </resources>

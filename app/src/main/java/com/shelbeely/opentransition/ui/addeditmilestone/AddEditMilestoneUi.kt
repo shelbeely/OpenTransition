@@ -19,6 +19,7 @@ import android.widget.TextView
 import androidx.annotation.StringRes
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.material.button.MaterialButton
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.ui.addeditmilestone.AddEditMilestoneUiState.Display
 import com.shelbeely.opentransition.util.setTextRetainingSelection
@@ -43,6 +44,8 @@ sealed class AddEditMilestoneUiEvent {
     data class Save(
         val day: Long, val title: String, val description: String
     ) : AddEditMilestoneUiEvent()
+    object AiProofread : AddEditMilestoneUiEvent()
+    object AiImprove : AddEditMilestoneUiEvent()
 }
 
 sealed class AddEditMilestoneUiState {
@@ -64,6 +67,9 @@ class AddEditMilestoneView(
     private val date: Button by bindView(R.id.add_milestone_date)
     private val descriptionLabel: View by bindView(R.id.add_milestone_description_label)
     private val description: EditText by bindView(R.id.add_milestone_description)
+
+    private val aiProofreadButton: MaterialButton by bindView(R.id.ai_proofread_button)
+    private val aiImproveButton: MaterialButton by bindView(R.id.ai_improve_button)
 
     private val save: Button by bindView(R.id.add_milestone_save)
 
@@ -91,7 +97,9 @@ class AddEditMilestoneView(
                 AddEditMilestoneUiEvent.Save(
                     day, title.text.toString(), description.text.toString()
                 )
-            })
+            },
+            aiProofreadButton.clicks().toV3().map { AddEditMilestoneUiEvent.AiProofread },
+            aiImproveButton.clicks().toV3().map { AddEditMilestoneUiEvent.AiImprove })
     }
 
     private var day: Long = 0L
@@ -141,6 +149,15 @@ class AddEditMilestoneView(
                 save.setText(titleRes)
             }
         }
+        isUserChange = true
+    }
+
+    fun getDescriptionText(): String = description.text.toString()
+
+    fun setDescriptionText(text: String) {
+        isUserChange = false
+        description.setText(text)
+        description.setSelection(text.length)
         isUserChange = true
     }
 }
