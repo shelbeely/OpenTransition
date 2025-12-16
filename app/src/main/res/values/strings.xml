@@ -43,9 +43,11 @@
     <string name="face_gallery">Face Gallery</string>
     <string name="extra_photos">+%1$d</string>
     <string name="body_gallery">Body Gallery</string>
+    <string name="audio_gallery">Audio Gallery</string>
 
     <string name="add_face_photo">Add face photo</string>
     <string name="add_body_photo">Add body photo</string>
+    <string name="add_audio_recording">Add audio recording</string>
 
     <string name="permission_required">Permission Required</string>
     <string name="grant_permission">Grant Permission</string>
@@ -209,6 +211,7 @@
     <string name="select_type">Select Type</string>
     <string name="face">Face</string>
     <string name="body">Body</string>
+    <string name="audio">Audio</string>
 
     <string name="saving_photo">Saving Photo</string>
     <string name="saved_photo">Successfully saved photo</string>
@@ -216,6 +219,21 @@
     <string name="error_saving_photo">An error occurred saving this photo</string>
 
     <string name="user_photos_date">Use the photo\'s date</string>
+
+    <!-- Audio Recording -->
+    <string name="record_audio">Record Audio</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="play_audio">Play Audio</string>
+    <string name="pause_audio">Pause Audio</string>
+    <string name="recording">Recording…</string>
+    <string name="analyzing_audio">Analyzing voice…</string>
+    <string name="audio_analysis">Voice Analysis</string>
+    <string name="view_analysis">View Analysis</string>
+    <string name="recording_time">Recording time: %s</string>
+    <string name="permission_audio_required">Microphone permission is required to record audio</string>
+    <string name="audio_record_error">Error recording audio</string>
+    <string name="audio_analysis_error">Error analyzing audio</string>
+    <string name="audio_analysis_complete">Voice analysis complete</string>
 
     <!-- Single Photo -->
     <string name="photo_details">Photo Details</string>
@@ -281,6 +299,11 @@
     <plurals name="milestones">
         <item quantity="one">%1$d Milestone</item>
         <item quantity="other">%1$d Milestones</item>
+    </plurals>
+
+    <plurals name="audio_analyses">
+        <item quantity="one">%1$d Audio Analysis</item>
+        <item quantity="other">%1$d Audio Analyses</item>
     </plurals>
 
     <!-- Add Milestone -->

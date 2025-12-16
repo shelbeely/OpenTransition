@@ -13,7 +13,7 @@ package com.shelbeely.opentransition.data
 import android.content.Context
 import androidx.annotation.IntDef
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.util.FileUtil.getImageFile
+import com.shelbeely.opentransition.util.FileUtil.getMediaFile
 import com.google.gson.JsonObject
 import com.google.gson.stream.JsonReader
 import io.realm.kotlin.types.RealmObject
@@ -34,7 +34,7 @@ class Photo : RealmObject {
     var type: Int = TYPE_FACE
 
     @kotlin.annotation.Retention(AnnotationRetention.SOURCE)
-    @IntDef(TYPE_FACE, TYPE_BODY)
+    @IntDef(TYPE_FACE, TYPE_BODY, TYPE_AUDIO)
     annotation class Type
 
     fun toJson(): JsonObject? {
@@ -55,6 +55,7 @@ class Photo : RealmObject {
     companion object {
         const val TYPE_FACE = 0
         const val TYPE_BODY = 1
+        const val TYPE_AUDIO = 2
 
         const val FIELD_ID = "id"
         const val FIELD_EPOCH_DAY = "epochDay"
@@ -66,6 +67,7 @@ class Photo : RealmObject {
         fun getTypeName(@Type type: Int, context: Context) = when (type) {
             TYPE_FACE -> context.getString(R.string.face)
             TYPE_BODY -> context.getString(R.string.body)
+            TYPE_AUDIO -> context.getString(R.string.audio)
             else -> throw IllegalArgumentException("Unhandled Type '$type'")
         }
 
@@ -92,12 +94,12 @@ class Photo : RealmObject {
                             }
 
                             FIELD_FILE_NAME -> {
-                                filePath = getImageFile(jsonReader.nextString()).absolutePath
+                                filePath = getMediaFile(jsonReader.nextString()).absolutePath
                             }
 
                             FIELD_TYPE -> {
                                 type = jsonReader.nextInt()
-                                if (type !in arrayOf(TYPE_FACE, TYPE_BODY)) {
+                                if (type !in arrayOf(TYPE_FACE, TYPE_BODY, TYPE_AUDIO)) {
                                     type = TYPE_FACE
                                 }
                             }

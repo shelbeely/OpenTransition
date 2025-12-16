@@ -10,9 +10,10 @@
 
 package com.shelbeely.opentransition.util
 
+import com.shelbeely.opentransition.data.AudioAnalysis
 import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.data.Photo
 import io.realm.kotlin.RealmConfiguration
 
 val RealmConfiguration.Companion.default
-    get() = create(setOf(Milestone::class, Photo::class))
+    get() = create(setOf(Milestone::class, Photo::class, AudioAnalysis::class))

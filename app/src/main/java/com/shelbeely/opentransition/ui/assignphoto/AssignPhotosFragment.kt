@@ -104,7 +104,7 @@ class AssignPhotosFragment : Fragment(R.layout.assign_photo) {
                 AlertDialog.Builder(view.context)
                     .setTitle(R.string.select_type)
                     .setSingleChoiceItems(
-                        arrayOf(view.getString(R.string.face), view.getString(R.string.body)),
+                        arrayOf(view.getString(R.string.face), view.getString(R.string.body), view.getString(R.string.audio)),
                         result.type
                     ) { dialog: DialogInterface, type: Int ->
                         if (result.type != type) {
