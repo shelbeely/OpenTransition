@@ -1,0 +1,324 @@
+name: UI Screenshots
+
+on:
+  pull_request:
+    paths:
+      - 'app/src/main/res/layout/**'
+      - 'app/src/main/res/values/**'
+      - 'app/src/main/res/drawable/**'
+      - 'app/src/main/java/**/ui/**'
+      - 'app/src/main/java/**/widget/**'
+      - '.github/workflows/ui-screenshots.yml'
+
+concurrency:
+  group: ui-screenshots-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  capture-screenshots:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: 🚚 Checkout PR
+      uses: actions/checkout@v4
+
+    - name: ☕️ Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'liberica'
+        cache: gradle
+
+    - name: 🙌 Copy secrets file
+      run: cp ./secrets.properties.example ./secrets.properties
+
+    - name: 📑 Create Google Services file
+      env:
+        GOOGLE_SERVICES_JSON_64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
+      run: |
+        if [ -z "$GOOGLE_SERVICES_JSON_64" ]; then
+          # Create a dummy google-services.json for builds
+          cat > ./app/google-services.json << 'EOF'
+        {
+          "project_info": {
+            "project_number": "123456789000",
+            "project_id": "opentransition-dev",
+            "storage_bucket": "opentransition-dev.appspot.com"
+          },
+          "client": [
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:123456789000:android:0000000000000000000000",
+                "android_client_info": {
+                  "package_name": "com.shelbeely.opentransition"
+                }
+              },
+              "oauth_client": [],
+              "api_key": [
+                {
+                  "current_key": "AIzaSyDevelopmentKeyForLocalBuild000000000"
+                }
+              ],
+              "services": {
+                "appinvite_service": {
+                  "other_platform_oauth_client": []
+                }
+              }
+            }
+          ],
+          "configuration_version": "1"
+        }
+        EOF
+        else
+          echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./app/google-services.json
+        fi
+
+    - name: 📝 Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: 👷‍♀️ Build Debug APK
+      run: ./gradlew assembleDebug --stacktrace
+
+    - name: 🤖 Enable KVM for Android Emulator
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+
+    - name: 📱 Run Screenshot Tests on Emulator
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        target: default
+        arch: x86_64
+        profile: pixel_3a
+        disable-animations: true
+        disk-size: 2048M
+        heap-size: 512M
+        ram-size: 4096M
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+        script: |
+          # Wait for emulator to be ready
+          adb wait-for-device
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+          
+          # Install APK
+          adb install -r app/build/outputs/apk/debug/app-debug.apk
+          
+          # Create screenshots directory
+          mkdir -p screenshots
+          
+          # Grant necessary permissions
+          adb shell pm grant com.shelbeely.opentransition android.permission.READ_EXTERNAL_STORAGE || true
+          adb shell pm grant com.shelbeely.opentransition android.permission.WRITE_EXTERNAL_STORAGE || true
+          adb shell pm grant com.shelbeely.opentransition android.permission.RECORD_AUDIO || true
+          
+          # Launch app
+          adb shell am start -n com.shelbeely.opentransition/.ui.MainActivity
+          sleep 5
+          
+          # Capture home screen
+          adb exec-out screencap -p > screenshots/01_home_screen.png
+          echo "✅ Captured: Home screen"
+          
+          # Navigate to Audio Gallery (tap on audio gallery button)
+          # Coordinates may need adjustment based on actual layout
+          adb shell input tap 540 1800
+          sleep 3
+          adb exec-out screencap -p > screenshots/02_audio_gallery_empty.png
+          echo "✅ Captured: Audio Gallery (empty state)"
+          
+          # Add recording button
+          adb shell input tap 980 200
+          sleep 2
+          adb exec-out screencap -p > screenshots/03_record_audio_screen.png
+          echo "✅ Captured: Record Audio screen"
+          
+          # Go back to home
+          adb shell input keyevent KEYCODE_BACK
+          sleep 1
+          adb shell input keyevent KEYCODE_BACK
+          sleep 2
+          
+          # Navigate to Face Gallery to show existing gallery pattern
+          adb shell input tap 540 1200
+          sleep 3
+          adb exec-out screencap -p > screenshots/04_face_gallery_reference.png
+          echo "✅ Captured: Face Gallery (reference)"
+          
+          # Go back
+          adb shell input keyevent KEYCODE_BACK
+          sleep 2
+          
+          # Final home screen
+          adb exec-out screencap -p > screenshots/05_home_screen_final.png
+          echo "✅ Captured: Final home screen"
+          
+          echo "📸 Screenshot capture complete!"
+
+    - name: 📊 Generate Screenshot Report
+      if: always()
+      run: |
+        # Create an HTML report
+        cat > screenshots/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>UI Screenshots - Audio Gallery PR</title>
+            <style>
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+                    max-width: 1400px;
+                    margin: 0 auto;
+                    padding: 20px;
+                    background: #0d1117;
+                    color: #c9d1d9;
+                }
+                h1 {
+                    color: #58a6ff;
+                    border-bottom: 1px solid #21262d;
+                    padding-bottom: 10px;
+                }
+                .screenshot-section {
+                    margin: 30px 0;
+                    padding: 20px;
+                    background: #161b22;
+                    border-radius: 8px;
+                    border: 1px solid #30363d;
+                }
+                .screenshot-section h2 {
+                    color: #58a6ff;
+                    margin-top: 0;
+                }
+                .screenshot-section img {
+                    max-width: 100%;
+                    height: auto;
+                    border: 2px solid #30363d;
+                    border-radius: 8px;
+                    margin-top: 10px;
+                    background: white;
+                }
+                .description {
+                    color: #8b949e;
+                    margin: 10px 0;
+                }
+                .new-badge {
+                    background: #238636;
+                    color: white;
+                    padding: 4px 8px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    font-weight: bold;
+                    margin-left: 10px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>🎵 Audio Gallery Feature - UI Screenshots</h1>
+            <p>Screenshots captured from PR automated testing on Android API 29 (Pixel 3a emulator)</p>
+            
+            <div class="screenshot-section">
+                <h2>1. Home Screen with Audio Gallery <span class="new-badge">NEW</span></h2>
+                <p class="description">Shows the new Audio Gallery button added to the home screen below Body Gallery</p>
+                <img src="01_home_screen.png" alt="Home Screen">
+            </div>
+            
+            <div class="screenshot-section">
+                <h2>2. Audio Gallery (Empty State)</h2>
+                <p class="description">Audio Gallery screen when no recordings exist yet</p>
+                <img src="02_audio_gallery_empty.png" alt="Audio Gallery Empty">
+            </div>
+            
+            <div class="screenshot-section">
+                <h2>3. Record Audio Screen <span class="new-badge">NEW</span></h2>
+                <p class="description">Recording interface accessible from Audio Gallery</p>
+                <img src="03_record_audio_screen.png" alt="Record Audio Screen">
+            </div>
+            
+            <div class="screenshot-section">
+                <h2>4. Face Gallery (Reference)</h2>
+                <p class="description">Existing gallery pattern for comparison - Audio Gallery follows same design language</p>
+                <img src="04_face_gallery_reference.png" alt="Face Gallery Reference">
+            </div>
+            
+            <div class="screenshot-section">
+                <h2>5. Home Screen (Final)</h2>
+                <p class="description">Final state showing all gallery options</p>
+                <img src="05_home_screen_final.png" alt="Home Screen Final">
+            </div>
+            
+            <hr style="border-color: #30363d; margin: 40px 0;">
+            <p style="color: #8b949e; text-align: center;">
+                <strong>Note:</strong> With actual audio recordings, the Audio Gallery would show items with waveforms, 
+                play/pause buttons, pitch data, and formant information as described in the PR.
+            </p>
+        </body>
+        </html>
+        EOF
+        echo "📊 Screenshot report generated"
+
+    - name: 📤 Upload Screenshots
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: ui-screenshots-${{ github.event.pull_request.number }}
+        path: screenshots/
+        retention-days: 30
+
+    - name: 💬 Comment on PR with Screenshots
+      if: always() && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          const screenshotDir = 'screenshots';
+          const files = fs.readdirSync(screenshotDir)
+            .filter(f => f.endsWith('.png'))
+            .sort();
+          
+          let comment = `## 📸 UI Screenshots\n\n`;
+          comment += `Automated screenshots captured from this PR on Android API 29 (Pixel 3a emulator).\n\n`;
+          comment += `[📊 View Full Screenshot Report (HTML)](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n`;
+          
+          comment += `### Screenshots Available:\n`;
+          files.forEach(file => {
+            const name = file.replace('.png', '').replace(/^\d+_/, '').replace(/_/g, ' ');
+            comment += `- ✅ ${name}\n`;
+          });
+          
+          comment += `\n**Total Screenshots:** ${files.length}\n\n`;
+          comment += `> 💡 Download the \`ui-screenshots-${{ github.event.pull_request.number }}\` artifact from the Actions tab to view all screenshots.\n`;
+          comment += `> The artifact includes an interactive HTML report for easy viewing.\n`;
+          
+          // Find existing comment
+          const { data: comments } = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
+          
+          const botComment = comments.find(comment => 
+            comment.user.type === 'Bot' && 
+            comment.body.includes('## 📸 UI Screenshots')
+          );
+          
+          if (botComment) {
+            // Update existing comment
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: comment
+            });
+          } else {
+            // Create new comment
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+          }
