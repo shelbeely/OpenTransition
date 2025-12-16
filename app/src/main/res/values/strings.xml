@@ -220,6 +220,21 @@
 
     <string name="user_photos_date">Use the photo\'s date</string>
 
+    <!-- Audio Recording -->
+    <string name="record_audio">Record Audio</string>
+    <string name="stop_recording">Stop Recording</string>
+    <string name="play_audio">Play Audio</string>
+    <string name="pause_audio">Pause Audio</string>
+    <string name="recording">Recording…</string>
+    <string name="analyzing_audio">Analyzing voice…</string>
+    <string name="audio_analysis">Voice Analysis</string>
+    <string name="view_analysis">View Analysis</string>
+    <string name="recording_time">Recording time: %s</string>
+    <string name="permission_audio_required">Microphone permission is required to record audio</string>
+    <string name="audio_record_error">Error recording audio</string>
+    <string name="audio_analysis_error">Error analyzing audio</string>
+    <string name="audio_analysis_complete">Voice analysis complete</string>
+
     <!-- Single Photo -->
     <string name="photo_details">Photo Details</string>
     <string name="photo_detail_replacement" translatable="false">%1$s - %2$s</string>
