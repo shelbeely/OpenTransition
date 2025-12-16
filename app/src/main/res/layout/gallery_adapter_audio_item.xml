@@ -69,8 +69,19 @@
         app:layout_constraintStart_toEndOf="@id/audio_play_button"
         app:layout_constraintEnd_toStartOf="@id/audio_selection_checkbox"
         app:layout_constraintTop_toBottomOf="@id/audio_pitch"
-        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="F1: 700 Hz | F2: 1800 Hz" />
+
+    <com.shelbeely.opentransition.ui.widget.WaveformView
+        android:id="@+id/audio_waveform"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintStart_toEndOf="@id/audio_play_button"
+        app:layout_constraintEnd_toStartOf="@id/audio_selection_checkbox"
+        app:layout_constraintTop_toBottomOf="@id/audio_formants"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <CheckBox
         android:id="@+id/audio_selection_checkbox"

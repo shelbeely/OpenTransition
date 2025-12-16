@@ -318,11 +318,12 @@ class GalleryAdapter(
         private val dateText: TextView by bindView(R.id.audio_date)
         private val pitchText: TextView by bindView(R.id.audio_pitch)
         private val formantsText: TextView by bindView(R.id.audio_formants)
+        private val waveformView: com.shelbeely.opentransition.ui.widget.WaveformView by bindView(R.id.audio_waveform)
         private val selectionCheckbox: CheckBox by bindView(R.id.audio_selection_checkbox)
 
         private val adapterRef = WeakReference(creatingAdapter)
         private var currentPhotoId = ""
-        private var isPlaying = false
+        private var currentAudioFile: File? = null
 
         init {
             itemView.setOnClickListener {
@@ -362,20 +363,34 @@ class GalleryAdapter(
             }
 
             playButton.setOnClickListener {
-                // TODO: Implement audio playback
-                isPlaying = !isPlaying
-                playButton.setImageResource(
-                    if (isPlaying) android.R.drawable.ic_media_pause
-                    else android.R.drawable.ic_media_play
-                )
+                currentAudioFile?.let { file ->
+                    val isPlaying = com.shelbeely.opentransition.util.AudioPlayerManager.togglePlayback(currentPhotoId, file)
+                    updatePlayButtonState(isPlaying)
+                }
             }
+        }
+        
+        private fun updatePlayButtonState(isPlaying: Boolean) {
+            playButton.setImageResource(
+                if (isPlaying) android.R.drawable.ic_media_pause
+                else android.R.drawable.ic_media_play
+            )
         }
 
         fun bind(item: GalleryAdapterItem, selectionMode: Boolean) {
             currentPhotoId = item.photo!!.id
+            currentAudioFile = File(item.photo.filePath)
 
             // Display date
             dateText.text = LocalDate.ofEpochDay(item.photo.epochDay).toFullDateString(itemView.context)
+
+            // Update play button state based on current playback
+            updatePlayButtonState(com.shelbeely.opentransition.util.AudioPlayerManager.isPlaying(currentPhotoId))
+
+            // Set waveform
+            if (currentAudioFile?.exists() == true) {
+                waveformView.setAudioFile(currentAudioFile!!)
+            }
 
             // Load audio analysis if available
             val realm = Realm.openDefault()

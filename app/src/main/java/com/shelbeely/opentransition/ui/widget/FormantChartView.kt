@@ -72,6 +72,16 @@ class FormantChartView @JvmOverloads constructor(
         data.addAll(analyses)
         invalidate()
     }
+    
+    fun addDataPoint(analysis: AudioAnalysis) {
+        data.add(analysis)
+        invalidate()
+    }
+    
+    fun clearData() {
+        data.clear()
+        invalidate()
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -131,16 +141,54 @@ class FormantChartView @JvmOverloads constructor(
 
         textPaint.textSize = 28f // Reset text size
 
-        // Plot data points
-        data.forEach { analysis ->
+        // Draw reference regions first (so points appear on top)
+        drawReferenceRegions(canvas, padding, chartWidth, chartHeight)
+
+        // Plot data points with color gradient (oldest = blue, newest = green)
+        data.forEachIndexed { index, analysis ->
             val x = mapF2ToX(analysis.f2Mean, padding, chartWidth)
             val y = mapF1ToY(analysis.f1Mean, padding, chartHeight)
             
-            canvas.drawCircle(x, y, 12f, pointPaint)
+            // Color gradient from blue to green based on chronological order
+            val progress = if (data.size > 1) index.toFloat() / (data.size - 1) else 0.5f
+            val color = interpolateColor(
+                Color.parseColor("#2196F3"), // Blue (oldest)
+                Color.parseColor("#4CAF50"), // Green (newest)
+                progress
+            )
+            
+            val pointPaintColored = Paint(pointPaint).apply {
+                this.color = color
+            }
+            
+            canvas.drawCircle(x, y, 12f, pointPaintColored)
+            
+            // Draw small label with index
+            val labelPaint = Paint(textPaint).apply {
+                textSize = 18f
+                textAlign = Paint.Align.CENTER
+            }
+            canvas.drawText("${index + 1}", x, y - 18f, labelPaint)
         }
-
-        // Draw reference regions
-        drawReferenceRegions(canvas, padding, chartWidth, chartHeight)
+    }
+    
+    private fun interpolateColor(startColor: Int, endColor: Int, fraction: Float): Int {
+        val startA = Color.alpha(startColor)
+        val startR = Color.red(startColor)
+        val startG = Color.green(startColor)
+        val startB = Color.blue(startColor)
+        
+        val endA = Color.alpha(endColor)
+        val endR = Color.red(endColor)
+        val endG = Color.green(endColor)
+        val endB = Color.blue(endColor)
+        
+        return Color.argb(
+            (startA + fraction * (endA - startA)).toInt(),
+            (startR + fraction * (endR - startR)).toInt(),
+            (startG + fraction * (endG - startG)).toInt(),
+            (startB + fraction * (endB - startB)).toInt()
+        )
     }
 
     private fun mapF2ToX(f2: Float, padding: Float, chartWidth: Float): Float {
