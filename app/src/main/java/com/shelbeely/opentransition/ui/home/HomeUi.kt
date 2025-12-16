@@ -21,8 +21,6 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.ui.widget.SwipeGestureListener
@@ -65,8 +63,8 @@ sealed class HomeUiState {
 
 class HomeView(context: Context, attributeSet: AttributeSet) :
     ConstraintLayout(context, attributeSet) {
-    private val toolbar: MaterialToolbar by bindView(R.id.home_toolbar)
-    private val takePhoto: FloatingActionButton by bindView(R.id.home_take_photo)
+    private val takePhoto: ImageButton by bindView(R.id.home_take_photo)
+    private val settings: ImageButton by bindView(R.id.home_settings)
 
     private val day: TextView by bindView(R.id.home_day_title)
 
@@ -87,6 +85,7 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     private val eventRelay: PublishRelay<HomeUiEvent> = PublishRelay.create()
     val events: Observable<HomeUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
         Observable.mergeArray(
+            settings.clicks().toV3().map { HomeUiEvent.Settings },
             previousRecord.clicks().toV3().map { HomeUiEvent.PreviousRecord },
             nextRecord.clicks().toV3().map { HomeUiEvent.NextRecord },
             milestones.clicks().toV3().map { HomeUiEvent.Milestones(date.toEpochDay()) },
@@ -133,16 +132,6 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         }
 
         takePhoto.setOnClickListener { showPhotoSourceMenu() }
-        
-        toolbar.setOnMenuItemClickListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.home_menu_settings -> {
-                    eventRelay.accept(HomeUiEvent.Settings)
-                    true
-                }
-                else -> false
-            }
-        }
 
         faceRecyclerView.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL, false
