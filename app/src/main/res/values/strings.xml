@@ -301,6 +301,11 @@
         <item quantity="other">%1$d Milestones</item>
     </plurals>
 
+    <plurals name="audio_analyses">
+        <item quantity="one">%1$d Audio Analysis</item>
+        <item quantity="other">%1$d Audio Analyses</item>
+    </plurals>
+
     <!-- Add Milestone -->
     <string name="add_milestone">Add Milestone</string>
     <string name="edit_milestone">Edit Milestone</string>

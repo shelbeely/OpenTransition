@@ -34,6 +34,7 @@ import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.TransTracksApp
 import com.shelbeely.opentransition.background.CameraHandler
 import com.shelbeely.opentransition.background.StoragePermissionHandler
+import com.shelbeely.opentransition.data.AudioAnalysis
 import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.databinding.ActivityMainBinding
@@ -319,7 +320,7 @@ class MainActivity : AppCompatActivity() {
 
     sealed class ImportResult {
         object Failure : ImportResult()
-        data class Success(val photoIssues: Int, val milestoneIssues: Int) : ImportResult()
+        data class Success(val photoIssues: Int, val milestoneIssues: Int, val audioAnalysisIssues: Int) : ImportResult()
     }
 
     private fun processImport(fileUri: Uri) {
@@ -337,11 +338,24 @@ class MainActivity : AppCompatActivity() {
                             val data = ByteArray(BUFFER_SIZE)
                             var zipEntry: ZipEntry? = zipInputStream.nextEntry
                             while (zipEntry != null) {
-                                val tempFile: File = when (val fileName = zipEntry.fileName()) {
-                                    "data.json" -> FileUtil.getTempFile(fileName)
+                                val tempFile: File = when {
+                                    fileName == "data.json" -> FileUtil.getTempFile(fileName)
                                         .also { tempDataFile = it }
-
-                                    else -> FileUtil.getImageFile(fileName)
+                                    
+                                    fileName.startsWith("audio/") -> {
+                                        // Extract audio file to audio directory
+                                        FileUtil.getAudioFile(fileName.removePrefix("audio/"))
+                                    }
+                                    
+                                    fileName.startsWith("photos/") -> {
+                                        // Extract photo file to photos directory (preserves backward compatibility)
+                                        FileUtil.getImageFile(fileName.removePrefix("photos/"))
+                                    }
+                                    
+                                    else -> {
+                                        // Backward compatibility - assume it's an image file
+                                        FileUtil.getImageFile(fileName)
+                                    }
                                 }
                                 try {
                                     FileOutputStream(tempFile).use { fileOutputStream ->
@@ -366,6 +380,7 @@ class MainActivity : AppCompatActivity() {
                     val dataFile = tempDataFile
                     var photoImportIssues = 0
                     var milestoneImportIssues = 0
+                    var audioAnalysisImportIssues = 0
 
                     if (dataFile != null && dataFile.exists() && dataFile.length() > 0) {
                         try {
@@ -418,6 +433,24 @@ class MainActivity : AppCompatActivity() {
                                                         jsonReader.endArray()
                                                     }
 
+                                                    "audioAnalysis" -> {
+                                                        jsonReader.beginArray()
+                                                        while (jsonReader.hasNext()) {
+                                                            jsonReader.beginObject()
+                                                            val audioAnalysis =
+                                                                AudioAnalysis.fromJson(jsonReader)
+                                                            if (audioAnalysis != null) {
+                                                                copyToRealm(
+                                                                    audioAnalysis, UpdatePolicy.ALL
+                                                                )
+                                                            } else {
+                                                                audioAnalysisImportIssues++
+                                                            }
+                                                            jsonReader.endObject()
+                                                        }
+                                                        jsonReader.endArray()
+                                                    }
+
                                                     else -> jsonReader.skipValue()
                                                 }
                                             }
@@ -429,7 +462,7 @@ class MainActivity : AppCompatActivity() {
                             }
 
                             return@map ImportResult.Success(
-                                photoImportIssues, milestoneImportIssues
+                                photoImportIssues, milestoneImportIssues, audioAnalysisImportIssues
                             )
                         } catch (e: Exception) {
                             return@map ImportResult.Failure
@@ -457,8 +490,9 @@ class MainActivity : AppCompatActivity() {
                     is ImportResult.Success -> {
                         val photoIssues = result.photoIssues
                         val milestoneIssues = result.milestoneIssues
+                        val audioAnalysisIssues = result.audioAnalysisIssues
                         when {
-                            photoIssues > 0 || milestoneIssues > 0 -> {
+                            photoIssues > 0 || milestoneIssues > 0 || audioAnalysisIssues > 0 -> {
                                 val errors = StringBuilder()
                                 if (photoIssues > 0) {
                                     errors.append(
@@ -468,9 +502,18 @@ class MainActivity : AppCompatActivity() {
                                     )
                                 }
                                 if (milestoneIssues > 0) {
+                                    if (errors.isNotEmpty()) errors.append(", ")
                                     errors.append(
                                         resources.getQuantityString(
                                             R.plurals.milestones, milestoneIssues, milestoneIssues
+                                        )
+                                    )
+                                }
+                                if (audioAnalysisIssues > 0) {
+                                    if (errors.isNotEmpty()) errors.append(", ")
+                                    errors.append(
+                                        resources.getQuantityString(
+                                            R.plurals.audio_analyses, audioAnalysisIssues, audioAnalysisIssues
                                         )
                                     )
                                 }

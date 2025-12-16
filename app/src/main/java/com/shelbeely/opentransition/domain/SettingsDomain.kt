@@ -11,6 +11,7 @@
 package com.shelbeely.opentransition.domain
 
 import com.shelbeely.opentransition.BuildConfig
+import com.shelbeely.opentransition.data.AudioAnalysis
 import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.domain.SettingsAction.Export
@@ -139,6 +140,8 @@ class SettingsDomain {
                                                         .count()
                                                         .find() + realm.query(Milestone::class)
                                                         .count()
+                                                        .find() + realm.query(AudioAnalysis::class)
+                                                        .count()
                                                         .find() + 1
                                                     var stepCount = 0.0
                                                     fun incrementStep() {
@@ -176,6 +179,17 @@ class SettingsDomain {
                                                         }
                                                     jsonWriter.endArray()
 
+                                                    jsonWriter.name("audioAnalysis")
+                                                    jsonWriter.beginArray()
+                                                    realm.query(AudioAnalysis::class).find()
+                                                        .forEach { audioAnalysis ->
+                                                            audioAnalysis.toJson()?.let {
+                                                                gson.toJson(it, jsonWriter)
+                                                            }
+                                                            incrementStep()
+                                                        }
+                                                    jsonWriter.endArray()
+
                                                     jsonWriter.endObject()
                                                 }
                                             }
@@ -193,8 +207,11 @@ class SettingsDomain {
                                             BufferedOutputStream(fileOutputStream).use { bufferedOutputStream ->
                                                 ZipOutputStream(bufferedOutputStream).use { zipOutputStream ->
                                                     val photosDir = FileUtil.getPhotosDirectory()
+                                                    val audioDir = FileUtil.getAudioDirectory()
                                                     val stepMax =
                                                         (photosDir.takeIf { it.exists() && it.isDirectory }
+                                                            ?.listFiles()?.size ?: 0) +
+                                                        (audioDir.takeIf { it.exists() && it.isDirectory }
                                                             ?.listFiles()?.size ?: 0) + 1
                                                     var stepCount = 0.0
                                                     fun incrementStep() {
@@ -213,6 +230,24 @@ class SettingsDomain {
                                                             try {
                                                                 zipOutputStream.writeFile(
                                                                     it, "photos/"
+                                                                )
+                                                            } catch (e: IOException) {
+                                                                if (!BuildConfig.DEBUG) {
+                                                                    FirebaseCrashlytics.getInstance()
+                                                                        .recordException(e)
+                                                                }
+                                                                e.printStackTrace()
+                                                            } finally {
+                                                                incrementStep()
+                                                            }
+                                                        }
+
+                                                    audioDir.takeIf { it.exists() && it.isDirectory }
+                                                        ?.listFiles()
+                                                        ?.forEach {
+                                                            try {
+                                                                zipOutputStream.writeFile(
+                                                                    it, "audio/"
                                                                 )
                                                             } catch (e: IOException) {
                                                                 if (!BuildConfig.DEBUG) {
