@@ -225,6 +225,14 @@ class HomeFragment : Fragment(R.layout.home) {
                         )
                     )
 
+                    is HomeUiEvent.AudioGallery -> findNavController().navigate(
+                        HomeFragmentDirections.actionShowGallery(
+                            isFaceGallery = false, 
+                            initialDay = event.day,
+                            galleryType = Photo.TYPE_AUDIO
+                        )
+                    )
+
                     is HomeUiEvent.ImageClick -> findNavController().navigate(
                         HomeFragmentDirections.actionHomeToSinglePhoto(photoId = event.photoId)
                     )

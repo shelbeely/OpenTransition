@@ -56,12 +56,16 @@ class GalleryFragment : Fragment(R.layout.gallery) {
         super.onStart()
         val view = view as? GalleryView ?: throw AssertionError("View must be GalleryView")
 
-        AnalyticsUtil.logEvent(Event.GalleryControllerShown(args.isFaceGallery))
-
-        val type: Int = when (args.isFaceGallery) {
-            true -> Photo.TYPE_FACE
-            false -> Photo.TYPE_BODY
+        val type: Int = if (args.galleryType != 0) {
+            args.galleryType
+        } else {
+            when (args.isFaceGallery) {
+                true -> Photo.TYPE_FACE
+                false -> Photo.TYPE_BODY
+            }
         }
+
+        AnalyticsUtil.logEvent(Event.GalleryControllerShown(args.isFaceGallery))
 
         view.display(
             GalleryUiState.Loaded(
@@ -181,6 +185,13 @@ class GalleryFragment : Fragment(R.layout.gallery) {
             .subscribe { _ ->
                 StoragePermissionHandler.showStoragePermissionDisabledSnackBar(
                     view, activity as AppCompatActivity
+                )
+            }
+
+        viewDisposables += sharedEvents.ofType<GalleryUiEvent.AddAudioRecording>()
+            .subscribe {
+                findNavController().navigate(
+                    GalleryFragmentDirections.actionGalleryToRecordAudio()
                 )
             }
 
