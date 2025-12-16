@@ -98,11 +98,11 @@ class FormantChartView @JvmOverloads constructor(
         }
 
         // Draw axis labels
-        canvas.drawText("F2 (Hz)", width / 2 - 40f, height - padding + 50f, textPaint)
+        canvas.drawText("F2 (Hz)", width / 2f - 40f, height - padding + 50f, textPaint)
         
         canvas.save()
-        canvas.rotate(-90f, padding - 60f, height / 2)
-        canvas.drawText("F1 (Hz)", padding - 60f, height / 2, textPaint)
+        canvas.rotate(-90f, padding - 60f, height / 2f)
+        canvas.drawText("F1 (Hz)", padding - 60f, height / 2f, textPaint)
         canvas.restore()
 
         // Draw F2 axis values
