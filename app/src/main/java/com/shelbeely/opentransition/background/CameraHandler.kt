@@ -16,7 +16,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.provider.MediaStore
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -27,7 +26,6 @@ import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.TransTracksFileProvider
-import com.shelbeely.opentransition.ui.camera.CameraActivity
 import com.shelbeely.opentransition.util.FileUtil
 import com.shelbeely.opentransition.util.Utils
 import com.shelbeely.opentransition.util.copyFrom
@@ -42,7 +40,6 @@ import java.io.InputStream
 
 class CameraHandler : Fragment() {
     private var currentFile: File? = null
-    private var useEnhancedCamera: Boolean = true
 
     init {
         retainInstance = true
@@ -50,20 +47,6 @@ class CameraHandler : Fragment() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        
-        // Handle enhanced camera result
-        if (requestCode == CameraActivity.REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            val photoPath = data.getStringExtra(CameraActivity.EXTRA_PHOTO_PATH)
-            if (photoPath != null) {
-                val imageFile = File(photoPath)
-                if (imageFile.exists() && imageFile.length() > 0) {
-                    photoTakenRelay.accept(imageFile.absolutePath)
-                }
-            }
-            return
-        }
-        
-        // Handle standard camera result
         if (requestCode == REQUEST_CODE_TAKE_PHOTO && resultCode == Activity.RESULT_OK
             && currentFile != null
         ) {
@@ -168,31 +151,16 @@ class CameraHandler : Fragment() {
     }
 
     private fun takePhoto() {
-        takePhoto(null)
-    }
-
-    private fun takePhoto(overlayPhotoUri: Uri? = null) {
         val localContext = requireContext()
-        
-        // Check if enhanced camera should be used
-        val prefs = localContext.getSharedPreferences("camera_prefs", android.content.Context.MODE_PRIVATE)
-        useEnhancedCamera = prefs.getBoolean("use_enhanced_camera", true)
-        
-        if (useEnhancedCamera) {
-            // Use the new enhanced camera activity
-            CameraActivity.start(requireActivity(), overlayPhotoUri)
-        } else {
-            // Use the original camera intent
-            currentFile = FileUtil.getTempImageFile()
-            val uri = FileProvider.getUriForFile(
-                localContext, TransTracksFileProvider::class.java.name, currentFile!!
-            )
+        currentFile = FileUtil.getTempImageFile()
+        val uri = FileProvider.getUriForFile(
+            localContext, TransTracksFileProvider::class.java.name, currentFile!!
+        )
 
-            val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
-            startActivityForResult(intent, REQUEST_CODE_TAKE_PHOTO)
-        }
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+        startActivityForResult(intent, REQUEST_CODE_TAKE_PHOTO)
     }
 
     companion object {
@@ -226,8 +194,7 @@ class CameraHandler : Fragment() {
         fun requestPhotoFromAnotherApp(activity: AppCompatActivity) = from(activity)
             .requestPhotoFromAnotherApp()
 
-        fun takePhoto(activity: AppCompatActivity, overlayPhotoUri: Uri? = null) = 
-            from(activity).takePhoto(overlayPhotoUri)
+        fun takePhoto(activity: AppCompatActivity) = from(activity).takePhoto()
 
         fun from(activity: AppCompatActivity): CameraHandler {
             try {
