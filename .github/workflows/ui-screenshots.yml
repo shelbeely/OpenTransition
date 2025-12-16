@@ -17,7 +17,22 @@ concurrency:
 jobs:
   capture-screenshots:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        include:
+          - api-level: 29
+            target: default
+            arch: x86_64
+            profile: pixel_3a
+            android-version: "Android 10"
+          - api-level: 31
+            target: google_apis
+            arch: x86_64
+            profile: pixel_5
+            android-version: "Android 12"
+    
+    name: Screenshots - ${{ matrix.android-version }} (API ${{ matrix.api-level }})
     
     steps:
     - name: 🚚 Checkout PR
@@ -86,13 +101,13 @@ jobs:
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
 
-    - name: 📱 Run Screenshot Tests on Emulator
+    - name: 📱 Run Screenshot Tests on ${{ matrix.android-version }}
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
-        target: default
-        arch: x86_64
-        profile: pixel_3a
+        api-level: ${{ matrix.api-level }}
+        target: ${{ matrix.target }}
+        arch: ${{ matrix.arch }}
+        profile: ${{ matrix.profile }}
         disable-animations: true
         disk-size: 2048M
         heap-size: 512M
@@ -165,7 +180,7 @@ jobs:
         <!DOCTYPE html>
         <html>
         <head>
-            <title>UI Screenshots - Audio Gallery PR</title>
+            <title>UI Screenshots - ${{ matrix.android-version }}</title>
             <style>
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
@@ -179,6 +194,16 @@ jobs:
                     color: #58a6ff;
                     border-bottom: 1px solid #21262d;
                     padding-bottom: 10px;
+                }
+                .android-version {
+                    background: #1f6feb;
+                    color: white;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 14px;
+                    font-weight: bold;
+                    display: inline-block;
+                    margin-bottom: 20px;
                 }
                 .screenshot-section {
                     margin: 30px 0;
@@ -216,7 +241,8 @@ jobs:
         </head>
         <body>
             <h1>🎵 Audio Gallery Feature - UI Screenshots</h1>
-            <p>Screenshots captured from PR automated testing on Android API 29 (Pixel 3a emulator)</p>
+            <div class="android-version">📱 ${{ matrix.android-version }} (API ${{ matrix.api-level }}) - ${{ matrix.profile }}</div>
+            <p>Screenshots captured from PR automated testing</p>
             
             <div class="screenshot-section">
                 <h2>1. Home Screen with Audio Gallery <span class="new-badge">NEW</span></h2>
@@ -256,13 +282,13 @@ jobs:
         </body>
         </html>
         EOF
-        echo "📊 Screenshot report generated"
+        echo "📊 Screenshot report generated for ${{ matrix.android-version }}"
 
     - name: 📤 Upload Screenshots
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: ui-screenshots-${{ github.event.pull_request.number }}
+        name: ui-screenshots-api${{ matrix.api-level }}-${{ github.event.pull_request.number }}
         path: screenshots/
         retention-days: 30
 
@@ -279,19 +305,21 @@ jobs:
             .filter(f => f.endsWith('.png'))
             .sort();
           
-          let comment = `## 📸 UI Screenshots\n\n`;
-          comment += `Automated screenshots captured from this PR on Android API 29 (Pixel 3a emulator).\n\n`;
-          comment += `[📊 View Full Screenshot Report (HTML)](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n`;
+          const androidVersion = '${{ matrix.android-version }}';
+          const apiLevel = '${{ matrix.api-level }}';
+          const profile = '${{ matrix.profile }}';
           
-          comment += `### Screenshots Available:\n`;
+          let comment = `### 📸 Screenshots - ${androidVersion} (API ${apiLevel})\n\n`;
+          comment += `**Device:** ${profile}\n\n`;
+          
+          comment += `**Screenshots captured:**\n`;
           files.forEach(file => {
             const name = file.replace('.png', '').replace(/^\d+_/, '').replace(/_/g, ' ');
             comment += `- ✅ ${name}\n`;
           });
           
-          comment += `\n**Total Screenshots:** ${files.length}\n\n`;
-          comment += `> 💡 Download the \`ui-screenshots-${{ github.event.pull_request.number }}\` artifact from the Actions tab to view all screenshots.\n`;
-          comment += `> The artifact includes an interactive HTML report for easy viewing.\n`;
+          comment += `\n**Total:** ${files.length} screenshots\n\n`;
+          comment += `📦 Download artifact: \`ui-screenshots-api${apiLevel}-${{ github.event.pull_request.number }}\`\n`;
           
           // Find existing comment
           const { data: comments } = await github.rest.issues.listComments({
@@ -302,23 +330,31 @@ jobs:
           
           const botComment = comments.find(comment => 
             comment.user.type === 'Bot' && 
-            comment.body.includes('## 📸 UI Screenshots')
+            comment.body.includes('## 📸 UI Screenshots - Multi-Version')
           );
           
           if (botComment) {
-            // Update existing comment
-            await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: botComment.id,
-              body: comment
-            });
+            // Update existing comment by appending this version's info
+            let updatedBody = botComment.body;
+            if (!updatedBody.includes(`API ${apiLevel}`)) {
+              updatedBody += `\n\n---\n\n${comment}`;
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: updatedBody
+              });
+            }
           } else {
-            // Create new comment
+            // Create new comment with header
+            const header = `## 📸 UI Screenshots - Multi-Version\n\n`;
+            const intro = `Automated screenshots captured from this PR on multiple Android versions for compatibility testing.\n\n`;
+            const fullComment = header + intro + comment;
+            
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: comment
+              body: fullComment
             });
           }
