@@ -28,6 +28,23 @@ object FileUtil {
 
     fun getImageFile(fileName: String): File = File(getPhotosDirectory(), fileName)
 
+    fun getAudioFile(fileName: String): File = File(getAudioDirectory(), fileName)
+
+    fun getMediaFile(fileName: String): File {
+        // Try to find file in photos directory first
+        val photoFile = File(getPhotosDirectory(), fileName)
+        if (photoFile.exists()) {
+            return photoFile
+        }
+        // Then try audio directory
+        val audioFile = File(getAudioDirectory(), fileName)
+        if (audioFile.exists()) {
+            return audioFile
+        }
+        // Default to photos directory for backward compatibility
+        return photoFile
+    }
+
     fun getNewImageFile(photoDate: LocalDate): File {
         val photoDateString = photoDate.toFileDateFormat()
         val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
@@ -37,10 +54,25 @@ object FileUtil {
         return file
     }
 
+    fun getNewAudioFile(photoDate: LocalDate): File {
+        val photoDateString = photoDate.toFileDateFormat()
+        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+
+        val file = getAudioFile("audio_${photoDateString}_recorded_$timeStamp.m4a")
+        file.createNewFile()
+        return file
+    }
+
     fun getPhotosDirectory(): File {
         val photosDir = File(TransTracksApp.instance.filesDir, "photos/")
         photosDir.mkdirs()
         return photosDir
+    }
+
+    fun getAudioDirectory(): File {
+        val audioDir = File(TransTracksApp.instance.filesDir, "audio/")
+        audioDir.mkdirs()
+        return audioDir
     }
 
     private fun getTempFolder(): File {
@@ -59,6 +91,12 @@ object FileUtil {
         val timeStamp = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US).format(Date())
         val uuid = UUID.randomUUID().toString()
         return getTempFile("${timeStamp}_${uuid}.jpg")
+    }
+
+    fun getTempAudioFile(): File {
+        val timeStamp = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US).format(Date())
+        val uuid = UUID.randomUUID().toString()
+        return getTempFile("${timeStamp}_${uuid}.m4a")
     }
 
     fun removeImageFromGallery(filePath: String) {
