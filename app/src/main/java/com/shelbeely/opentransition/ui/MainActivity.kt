@@ -338,6 +338,7 @@ class MainActivity : AppCompatActivity() {
                             val data = ByteArray(BUFFER_SIZE)
                             var zipEntry: ZipEntry? = zipInputStream.nextEntry
                             while (zipEntry != null) {
+                                val fileName = zipEntry.fileName()
                                 val tempFile: File = when {
                                     fileName == "data.json" -> FileUtil.getTempFile(fileName)
                                         .also { tempDataFile = it }
