@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+  ~ Copyright © 2018 TransTracks. All rights reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rounded_transparent_button"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginTop="4dp"
+    android:layout_marginBottom="4dp"
+    android:padding="12dp">
+
+    <ImageButton
+        android:id="@+id/audio_play_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:background="@drawable/rounded_transparent_button"
+        android:contentDescription="@string/play_audio"
+        android:src="@android:drawable/ic_media_play"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/audio_date"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:textColor="@color/white_text_selector"
+        app:layout_constraintStart_toEndOf="@id/audio_play_button"
+        app:layout_constraintEnd_toStartOf="@id/audio_selection_checkbox"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Jan 15, 2024" />
+
+    <TextView
+        android:id="@+id/audio_pitch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="4dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/transparent_white_90_text_selector"
+        app:layout_constraintStart_toEndOf="@id/audio_play_button"
+        app:layout_constraintEnd_toStartOf="@id/audio_selection_checkbox"
+        app:layout_constraintTop_toBottomOf="@id/audio_date"
+        tools:text="Pitch: 180 Hz" />
+
+    <TextView
+        android:id="@+id/audio_formants"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="2dp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+        android:textColor="@color/transparent_white_90_text_selector"
+        app:layout_constraintStart_toEndOf="@id/audio_play_button"
+        app:layout_constraintEnd_toStartOf="@id/audio_selection_checkbox"
+        app:layout_constraintTop_toBottomOf="@id/audio_pitch"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:text="F1: 700 Hz | F2: 1800 Hz" />
+
+    <CheckBox
+        android:id="@+id/audio_selection_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
