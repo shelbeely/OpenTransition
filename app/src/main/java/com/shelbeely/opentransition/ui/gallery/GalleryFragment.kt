@@ -116,41 +116,16 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                 )
             }
 
-        viewDisposables += Observables.combineLatest(
-            sharedEvents.ofType<GalleryUiEvent.AddPhotoCamera>(),
-            CameraHandler.cameraPermissionEnabled
-        ) { _, cameraEnabled -> cameraEnabled }
-            .subscribe { cameraEnabled ->
-                if (cameraEnabled) {
-                    CameraHandler.takePhoto(activity as AppCompatActivity)
-                } else {
-                    if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        AlertDialog.Builder(requireActivity())
-                            .setTitle(R.string.permission_required)
-                            .setMessage(R.string.camera_permission_required_message)
-                            .setPositiveButton(R.string.grant_permission) { _, _ ->
-                                CameraHandler
-                                    .requestIfNeeded(requireActivity() as AppCompatActivity)
-                            }
-                            .setNeutralButton(R.string.cancel, null)
-                            .show()
-                    } else {
-                        val didShow = CameraHandler
-                            .requestIfNeeded(requireActivity() as AppCompatActivity)
-
-                        if (!didShow) {
-                            CameraHandler.showCameraPermissionDisabledSnackBar(
-                                view, requireActivity()
-                            )
-                        }
-                    }
-                }
-            }
-
-        viewDisposables += CameraHandler.cameraPermissionBlocked
-            .filter { showRationale -> !showRationale }
-            .subscribe {
-                CameraHandler.showCameraPermissionDisabledSnackBar(view, requireActivity())
+        viewDisposables += sharedEvents.ofType<GalleryUiEvent.AddPhotoCamera>()
+            .subscribe { event ->
+                // Navigate to new CameraFragment with face detection
+                findNavController().navigate(
+                    GalleryFragmentDirections.actionGlobalCamera(
+                        type = event.type,
+                        destinationToPopTo = R.id.galleryFragment,
+                        epochDay = null
+                    )
+                )
             }
 
         viewDisposables += Observables.combineLatest(
