@@ -1,6 +1,7 @@
 name: UI Screenshots
 
 on:
+  workflow_dispatch:  # Allow manual workflow runs from GitHub Actions UI
   pull_request:
     paths:
       - 'app/src/main/res/layout/**'
