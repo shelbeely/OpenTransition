@@ -217,16 +217,14 @@
     <string name="saved_photo">Successfully saved photo</string>
     <string name="skipped_photo">Skipped photo</string>
     <string name="error_saving_photo">An error occurred saving this photo</string>
-    
+
+    <string name="user_photos_date">Use the photo\'s date</string>
+
     <!-- Audio Recording -->
     <string name="save_audio">Save Audio</string>
     <string name="saving_audio">Saving Audio</string>
     <string name="saved_audio">Successfully saved audio</string>
     <string name="error_saving_audio">An error occurred saving this audio</string>
-
-    <string name="user_photos_date">Use the photo\'s date</string>
-
-    <!-- Audio Recording -->
     <string name="record_audio">Record Audio</string>
     <string name="stop_recording">Stop Recording</string>
     <string name="play_audio">Play Audio</string>
