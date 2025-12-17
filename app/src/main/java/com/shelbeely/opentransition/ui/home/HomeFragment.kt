@@ -204,6 +204,7 @@ class HomeFragment : Fragment(R.layout.home) {
                         && event !is HomeUiEvent.NextRecord
                         && event !is HomeUiEvent.AddPhotoCamera
                         && event !is HomeUiEvent.AddPhotoGallery
+                        && event !is HomeUiEvent.AddAudioRecording
             }
             .subscribe { event ->
                 when (event) {
@@ -239,9 +240,17 @@ class HomeFragment : Fragment(R.layout.home) {
 
                     is HomeUiEvent.AddPhotoCamera,
                     is HomeUiEvent.AddPhotoGallery,
+                    is HomeUiEvent.AddAudioRecording,
                     is HomeUiEvent.NextRecord,
                     is HomeUiEvent.PreviousRecord -> throw IllegalStateException("unexpected event")
                 }
+            }
+        
+        viewDisposables += sharedEvents.ofType<HomeUiEvent.AddAudioRecording>()
+            .subscribe { event ->
+                findNavController().navigate(
+                    HomeFragmentDirections.actionHomeToRecordAudio()
+                )
             }
 
         if (photoTakenDisposable.isDisposed) {

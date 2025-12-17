@@ -112,6 +112,13 @@ class HomeGalleryAdapter(
 
         init {
             add.setOnClickListener {
+                // For audio type, directly navigate to recording
+                if (type == Photo.TYPE_AUDIO) {
+                    eventRelayRef.get()?.accept(HomeUiEvent.AddAudioRecording(currentDate))
+                    return@setOnClickListener
+                }
+                
+                // For face/body, show camera/gallery menu
                 val popup = PopupMenu(it.context, it)
                 popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
                 popup.setOnMenuItemClickListener { menuItem: MenuItem ->
