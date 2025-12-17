@@ -46,6 +46,7 @@ sealed class GalleryUiEvent {
     data class ImageClick(val photoId: String) : GalleryUiEvent()
     data class AddPhotoCamera(@Photo.Type val type: Int) : GalleryUiEvent()
     data class AddPhotoGallery(@Photo.Type val type: Int) : GalleryUiEvent()
+    object AddAudioRecording : GalleryUiEvent()
     object StartMultiSelect : GalleryUiEvent()
     data class SelectionUpdated(val selectedIds: ArrayList<String>) : GalleryUiEvent()
     object EndActionMode : GalleryUiEvent()
@@ -126,6 +127,7 @@ class GalleryView(
         @StringRes val titleRes: Int = when (type) {
             Photo.TYPE_FACE -> R.string.face_gallery
             Photo.TYPE_BODY -> R.string.body_gallery
+            Photo.TYPE_AUDIO -> R.string.audio_gallery
             else -> throw IllegalArgumentException("Unhandled type")
         }
 
@@ -185,6 +187,12 @@ class GalleryView(
     }
 
     private fun showPhotoSourceMenu(view: View) {
+        // For audio type, directly trigger recording instead of showing menu
+        if (type == Photo.TYPE_AUDIO) {
+            eventRelay.accept(GalleryUiEvent.AddAudioRecording)
+            return
+        }
+        
         val popup = PopupMenu(context, view)
         popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->

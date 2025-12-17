@@ -230,6 +230,12 @@
     <string name="audio_analysis">Voice Analysis</string>
     <string name="view_analysis">View Analysis</string>
     <string name="recording_time">Recording time: %s</string>
+    <string name="pitch_format">Pitch: %s Hz</string>
+    <string name="formants_format">F1: %s Hz | F2: %s Hz</string>
+    <string name="audio_comparison">Audio Comparison</string>
+    <string name="formant_comparison">Formant Comparison</string>
+    <string name="pitch_progression">Pitch Progression Over Time</string>
+    <string name="recording_details">Recording Details</string>
     <string name="permission_audio_required">Microphone permission is required to record audio</string>
     <string name="audio_record_error">Error recording audio</string>
     <string name="audio_analysis_error">Error analyzing audio</string>

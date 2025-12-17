@@ -13,6 +13,8 @@ package com.shelbeely.opentransition.ui.gallery
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
@@ -83,15 +85,25 @@ class GalleryAdapter(
         when (holder) {
             is TitleViewHolder -> holder.bind(items[position])
             is PhotoViewHolder -> holder.bind(items[position], selectionMode)
+            is AudioViewHolder -> holder.bind(items[position], selectionMode)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
-
         return when (viewType) {
-            TYPE_TITLE -> TitleViewHolder(view)
-            TYPE_PHOTO -> PhotoViewHolder(view, this)
+            TYPE_TITLE -> {
+                val view = LayoutInflater.from(parent.context).inflate(R.layout.gallery_adapter_title_item, parent, false)
+                TitleViewHolder(view)
+            }
+            TYPE_PHOTO -> {
+                if (type == Photo.TYPE_AUDIO) {
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.gallery_adapter_audio_item, parent, false)
+                    AudioViewHolder(view, this)
+                } else {
+                    val view = LayoutInflater.from(parent.context).inflate(R.layout.gallery_adapter_item, parent, false)
+                    PhotoViewHolder(view, this)
+                }
+            }
             else -> throw IllegalArgumentException("Unhandled item type")
         }
     }
@@ -297,6 +309,115 @@ class GalleryAdapter(
                     false -> itemView.getString(R.string.not_selected)
                 }
             }
+        }
+    }
+
+    class AudioViewHolder(itemView: View, creatingAdapter: GalleryAdapter?) :
+        BaseViewHolder(itemView) {
+        private val playButton: ImageButton by bindView(R.id.audio_play_button)
+        private val dateText: TextView by bindView(R.id.audio_date)
+        private val pitchText: TextView by bindView(R.id.audio_pitch)
+        private val formantsText: TextView by bindView(R.id.audio_formants)
+        private val waveformView: com.shelbeely.opentransition.ui.widget.WaveformView by bindView(R.id.audio_waveform)
+        private val selectionCheckbox: CheckBox by bindView(R.id.audio_selection_checkbox)
+
+        private val adapterRef = WeakReference(creatingAdapter)
+        private var currentPhotoId = ""
+        private var currentAudioFile: File? = null
+
+        init {
+            itemView.setOnClickListener {
+                val adapter = adapterRef.get() ?: return@setOnClickListener
+
+                val event: GalleryUiEvent = when (adapter.selectionMode) {
+                    true -> {
+                        if (adapter.selectedIds.contains(currentPhotoId)) {
+                            adapter.selectedIds.remove(currentPhotoId)
+                        } else {
+                            adapter.selectedIds.add(currentPhotoId)
+                        }
+
+                        val returnList = ArrayList<String>(adapter.selectedIds.size)
+                        returnList.addAll(adapter.selectedIds)
+
+                        GalleryUiEvent.SelectionUpdated(returnList)
+                    }
+
+                    false -> GalleryUiEvent.ImageClick(currentPhotoId)
+                }
+
+                adapter.eventRelayRef.get()?.accept(event)
+            }
+
+            itemView.setOnLongClickListener {
+                val adapter = adapterRef.get() ?: return@setOnLongClickListener false
+
+                if (!adapter.selectionMode) {
+                    adapter.eventRelayRef.get()
+                        ?.accept(GalleryUiEvent.SelectionUpdated(arrayListOf(currentPhotoId)))
+                } else {
+                    itemView.performClick()
+                }
+
+                return@setOnLongClickListener true
+            }
+
+            playButton.setOnClickListener {
+                currentAudioFile?.let { file ->
+                    val isPlaying = com.shelbeely.opentransition.util.AudioPlayerManager.togglePlayback(currentPhotoId, file)
+                    updatePlayButtonState(isPlaying)
+                }
+            }
+        }
+        
+        private fun updatePlayButtonState(isPlaying: Boolean) {
+            playButton.setImageResource(
+                if (isPlaying) android.R.drawable.ic_media_pause
+                else android.R.drawable.ic_media_play
+            )
+        }
+
+        fun bind(item: GalleryAdapterItem, selectionMode: Boolean) {
+            currentPhotoId = item.photo!!.id
+            currentAudioFile = File(item.photo.filePath)
+
+            // Display date
+            dateText.text = LocalDate.ofEpochDay(item.photo.epochDay).toFullDateString(itemView.context)
+
+            // Update play button state based on current playback
+            updatePlayButtonState(com.shelbeely.opentransition.util.AudioPlayerManager.isPlaying(currentPhotoId))
+
+            // Set waveform
+            if (currentAudioFile?.exists() == true) {
+                waveformView.setAudioFile(currentAudioFile!!)
+            }
+
+            // Load audio analysis if available
+            val realm = Realm.openDefault()
+            val analysis = realm.query(com.shelbeely.opentransition.data.AudioAnalysis::class, 
+                "photoId == '$currentPhotoId'")
+                .first()
+                .find()
+
+            if (analysis != null) {
+                pitchText.text = itemView.context.getString(
+                    R.string.pitch_format,
+                    String.format("%.0f", analysis.f0Mean)
+                )
+                formantsText.text = itemView.context.getString(
+                    R.string.formants_format,
+                    String.format("%.0f", analysis.f1Mean),
+                    String.format("%.0f", analysis.f2Mean)
+                )
+            } else {
+                pitchText.text = itemView.context.getString(R.string.pitch_format, "N/A")
+                formantsText.text = itemView.context.getString(R.string.formants_format, "N/A", "N/A")
+            }
+
+            realm.close()
+
+            selectionCheckbox.setVisibleOrGone(selectionMode)
+            selectionCheckbox.isChecked = item.selected
         }
     }
 

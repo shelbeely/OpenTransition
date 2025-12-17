@@ -43,6 +43,7 @@ sealed class HomeUiEvent {
     data class Milestones(val day: Long) : HomeUiEvent()
     data class FaceGallery(val day: Long) : HomeUiEvent()
     data class BodyGallery(val day: Long) : HomeUiEvent()
+    data class AudioGallery(val day: Long) : HomeUiEvent()
     data class ImageClick(val photoId: String) : HomeUiEvent()
     data class AddPhotoCamera(
         val currentDate: LocalDate? = null, @Photo.Type val type: Int? = null
@@ -82,6 +83,9 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     private val bodyGallery: Button by bindView(R.id.home_body_gallery)
     private val bodyRecyclerView: RecyclerView by bindView(R.id.home_body_images)
 
+    private val audioGallery: Button by bindView(R.id.home_audio_gallery)
+    private val audioRecyclerView: RecyclerView by bindView(R.id.home_audio_images)
+
     private val eventRelay: PublishRelay<HomeUiEvent> = PublishRelay.create()
     val events: Observable<HomeUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
         Observable.mergeArray(
@@ -91,12 +95,14 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
             milestones.clicks().toV3().map { HomeUiEvent.Milestones(date.toEpochDay()) },
             faceGallery.clicks().toV3().map { HomeUiEvent.FaceGallery(date.toEpochDay()) },
             bodyGallery.clicks().toV3().map { HomeUiEvent.BodyGallery(date.toEpochDay()) },
+            audioGallery.clicks().toV3().map { HomeUiEvent.AudioGallery(date.toEpochDay()) },
             eventRelay
         )
     }
 
     private val facePhotoIds = Array<String?>(3) { _ -> null }
     private val bodyPhotoIds = Array<String?>(3) { _ -> null }
+    private val audioPhotoIds = Array<String?>(3) { _ -> null }
 
     private var date = LocalDate.MIN
     private var hasPrevious = false

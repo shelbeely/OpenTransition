@@ -162,7 +162,12 @@
         android:label="GalleryFragment">
         <argument
             android:name="isFaceGallery"
-            app:argType="boolean" />
+            app:argType="boolean"
+            android:defaultValue="true" />
+        <argument
+            android:name="galleryType"
+            app:argType="integer"
+            android:defaultValue="0" />
         <argument
             android:name="initialDay"
             app:argType="long" />
@@ -182,6 +187,13 @@
         <action
             android:id="@+id/action_gallery_to_singlePhoto"
             app:destination="@id/singlePhotoFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/still"
+            app:popEnterAnim="@anim/still"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_gallery_to_recordAudio"
+            app:destination="@id/recordAudioFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/still"
             app:popEnterAnim="@anim/still"
@@ -275,4 +287,8 @@
             android:name="photoId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/recordAudioFragment"
+        android:name="com.shelbeely.opentransition.ui.recordaudio.RecordAudioFragment"
+        android:label="RecordAudioFragment" />
 </navigation>
