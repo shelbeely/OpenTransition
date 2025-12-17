@@ -166,7 +166,8 @@ fun analyzeAudioFile(audioFile: File): AudioAnalysis? {
     val durationSeconds = audioFormat.getDuration()
     
     // Estimate formants (simplified approach)
-    // TODO: Integrate proper DSP library for real formant extraction
+    // Note: This is a placeholder - real implementation would use
+    // DSP library for accurate formant extraction via LPC
     val analysis = AudioAnalysis().apply {
         f0Mean = estimatedPitch
         f1Mean = estimateF1(f0Mean)
@@ -447,12 +448,16 @@ fun testRecordAndAnalyze() {
 
 ### Voice Science
 
-- [r/transvoice Community](https://www.reddit.com/r/transvoice/) - Reddit community for voice training support
-- [r/transvoice Wiki](https://www.reddit.com/r/transvoice/wiki/index) - Comprehensive voice training guides and resources
-- [Formant Analysis Basics](https://en.wikipedia.org/wiki/Formant) - Technical background on formants
+External resources for learning about voice and formants:
+
+- [r/transvoice Community (Reddit)](https://www.reddit.com/r/transvoice/) - Active community providing voice training support and feedback
+- [r/transvoice Wiki (Reddit)](https://www.reddit.com/r/transvoice/wiki/index) - Comprehensive guides covering voice training techniques and exercises
+- [Formant Analysis (Wikipedia)](https://en.wikipedia.org/wiki/Formant) - Technical explanation of formants and acoustic phonetics
 
 ### Libraries for Future Integration
 
-- [TarsosDSP](https://github.com/JorenSix/TarsosDSP) - Java audio processing
-- [Praat](https://www.fon.hum.uva.nl/praat/) - Phonetics analysis tool
-- [Essentia](https://essentia.upf.edu/) - Audio analysis library
+Open-source tools that could enhance voice analysis:
+
+- [TarsosDSP (GitHub)](https://github.com/JorenSix/TarsosDSP) - Java library for real-time audio processing and pitch detection
+- [Praat (External)](https://www.fon.hum.uva.nl/praat/) - Professional phonetics software for detailed voice analysis
+- [Essentia (External)](https://essentia.upf.edu/) - C++ library for audio and music analysis with Python bindings

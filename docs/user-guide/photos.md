@@ -9,7 +9,7 @@
 - Take photos in consistent lighting
 - Use the same angle and distance
 - Take photos regularly for best tracking
-- Organize by type (Face, Body, Custom)
+- Organize by type (Face, Body)
 
 ### Audio Recordings
 
