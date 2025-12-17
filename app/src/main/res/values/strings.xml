@@ -328,4 +328,8 @@
     <string name="milestone_updated">Milestone updated</string>
     <string name="confirm_delete_milestone">Deleting this milestone will remove it permanently.</string>
     <string name="error_deleting_milestone">Error deleting milestone</string>
+
+    <!-- Camera with Face Detection -->
+    <string name="toggle_overlay">Toggle overlay</string>
+    <string name="back">Back</string>
 </resources>
