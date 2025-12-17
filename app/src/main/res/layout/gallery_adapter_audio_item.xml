@@ -15,17 +15,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:minHeight="140dp"
     android:background="@drawable/rounded_transparent_button"
     android:layout_marginStart="8dp"
     android:layout_marginEnd="8dp"
-    android:layout_marginTop="4dp"
-    android:layout_marginBottom="4dp"
-    android:padding="12dp">
+    android:layout_marginTop="6dp"
+    android:layout_marginBottom="6dp"
+    android:padding="16dp">
 
     <ImageButton
         android:id="@+id/audio_play_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:background="@drawable/rounded_transparent_button"
         android:contentDescription="@string/play_audio"
         android:src="@android:drawable/ic_media_play"
@@ -74,10 +75,11 @@
     <com.shelbeely.opentransition.ui.widget.WaveformView
         android:id="@+id/audio_waveform"
         android:layout_width="0dp"
-        android:layout_height="60dp"
+        android:layout_height="80dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
         app:layout_constraintStart_toEndOf="@id/audio_play_button"
         app:layout_constraintEnd_toStartOf="@id/audio_selection_checkbox"
         app:layout_constraintTop_toBottomOf="@id/audio_formants"

@@ -89,6 +89,7 @@ nav:
       - Navigation: architecture/navigation.md
     - Features:
       - Photo Tracking: features/photo-tracking.md
+      - Audio Tracking: features/audio-tracking.md
       - Milestones: features/milestones.md
       - Gallery: features/gallery.md
       - Lock & Security: features/lock-security.md
