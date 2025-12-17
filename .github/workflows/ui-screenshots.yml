@@ -16,10 +16,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-apk:
+  capture-screenshots:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    name: Build Debug APK
+    timeout-minutes: 40
+    strategy:
+      matrix:
+        include:
+          - api-level: 29
+            target: default
+            arch: x86_64
+            profile: pixel_3a
+            android-version: "Android 10"
+          - api-level: 31
+            target: google_apis
+            arch: x86_64
+            profile: pixel_5
+            android-version: "Android 12"
+    
+    name: Screenshots - ${{ matrix.android-version }} (API ${{ matrix.api-level }})
     
     steps:
     - name: 🚚 Checkout PR
@@ -81,43 +95,6 @@ jobs:
 
     - name: 👷‍♀️ Build Debug APK
       run: ./gradlew assembleDebug --stacktrace
-
-    - name: 📦 Upload APK Artifact
-      uses: actions/upload-artifact@v4.4.3
-      with:
-        name: app-debug-apk
-        path: app/build/outputs/apk/debug/app-debug.apk
-        retention-days: 1
-
-  capture-screenshots:
-    needs: build-apk
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    strategy:
-      matrix:
-        include:
-          - api-level: 29
-            target: default
-            arch: x86_64
-            profile: pixel_3a
-            android-version: "Android 10"
-          - api-level: 31
-            target: google_apis
-            arch: x86_64
-            profile: pixel_5
-            android-version: "Android 12"
-    
-    name: Screenshots - ${{ matrix.android-version }} (API ${{ matrix.api-level }})
-    
-    steps:
-    - name: 🚚 Checkout PR
-      uses: actions/checkout@v4
-
-    - name: 📥 Download APK Artifact
-      uses: actions/download-artifact@v4.1.3
-      with:
-        name: app-debug-apk
-        path: app/build/outputs/apk/debug/
 
     - name: 🤖 Enable KVM for Android Emulator
       run: |
