@@ -15,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.PopupMenu
@@ -77,6 +78,7 @@ class HomeGalleryAdapter(
         when (holder) {
             is AddViewHolder -> holder.bind(currentDate, type)
             is PhotoViewHolder -> holder.bind(result[position - 1])
+            is AudioViewHolder -> holder.bind(result[position - 1])
         }
     }
 
@@ -86,6 +88,7 @@ class HomeGalleryAdapter(
         return when (viewType) {
             TYPE_ADD -> AddViewHolder(view, eventRelayRef.get())
             TYPE_PHOTO -> PhotoViewHolder(view, eventRelayRef.get())
+            TYPE_AUDIO -> AudioViewHolder(view, eventRelayRef.get())
             else -> throw IllegalArgumentException("Unhandled item type")
         }
     }
@@ -94,7 +97,7 @@ class HomeGalleryAdapter(
 
     override fun getItemViewType(position: Int): Int = when (position) {
         0 -> TYPE_ADD
-        else -> TYPE_PHOTO
+        else -> if (type == Photo.TYPE_AUDIO) TYPE_AUDIO else TYPE_PHOTO
     }
 
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -169,9 +172,53 @@ class HomeGalleryAdapter(
         }
     }
 
+    class AudioViewHolder(itemView: View, eventRelay: PublishRelay<HomeUiEvent>?) :
+        BaseViewHolder(itemView) {
+        private val playButton: ImageButton by bindView(R.id.home_audio_play_button)
+        private val waveformView: com.shelbeely.opentransition.ui.widget.WaveformView by bindView(R.id.home_audio_waveform)
+
+        private val eventRelayRef = WeakReference(eventRelay)
+        private var currentPhotoId = ""
+        private var currentAudioFile: File? = null
+
+        init {
+            itemView.setOnClickListener {
+                eventRelayRef.get()?.accept(HomeUiEvent.ImageClick(currentPhotoId))
+            }
+
+            playButton.setOnClickListener {
+                currentAudioFile?.let { file ->
+                    val isPlaying = com.shelbeely.opentransition.util.AudioPlayerManager.togglePlayback(currentPhotoId, file)
+                    updatePlayButtonState(isPlaying)
+                }
+            }
+        }
+
+        private fun updatePlayButtonState(isPlaying: Boolean) {
+            playButton.setImageResource(
+                if (isPlaying) android.R.drawable.ic_media_pause
+                else android.R.drawable.ic_media_play
+            )
+        }
+
+        fun bind(photo: Photo) {
+            currentPhotoId = photo.id
+            currentAudioFile = File(photo.filePath)
+
+            // Update play button state based on current playback
+            updatePlayButtonState(com.shelbeely.opentransition.util.AudioPlayerManager.isPlaying(currentPhotoId))
+
+            // Set waveform
+            if (currentAudioFile?.exists() == true) {
+                waveformView.setAudioFile(currentAudioFile!!)
+            }
+        }
+    }
+
     @Suppress("MayBeConstant")
     companion object {
         private val TYPE_PHOTO = R.layout.home_adapter_item
         private val TYPE_ADD = R.layout.home_adapter_add_item
+        private val TYPE_AUDIO = R.layout.home_adapter_audio_item
     }
 }
