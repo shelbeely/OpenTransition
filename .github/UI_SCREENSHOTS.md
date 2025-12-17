@@ -28,8 +28,8 @@ Screenshots are captured on **two Android versions** for comprehensive compatibi
 ## What Gets Captured
 
 The workflow:
-1. ✅ Builds the debug APK
-2. ✅ Launches Android emulators for both API levels
+1. ✅ Builds the debug APK once (shared across all Android versions)
+2. ✅ Launches Android emulators for both API levels in parallel
 3. ✅ Installs and runs the app on each version
 4. ✅ Navigates through key screens automatically
 5. ✅ Captures screenshots at each step on each version
@@ -120,12 +120,30 @@ matrix:
 3. Note the X/Y coordinates displayed
 4. Use those in `adb shell input tap X Y`
 
+## Workflow Architecture
+
+The workflow is split into two jobs for efficiency:
+
+### Job 1: Build APK (runs once)
+- Builds the debug APK using `./gradlew assembleDebug`
+- Uploads the APK as an artifact
+- This runs **once** regardless of how many Android versions are tested
+
+### Job 2: Screenshot Capture (runs in parallel)
+- Downloads the pre-built APK
+- Runs simultaneously for all Android versions in the matrix
+- Each version captures screenshots independently
+- Faster execution since APK is already built
+
+**Benefits**: The APK is built once instead of separately for each Android version, reducing build time by ~50%.
+
 ## Troubleshooting
 
 ### No screenshots generated
-- Check the workflow logs in Actions tab
+- Check the workflow logs in Actions tab (both build and screenshot jobs)
 - Verify the emulator started successfully for both versions
-- Ensure APK built without errors
+- Ensure APK built successfully in the build job
+- Check that the APK artifact was uploaded and downloaded correctly
 
 ### Screenshots show wrong content
 - Adjust sleep timings between taps (UI might need more time to load)
@@ -168,6 +186,8 @@ adb pull /sdcard/screenshot.png
 
 ✅ **Multi-Version**: Tests on both Android 12+ and pre-12 automatically
 ✅ **Automatic**: No manual work needed for screenshots
+✅ **Efficient**: APK built once and reused for all Android versions
+✅ **Parallel**: Screenshot jobs run simultaneously for faster results
 ✅ **Consistent**: Same emulator setup every time
 ✅ **Historical**: 30-day artifact retention per version
 ✅ **Reviewable**: Screenshots available during code review
