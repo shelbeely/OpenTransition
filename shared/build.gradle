@@ -1,0 +1,39 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-parcelize'
+}
+
+android {
+    compileSdk 36
+    
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 36
+        
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+    
+    namespace 'com.shelbeely.opentransition.shared'
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    
+    // Wearable Data Layer for communication between mobile and wear
+    implementation 'com.google.android.gms:play-services-wearable:18.1.0'
+    
+    // Gson for serialization
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    testImplementation 'junit:junit:4.13.2'
+}

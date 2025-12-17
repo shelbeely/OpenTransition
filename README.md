@@ -4,6 +4,21 @@ OpenTransition is a transition tracking application made specifically for transg
 
 This is a customized fork of the original TransTracks application, rebranded and repackaged for independent deployment.
 
+## 📱 Multi-Platform Support
+
+This repository is organized as a **monorepo** containing multiple Android applications:
+
+- 📱 **Mobile App** - Full-featured Android app for phones and tablets
+- ⌚ **Wear OS App** - Companion app for Android smartwatches
+- 🔗 **Shared Module** - Common code and data models for communication
+
+The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, allowing you to:
+- Trigger photo capture from your smartwatch
+- View recent milestones on your wrist
+- Receive notifications on your watch
+
+**See [MONOREPO.md](MONOREPO.md) for detailed information about the monorepo structure and inter-app communication.**
+
 ## 📚 Documentation
 
 **Complete documentation is available at:** [**https://shelbeely.github.io/OpenTransition**](https://shelbeely.github.io/OpenTransition)
@@ -30,24 +45,45 @@ This is a customized fork of the original TransTracks application, rebranded and
 - 🔒 **Privacy First** - App lock, disguised mode, and local storage
 - 💾 **Data Control** - Export, backup, and sync on your terms
 - 🎨 **Customizable** - Multiple themes and personalization options
+- ⌚ **Wear OS Companion** - Access key features from your smartwatch
 
 ## 🚀 Quick Start for Development
 
 1. Set up a Firebase project for development
 2. Download the `google-services.json` file from Firebase console
-3. Place the `google-services.json` file in the `app/` folder
+3. Place the `google-services.json` file in the `mobile/` folder (note: was `app/` previously)
 4. Copy `secrets.properties.example` to `secrets.properties`
 5. Build and run: `./gradlew build`
+
+**Build specific modules:**
+```bash
+# Mobile app only
+./gradlew :mobile:assembleDebug
+
+# Wear OS app only
+./gradlew :wear:assembleDebug
+
+# All modules
+./gradlew build
+```
 
 **Full setup instructions:** [Development Setup Guide](https://shelbeely.github.io/OpenTransition/getting-started/development-setup/)
 
 ## 📦 Package Information
 
+### Mobile App
 - **Package Name**: `com.shelbeely.opentransition`
 - **App Name**: OpenTransition
 - **Minimum SDK**: 21 (Android 5.0)
 - **Target SDK**: 36
-- This fork uses a different package name to allow independent deployment
+
+### Wear OS App
+- **Package Name**: `com.shelbeely.opentransition.wear`
+- **App Name**: OpenTransition
+- **Minimum SDK**: 30 (Wear OS 3.0)
+- **Target SDK**: 36
+
+This fork uses a different package name to allow independent deployment
 
 ## 🤝 Contributing
 

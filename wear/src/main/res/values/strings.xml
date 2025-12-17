@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">OpenTransition</string>
+    <string name="trigger_photo">Take Photo</string>
+    <string name="view_milestones">Milestones</string>
+    <string name="sync_now">Sync Now</string>
+    <string name="no_milestones">No milestones yet</string>
+    <string name="connecting">Connecting to phone…</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Phone disconnected</string>
+    <string name="photo_triggered">Photo triggered on phone</string>
+</resources>

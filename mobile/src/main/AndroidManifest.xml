@@ -187,6 +187,22 @@
                 android:value="" />
         </service>
 
+        <!-- Service for handling messages from Wear OS app -->
+        <service
+            android:name=".wear.MobileWearableListenerService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
+                <data
+                    android:scheme="wear"
+                    android:host="*"
+                    android:pathPrefix="/opentransition" />
+            </intent-filter>
+        </service>
+
         <provider
             android:name=".data.TransTracksFileProvider"
             android:authorities="com.shelbeely.opentransition.data.TransTracksFileProvider"
