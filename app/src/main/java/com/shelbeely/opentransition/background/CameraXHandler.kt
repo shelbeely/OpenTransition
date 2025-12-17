@@ -38,7 +38,8 @@ class CameraXHandler(
     private val context: Context,
     private val lifecycleOwner: LifecycleOwner,
     private val previewView: PreviewView,
-    private val onFaceDetection: (FaceDetectionResult) -> Unit
+    private val onFaceDetection: (FaceDetectionResult) -> Unit,
+    private val useFrontCamera: Boolean = true  // Default to front camera for selfies
 ) {
 
     private var cameraProvider: ProcessCameraProvider? = null
@@ -95,8 +96,12 @@ class CameraXHandler(
                 }
         }
 
-        // Select front camera by default for selfies
-        val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+        // Select camera based on configuration
+        val cameraSelector = if (useFrontCamera) {
+            CameraSelector.DEFAULT_FRONT_CAMERA
+        } else {
+            CameraSelector.DEFAULT_BACK_CAMERA
+        }
 
         try {
             // Unbind all use cases before rebinding

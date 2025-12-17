@@ -75,7 +75,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         // Back button with spring animation
         binding.btnBack.setOnClickListener {
             animateButtonPress(it) {
-                requireActivity().onBackPressed()
+                findNavController().navigateUp()
             }
         }
 

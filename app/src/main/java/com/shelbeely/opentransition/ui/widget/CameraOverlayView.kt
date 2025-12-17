@@ -125,9 +125,10 @@ class CameraOverlayView @JvmOverloads constructor(
 
         // Draw center alignment guide
         val centerX = width / 2f
-        canvas.drawLine(centerX, 0f, centerX, height.toFloat(), guidePaint.apply {
-            alpha = 64 // Semi-transparent
-        })
+        val savedAlpha = guidePaint.alpha
+        guidePaint.alpha = 64 // Semi-transparent
+        canvas.drawLine(centerX, 0f, centerX, height.toFloat(), guidePaint)
+        guidePaint.alpha = savedAlpha // Restore alpha
 
         // Draw landmarks
         result.leftEyePos?.let { drawLandmark(canvas, it) }
