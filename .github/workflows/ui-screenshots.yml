@@ -287,7 +287,7 @@ jobs:
 
     - name: 📤 Upload Screenshots
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4.4.3
       with:
         name: ui-screenshots-api${{ matrix.api-level }}-${{ github.event.pull_request.number }}
         path: screenshots/
