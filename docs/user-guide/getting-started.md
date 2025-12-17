@@ -29,6 +29,7 @@ When you first open OpenTransition, you'll see the home screen. No account requi
 The app may ask for permissions:
 
 - **Camera**: To take photos directly in the app (you can skip this and import photos instead)
+- **Microphone**: To record voice samples for voice tracking (optional)
 - **Storage/Photos**: To import existing photos from your device
 - **Notifications**: To remind you to take progress photos (optional)
 
@@ -59,6 +60,7 @@ The app has four main sections:
 **➕ Add Button** - Tap the plus button to:
 - Take a new photo
 - Import existing photos
+- Record audio (voice tracking)
 - Add a milestone
 - Create a note
 
@@ -87,6 +89,39 @@ The app has four main sections:
     - **Body**: For full body progress photos
     - **Custom**: For specific areas you want to track separately
 
+## Recording Your Voice
+
+OpenTransition includes voice tracking to help monitor vocal changes during transition.
+
+### Recording Audio
+
+1. Tap the **➕ button**
+2. Select **Record Audio**
+3. Grant microphone permission if prompted
+4. Tap the **Record** button to start recording
+5. Speak or read a consistent phrase (helps with comparison later)
+6. Tap **Stop** when finished
+7. Review the recording
+8. Select the date (defaults to today)
+9. Save!
+
+!!! tip "Voice Recording Tips"
+    - Record in a quiet environment
+    - Use the same phrase or vowel sounds each time
+    - Maintain consistent microphone distance
+    - Record at the same time of day when possible
+    - The app automatically analyzes pitch (F0) and formant frequencies (F1-F4)
+
+### Understanding Voice Analysis
+
+After recording, the app provides:
+- **Pitch (F0)**: Your average speaking pitch in Hz
+- **Formants (F1, F2, F3, F4)**: Vocal tract resonance frequencies
+- **Waveform**: Visual representation of your recording
+- **Duration**: Length of the recording
+
+These metrics help you track vocal changes over time, which is valuable for voice training and monitoring HRT effects on voice.
+
 ## Adding Your First Milestone
 
 Milestones help you remember important events in your transition.
@@ -110,16 +145,18 @@ Milestones help you remember important events in your transition.
 ### Gallery View
 
 1. Tap **Gallery** in the bottom navigation
-2. Browse all your photos organized by date
-3. Filter by photo type (Face, Body, Custom)
+2. Browse all your photos and audio recordings organized by date
+3. Filter by type (Face, Body, Audio)
 4. Tap any photo to view it full screen
+5. Tap any audio recording to play it and see voice analysis
 
-### Compare Photos
+### Compare Photos and Voice Recordings
 
-1. Open any photo in gallery
-2. Swipe left or right to see other photos
+1. Open any photo or audio in gallery
+2. Swipe left or right to see other items
 3. Use the comparison view to see changes over time
-4. Photos are automatically organized by date for easy comparison
+4. For audio: Compare formant charts and pitch data side-by-side
+5. Items are automatically organized by date for easy comparison
 
 ### Timeline View
 

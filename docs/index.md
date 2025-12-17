@@ -16,11 +16,14 @@ OpenTransition is a customized fork of the original **TransTracks** application,
 ### 📸 Photo Tracking
 Track your transition with photos organized by different body types (face, body, custom areas). Compare photos side-by-side to see your progress over time.
 
+### 🎤 Voice Tracking
+Record audio samples to track voice changes throughout your transition. Automatic voice analysis provides formant frequencies (F1, F2, F3, F4) and pitch data (F0) to help you monitor vocal progress. Compare recordings over time with visualizations including waveforms, pitch progression charts, and formant plots.
+
 ### 🎯 Milestone Management
 Record and celebrate important milestones in your transition journey. Track dates, add descriptions, and associate photos with specific achievements.
 
 ### 🖼️ Gallery View
-Browse your transition photos in an organized gallery. Filter by date, body type, and milestones to find exactly what you're looking for.
+Browse your transition photos and audio recordings in an organized gallery. Filter by date, type, and milestones to find exactly what you're looking for.
 
 ### 🔒 Privacy & Security
 - App lock with PIN or pattern
