@@ -56,9 +56,9 @@ Train Mode is a disguise feature that changes the app icon to look like a train/
 
 - **Face**: For tracking facial changes (great for seeing HRT effects on your face)
 - **Body**: For full-body progress photos
-- **Custom**: For any specific area you want to track separately (hands, legs, hair, etc.)
 
-You can use all three types to organize your photos in whatever way makes sense for your journey.
+!!! note "Photo Organization"
+    The app currently offers Face and Body photo types. You can use these flexibly to track any areas you want. For example, use "Face" for close-ups of specific features, or "Body" for any body part.
 
 ### Can I record audio to track voice changes?
 

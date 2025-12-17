@@ -8,7 +8,6 @@ OpenTransition provides comprehensive tools for tracking your transition journey
 Document your transition with photos organized by type:
 - **Face Photos**: Track facial changes from HRT
 - **Body Photos**: Full body progress tracking
-- **Custom Areas**: Track specific body parts or areas
 
 [Learn more about photo management →](photos.md)
 

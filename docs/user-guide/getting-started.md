@@ -70,7 +70,7 @@ The app has four main sections:
 
 1. Tap the **➕ button**
 2. Select **Take Photo**
-3. Choose photo type (Face, Body, or Custom)
+3. Choose photo type (Face or Body)
 4. Take your photo
 5. Select the date (defaults to today)
 6. Save!
@@ -79,7 +79,7 @@ The app has four main sections:
 
 1. Tap the **➕ button**
 2. Select **Import Photos**
-3. Choose photo type (Face, Body, or Custom)
+3. Choose photo type (Face or Body)
 4. Select one or more photos from your device
 5. Choose the date for each photo
 6. Save!
@@ -87,7 +87,8 @@ The app has four main sections:
 !!! tip "Photo Types"
     - **Face**: For facial progress (great for tracking HRT facial changes)
     - **Body**: For full body progress photos
-    - **Custom**: For specific areas you want to track separately
+    
+    You can use these types flexibly to track any areas you want. For example, you might use "Face" for close-up photos of specific features, or "Body" for any part of your body.
 
 ## Recording Your Voice
 
@@ -149,6 +150,9 @@ Milestones help you remember important events in your transition.
 3. Filter by type (Face, Body, Audio)
 4. Tap any photo to view it full screen
 5. Tap any audio recording to play it and see voice analysis
+
+!!! note "Photo Types"
+    The gallery supports Face photos, Body photos, and Audio recordings. Custom areas can be tracked using Face or Body types.
 
 ### Compare Photos and Voice Recordings
 

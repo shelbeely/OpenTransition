@@ -236,11 +236,16 @@ val audioFile = FileUtil.getNewAudioFile(date)
 Audio recordings are stored as `Photo` objects with `TYPE_AUDIO`:
 
 ```kotlin
+// Photo type constants
+const val TYPE_FACE = 0
+const val TYPE_BODY = 1
+const val TYPE_AUDIO = 2  // Voice recordings
+
 val photo = Photo().apply {
     epochDay = date.toEpochDay()
     timestamp = System.currentTimeMillis()
     filePath = audioFile.absolutePath
-    type = Photo.TYPE_AUDIO
+    type = Photo.TYPE_AUDIO  // Value: 2
 }
 
 // Linked AudioAnalysis
@@ -442,9 +447,9 @@ fun testRecordAndAnalyze() {
 
 ### Voice Science
 
-- [Voice Feminization Guide](https://www.reddit.com/r/transvoice/) - Community resources
-- [Formant Analysis Basics](https://en.wikipedia.org/wiki/Formant) - Technical background
-- [Voice Training](https://www.reddit.com/r/transvoice/wiki/index) - Community wiki
+- [r/transvoice Community](https://www.reddit.com/r/transvoice/) - Reddit community for voice training support
+- [r/transvoice Wiki](https://www.reddit.com/r/transvoice/wiki/index) - Comprehensive voice training guides and resources
+- [Formant Analysis Basics](https://en.wikipedia.org/wiki/Formant) - Technical background on formants
 
 ### Libraries for Future Integration
 

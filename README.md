@@ -24,7 +24,7 @@ This is a customized fork of the original TransTracks application, rebranded and
 
 ## ✨ Key Features
 
-- 📸 **Photo Tracking** - Document your transition with organized photos (face, body, custom areas)
+- 📸 **Photo Tracking** - Document your transition with organized photos (face, body)
 - 🎤 **Voice Tracking** - Record audio samples and track voice changes with formant analysis
 - 🎯 **Milestone Management** - Record and celebrate important events
 - 🖼️ **Gallery View** - Browse and compare your progress photos and audio recordings
