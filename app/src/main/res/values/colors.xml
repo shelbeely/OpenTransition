@@ -45,4 +45,8 @@
 
     <color name="disabled_white">#eaeaea</color>
     <color name="disabled_transparent_white_90">#cceaeaea</color>
+
+    <!-- Face detection overlay colors -->
+    <color name="success_green">#4CAF50</color>
+    <color name="warning_yellow">#FFC107</color>
 </resources>

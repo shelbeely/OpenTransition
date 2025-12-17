@@ -39,6 +39,8 @@ sealed class Event {
     object SettingsControllerShown : Event()
 
     object SinglePhotoControllerShown : Event()
+
+    object CameraFragmentShown : Event()
 }
 
 object AnalyticsUtil {
@@ -62,6 +64,7 @@ object AnalyticsUtil {
         Event.SingleAlbumControllerShown -> "SingleAlbumControllerShown"
         Event.SettingsControllerShown -> "SettingsControllerShown"
         Event.SinglePhotoControllerShown -> "SinglePhotoControllerShown"
+        Event.CameraFragmentShown -> "CameraFragmentShown"
     }
 
     private fun getEventBundle(event: Event): Bundle? = when (event) {

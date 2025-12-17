@@ -129,41 +129,16 @@ class HomeFragment : Fragment(R.layout.home) {
                 )
             }
 
-        viewDisposables += Observables.combineLatest(
-            sharedEvents.ofType<HomeUiEvent.AddPhotoCamera>(), CameraHandler.cameraPermissionEnabled
-        ) { event, cameraEnabled -> event to cameraEnabled }
-            .subscribe { (event, cameraEnabled) ->
-                if (cameraEnabled) {
-                    lastCameraEvent = event
-                    CameraHandler.takePhoto(activity as AppCompatActivity)
-                } else {
-                    if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-                        AlertDialog.Builder(requireActivity())
-                            .setTitle(R.string.permission_required)
-                            .setMessage(R.string.camera_permission_required_message)
-                            .setPositiveButton(R.string.grant_permission) { _, _ ->
-                                CameraHandler
-                                    .requestIfNeeded(requireActivity() as AppCompatActivity)
-                            }
-                            .setNeutralButton(R.string.cancel, null)
-                            .show()
-                    } else {
-                        val didShow = CameraHandler
-                            .requestIfNeeded(requireActivity() as AppCompatActivity)
-
-                        if (!didShow) {
-                            CameraHandler.showCameraPermissionDisabledSnackBar(
-                                view, requireActivity()
-                            )
-                        }
-                    }
-                }
-            }
-
-        viewDisposables += CameraHandler.cameraPermissionBlocked
-            .filter { showRationale -> !showRationale }
-            .subscribe {
-                CameraHandler.showCameraPermissionDisabledSnackBar(view, requireActivity())
+        viewDisposables += sharedEvents.ofType<HomeUiEvent.AddPhotoCamera>()
+            .subscribe { event ->
+                // Navigate to new CameraFragment with face detection
+                findNavController().navigate(
+                    HomeFragmentDirections.actionGlobalCamera(
+                        type = event.type ?: Photo.TYPE_FACE,
+                        destinationToPopTo = R.id.homeFragment,
+                        epochDay = event.currentDate?.toEpochDay()?.boxed()
+                    )
+                )
             }
 
         viewDisposables += Observables.combineLatest(

@@ -298,4 +298,27 @@
         android:id="@+id/recordAudioFragment"
         android:name="com.shelbeely.opentransition.ui.recordaudio.RecordAudioFragment"
         android:label="RecordAudioFragment" />
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="com.shelbeely.opentransition.ui.camera.CameraFragment"
+        android:label="CameraFragment">
+        <argument
+            android:name="epochDay"
+            android:defaultValue="@null"
+            app:argType="com.shelbeely.opentransition.util.BoxedLong"
+            app:nullable="true" />
+        <argument
+            android:name="type"
+            app:argType="integer" />
+        <argument
+            android:name="destinationToPopTo"
+            app:argType="integer" />
+    </fragment>
+    <action
+        android:id="@+id/action_global_camera"
+        app:destination="@id/cameraFragment"
+        app:enterAnim="@anim/slide_in_right"
+        app:exitAnim="@anim/still"
+        app:popEnterAnim="@anim/still"
+        app:popExitAnim="@anim/slide_out_right" />
 </navigation>
