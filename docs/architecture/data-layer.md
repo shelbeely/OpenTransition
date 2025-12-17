@@ -46,8 +46,8 @@ class Photo : RealmObject {
 - **Body** (1): Full body progress photos  
 - **Audio** (2): Voice recordings with analysis
 
-!!! note "Custom Photo Type"
-    In the current version, the TYPE_CUSTOM constant was replaced with TYPE_AUDIO (value 2). Custom photo areas can still be tracked using Face or Body types with appropriate organization.
+!!! note "Photo Type Changes"
+    In the current version, the TYPE_CUSTOM constant (previously value 2) was replaced with TYPE_AUDIO. The app now focuses on Face and Body photo types, which can be used flexibly to track any areas. This change was made to accommodate the new voice tracking feature while maintaining backward compatibility with the database schema.
 
 ### AudioAnalysis Model
 

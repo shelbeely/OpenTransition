@@ -70,7 +70,8 @@ The app has four main sections:
 
 1. Tap the **➕ button**
 2. Select **Take Photo**
-3. Choose photo type (Face or Body)
+3. Choose photo type: **Face** or **Body**
+   - Use flexibly for any area you want to track
 4. Take your photo
 5. Select the date (defaults to today)
 6. Save!
@@ -79,7 +80,8 @@ The app has four main sections:
 
 1. Tap the **➕ button**
 2. Select **Import Photos**
-3. Choose photo type (Face or Body)
+3. Choose photo type: **Face** or **Body**
+   - Use flexibly for any area you want to track
 4. Select one or more photos from your device
 5. Choose the date for each photo
 6. Save!

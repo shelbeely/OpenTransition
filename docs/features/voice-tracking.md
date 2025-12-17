@@ -6,6 +6,9 @@
 
 The voice tracking feature allows users to record audio samples and track vocal changes throughout their transition. The system provides automatic voice analysis including formant frequencies and pitch data, helping users monitor progress in voice feminization or masculinization.
 
+!!! note "Current Implementation Status"
+    The current voice analysis provides **estimated** formant values based on typical vocal characteristics and audio metadata. For production use requiring precise formant extraction, the implementation should be enhanced with a DSP library using Linear Predictive Coding (LPC) or similar advanced techniques. See the Future Enhancements section for details.
+
 ## Architecture
 
 ### Components
@@ -148,12 +151,14 @@ Formants are resonant frequencies of the vocal tract that characterize voice qua
 **F4 (Fourth Formant)**: 3000-4500 Hz
 - Higher-order resonance characteristics
 
-### Analysis Implementation
+**Analysis Implementation**
 
 **File**: `app/src/main/java/com/shelbeely/opentransition/util/AudioAnalysisUtil.kt`
 
 !!! note "Current Implementation"
     The current implementation provides estimated formant values based on typical vocal characteristics. For production use with precise formant extraction, consider integrating a DSP (Digital Signal Processing) library that implements Linear Predictive Coding (LPC) or other advanced formant analysis techniques.
+
+The following shows the current analysis approach (simplified pseudocode for documentation):
 
 ```kotlin
 fun analyzeAudioFile(audioFile: File): AudioAnalysis? {
@@ -165,9 +170,8 @@ fun analyzeAudioFile(audioFile: File): AudioAnalysis? {
     val audioFormat = getAudioFormat(extractor)
     val durationSeconds = audioFormat.getDuration()
     
-    // Estimate formants (simplified approach)
-    // Note: This is a placeholder - real implementation would use
-    // DSP library for accurate formant extraction via LPC
+    // Current implementation: Estimate formants based on typical values
+    // Real implementation would use DSP library for accurate extraction
     val analysis = AudioAnalysis().apply {
         f0Mean = estimatedPitch
         f1Mean = estimateF1(f0Mean)
