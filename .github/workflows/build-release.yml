@@ -92,7 +92,7 @@ jobs:
           fi
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.4.3
         with:
           name: transtracks-${{ steps.build_apk.outputs.build_type }}-apk
           path: ${{ steps.build_apk.outputs.apk_path }}
