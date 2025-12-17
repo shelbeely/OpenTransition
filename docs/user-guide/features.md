@@ -8,9 +8,18 @@ OpenTransition provides comprehensive tools for tracking your transition journey
 Document your transition with photos organized by type:
 - **Face Photos**: Track facial changes from HRT
 - **Body Photos**: Full body progress tracking
-- **Custom Areas**: Track specific body parts or areas
 
 [Learn more about photo management →](photos.md)
+
+### 🎤 Voice Tracking
+Record and analyze your voice to track vocal changes:
+- **Audio Recording**: Record voice samples with built-in recorder
+- **Voice Analysis**: Automatic formant analysis (F1, F2, F3, F4)
+- **Pitch Tracking**: Monitor fundamental frequency (F0) changes
+- **Progress Visualization**: View waveforms, pitch progression, and formant charts
+- **Comparisons**: Compare recordings over time to see vocal progress
+
+Voice tracking helps monitor changes in vocal resonance and pitch, which are important aspects of voice feminization or masculinization during transition.
 
 ### 🎯 Milestone Tracking
 Record important events in your journey:

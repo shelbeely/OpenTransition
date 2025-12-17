@@ -44,7 +44,55 @@ class Photo : RealmObject {
 **Photo Types**:
 - **Face** (0): Facial progress photos
 - **Body** (1): Full body progress photos  
-- **Custom** (2): User-defined areas
+- **Audio** (2): Voice recordings with analysis
+
+!!! note "Photo Type Changes"
+    In the current version, the TYPE_CUSTOM constant (previously value 2) was replaced with TYPE_AUDIO. The app now focuses on Face and Body photo types, which can be used flexibly to track any areas. This change was made to accommodate the new voice tracking feature while maintaining backward compatibility with the database schema.
+
+### AudioAnalysis Model
+
+The `AudioAnalysis` class stores voice analysis data for audio recordings.
+
+**File**: `app/src/main/java/com/shelbeely/opentransition/data/AudioAnalysis.kt`
+
+```kotlin
+class AudioAnalysis : RealmObject {
+    @PrimaryKey var id: String = UUID.randomUUID().toString()
+    var photoId: String = ""  // Reference to associated Photo
+    
+    // Fundamental frequency (pitch) in Hz
+    var f0Mean: Float = 0f   // Average pitch
+    var f0Min: Float = 0f    // Minimum pitch
+    var f0Max: Float = 0f    // Maximum pitch
+    var f0StdDev: Float = 0f // Pitch variability
+    
+    // Formant frequencies in Hz
+    var f1Mean: Float = 0f   // First formant (tongue height)
+    var f2Mean: Float = 0f   // Second formant (tongue position)
+    var f3Mean: Float = 0f   // Third formant
+    var f4Mean: Float = 0f   // Fourth formant
+    
+    var durationSeconds: Float = 0f
+    var analysisTimestamp: Long = 0
+}
+```
+
+**Key Properties**:
+- `id`: Unique identifier (UUID)
+- `photoId`: Links to the Photo object with TYPE_AUDIO
+- `f0Mean/Min/Max`: Pitch measurements in Hertz
+- `f1Mean/f2Mean/f3Mean/f4Mean`: Formant frequency measurements
+- `f0StdDev`: Pitch variability measurement
+- `durationSeconds`: Recording length
+- `analysisTimestamp`: When analysis was performed
+
+**Voice Analysis Use Cases**:
+- Track vocal pitch changes during transition
+- Monitor formant frequencies for voice training
+- Compare recordings over time to see progress
+- Visualize voice characteristics with charts
+
+See [Voice Tracking Feature](../features/voice-tracking.md) for detailed documentation on audio analysis and formant extraction.
 
 ### Milestone Model
 

@@ -56,9 +56,32 @@ Train Mode is a disguise feature that changes the app icon to look like a train/
 
 - **Face**: For tracking facial changes (great for seeing HRT effects on your face)
 - **Body**: For full-body progress photos
-- **Custom**: For any specific area you want to track separately (hands, legs, hair, etc.)
 
-You can use all three types to organize your photos in whatever way makes sense for your journey.
+!!! note "Photo Organization"
+    The app currently offers Face and Body photo types. You can use these flexibly to track any areas you want. For example, use "Face" for close-ups of specific features, or "Body" for any body part.
+
+### Can I record audio to track voice changes?
+
+Yes! OpenTransition includes voice tracking features:
+1. Tap the ➕ button
+2. Select "Record Audio"
+3. Record a voice sample (try to use consistent phrases)
+4. The app automatically analyzes pitch and formant frequencies
+5. Compare recordings over time to see vocal progress
+
+Voice tracking is useful for monitoring voice training progress and documenting vocal changes during transition.
+
+### What are formants and pitch?
+
+The voice analysis provides:
+- **Pitch (F0)**: Your speaking voice frequency in Hertz (Hz)
+  - Lower values are typically masculine (85-180 Hz)
+  - Higher values are typically feminine (165-255 Hz)
+- **Formants (F1, F2, F3, F4)**: Resonant frequencies that characterize voice quality
+  - Important for voice training and tracking vocal tract changes
+  - F1 and F2 are especially important for voice feminization/masculinization
+
+You don't need to understand all the technical details—the app visualizes progress with charts and graphs!
 
 ### Can I import photos I've already taken?
 
@@ -108,6 +131,7 @@ There's no hard limit on the number of photos. The only limit is your device's a
 
 A backup includes:
 - All your photos
+- All audio recordings and voice analysis data
 - All milestones and their details
 - App settings (theme, preferences, etc.)
 - Everything needed to restore your data completely
@@ -218,6 +242,24 @@ If import fails:
 - Check all required permissions are granted
 - Try importing on a different device
 
+### Audio recording isn't working
+
+If you can't record audio:
+- Check that microphone permission is granted (Settings → Apps → OpenTransition → Permissions)
+- Ensure no other app is using the microphone
+- Try restarting the app
+- Check that your device has sufficient storage space
+- Test your microphone with another app to verify it's working
+
+### Audio playback doesn't work
+
+If audio won't play:
+- Verify the recording file wasn't corrupted
+- Check device volume settings
+- Ensure media volume isn't muted
+- Try restarting the app
+- If the issue persists, report it on GitHub
+
 ## Features & Customization
 
 ### Can I change the theme?
@@ -268,7 +310,8 @@ Or enable auto-updates for the app in Play Store settings.
 
 Some features being considered:
 - More customization options
-- Additional photo comparison tools
+- Additional photo and audio comparison tools
+- Improved voice analysis with real-time feedback
 - Timeline visualizations
 - More theme options
 - Widget support
