@@ -52,6 +52,8 @@ sealed class HomeUiEvent {
     data class AddPhotoGallery(
         val currentDate: LocalDate? = null, @Photo.Type val type: Int? = null
     ) : HomeUiEvent()
+    
+    data class AddAudioRecording(val currentDate: LocalDate? = null) : HomeUiEvent()
 }
 
 sealed class HomeUiState {
@@ -145,6 +147,9 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         bodyRecyclerView.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL, false
         )
+        audioRecyclerView.layoutManager = LinearLayoutManager(
+            context, LinearLayoutManager.HORIZONTAL, false
+        )
     }
 
     fun display(state: HomeUiState) {
@@ -186,6 +191,10 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
                 )
                 bodyRecyclerView.adapter = HomeGalleryAdapter(
                     state.currentDate, Photo.TYPE_BODY,
+                    eventRelay
+                )
+                audioRecyclerView.adapter = HomeGalleryAdapter(
+                    state.currentDate, Photo.TYPE_AUDIO,
                     eventRelay
                 )
             }
