@@ -11,29 +11,45 @@
 package com.shelbeely.opentransition.wear
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.gms.wearable.*
+import com.google.gson.Gson
 import com.shelbeely.opentransition.shared.WearableConstants
+import com.shelbeely.opentransition.shared.models.MilestoneData
+import com.shelbeely.opentransition.shared.util.WearableHelper
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainActivity : Activity(), DataClient.OnDataChangedListener, 
     MessageClient.OnMessageReceivedListener,
     CapabilityClient.OnCapabilityChangedListener {
 
     private lateinit var triggerPhotoButton: Button
+    private lateinit var syncButton: Button
     private lateinit var statusText: TextView
+    private lateinit var milestoneCountText: TextView
+    private lateinit var lastMilestoneText: TextView
     private lateinit var dataClient: DataClient
     private lateinit var messageClient: MessageClient
     private lateinit var capabilityClient: CapabilityClient
+    
+    private var milestones: List<MilestoneData> = emptyList()
+    private val dateFormat = SimpleDateFormat("MMM d, yyyy", Locale.getDefault())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         triggerPhotoButton = findViewById(R.id.trigger_photo_button)
+        syncButton = findViewById(R.id.sync_button)
         statusText = findViewById(R.id.status_text)
+        milestoneCountText = findViewById(R.id.milestone_count_text)
+        lastMilestoneText = findViewById(R.id.last_milestone_text)
 
         dataClient = Wearable.getDataClient(this)
         messageClient = Wearable.getMessageClient(this)
@@ -42,8 +58,13 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
         triggerPhotoButton.setOnClickListener {
             sendPhotoTriggerMessage()
         }
+        
+        syncButton.setOnClickListener {
+            requestSync()
+        }
 
         checkMobileAppConnection()
+        loadCachedMilestones()
     }
 
     override fun onResume() {
@@ -51,6 +72,7 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
         dataClient.addListener(this)
         messageClient.addListener(this)
         capabilityClient.addListener(this, WearableConstants.CAPABILITY_MOBILE_APP)
+        checkMobileAppConnection()
     }
 
     override fun onPause() {
@@ -67,19 +89,31 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
                 val nodes = capabilityInfo.nodes
                 if (nodes.isNotEmpty()) {
                     val nodeId = nodes.first().id
-                    val message = WearableConstants.PHOTO_TYPE_FACE.toByteArray()
+                    WearableHelper.sendPhotoTrigger(messageClient, nodeId, WearableConstants.PHOTO_TYPE_FACE)
                     
-                    messageClient.sendMessage(nodeId, WearableConstants.PATH_TRIGGER_PHOTO, message)
-                        .addOnSuccessListener {
-                            runOnUiThread {
-                                Toast.makeText(this, R.string.photo_triggered, Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                        .addOnFailureListener { e ->
-                            runOnUiThread {
-                                Toast.makeText(this, "Failed to send message: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        }
+                    runOnUiThread {
+                        Toast.makeText(this, R.string.photo_triggered, Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this, R.string.disconnected, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+    }
+    
+    private fun requestSync() {
+        capabilityClient
+            .getCapability(WearableConstants.CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_REACHABLE)
+            .addOnSuccessListener { capabilityInfo ->
+                val nodes = capabilityInfo.nodes
+                if (nodes.isNotEmpty()) {
+                    val nodeId = nodes.first().id
+                    WearableHelper.sendSyncRequest(messageClient, nodeId)
+                    
+                    runOnUiThread {
+                        Toast.makeText(this, "Syncing...", Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     runOnUiThread {
                         Toast.makeText(this, R.string.disconnected, Toast.LENGTH_SHORT).show()
@@ -97,23 +131,69 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
                     if (nodes.isNotEmpty()) {
                         statusText.text = getString(R.string.connected)
                         triggerPhotoButton.isEnabled = true
+                        syncButton.isEnabled = true
                     } else {
                         statusText.text = getString(R.string.disconnected)
                         triggerPhotoButton.isEnabled = false
+                        syncButton.isEnabled = false
                     }
                 }
             }
     }
+    
+    private fun loadCachedMilestones() {
+        val prefs = getSharedPreferences("wear_cache", Context.MODE_PRIVATE)
+        val cachedJson = prefs.getString("milestones", null)
+        
+        if (cachedJson != null) {
+            milestones = WearableHelper.parseMilestones(cachedJson)
+            updateMilestoneUI()
+        }
+    }
+    
+    private fun saveMilestones(milestones: List<MilestoneData>) {
+        this.milestones = milestones
+        
+        val prefs = getSharedPreferences("wear_cache", Context.MODE_PRIVATE)
+        val json = Gson().toJson(milestones)
+        prefs.edit().putString("milestones", json).apply()
+        
+        updateMilestoneUI()
+    }
+    
+    private fun updateMilestoneUI() {
+        runOnUiThread {
+            milestoneCountText.text = "Milestones: ${milestones.size}"
+            
+            if (milestones.isNotEmpty()) {
+                val latest = milestones.maxByOrNull { it.date }
+                if (latest != null) {
+                    val dateStr = dateFormat.format(Date(latest.date))
+                    lastMilestoneText.text = "Latest: ${latest.title}\n$dateStr"
+                    lastMilestoneText.visibility = View.VISIBLE
+                }
+            } else {
+                lastMilestoneText.text = getString(R.string.no_milestones)
+                lastMilestoneText.visibility = View.VISIBLE
+            }
+        }
+    }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-        // Handle data changes from mobile app
         for (event in dataEvents) {
             if (event.type == DataEvent.TYPE_CHANGED) {
                 val dataItem = event.dataItem
                 if (dataItem.uri.path == WearableConstants.DATA_PATH_MILESTONES) {
-                    // Handle milestone data updates
-                    runOnUiThread {
-                        Toast.makeText(this, "Milestones updated", Toast.LENGTH_SHORT).show()
+                    val dataMap = DataMapItem.fromDataItem(dataItem).dataMap
+                    val milestonesJson = dataMap.getString(WearableConstants.KEY_MILESTONE_DATA)
+                    
+                    if (milestonesJson != null) {
+                        val milestones = WearableHelper.parseMilestones(milestonesJson)
+                        saveMilestones(milestones)
+                        
+                        runOnUiThread {
+                            Toast.makeText(this, "Milestones synced", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 }
             }
@@ -121,12 +201,12 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
     }
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
-        // Handle messages from mobile app
         when (messageEvent.path) {
             WearableConstants.PATH_MILESTONE_UPDATE -> {
                 runOnUiThread {
                     Toast.makeText(this, "Milestone updated", Toast.LENGTH_SHORT).show()
                 }
+                requestSync()
             }
         }
     }

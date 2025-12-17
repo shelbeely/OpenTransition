@@ -12,11 +12,20 @@ The main OpenTransition Android application for phones and tablets. This is the 
 **Target SDK**: 36
 
 ### ⌚ wear
-The Wear OS companion app for Android smartwatches. Allows users to:
-- Trigger photo capture from their watch
-- View recent milestones
-- Receive notifications
-- Quick access to key features
+The Wear OS companion app for Android smartwatches. This is a **remote control and quick-view companion** that works with the mobile app.
+
+**What it does:**
+- 📸 **Quick Photo Trigger** - Tap your watch to open the camera on your phone
+- 📊 **Milestone Summary** - See total milestones and latest achievement at a glance
+- 🔄 **Manual Sync** - Request fresh data from your phone
+- 🔗 **Connection Status** - Know when your phone app is reachable
+
+**What it doesn't do:**
+- ❌ Store photos (too large, kept on phone)
+- ❌ Edit milestones (use phone for detailed work)
+- ❌ Work without phone (companion app, not standalone)
+
+**See [WEAR_APP_FEATURES.md](WEAR_APP_FEATURES.md) for detailed feature documentation.**
 
 **Package**: `com.shelbeely.opentransition.wear`
 **Min SDK**: 30 (Wear OS 3.0)
