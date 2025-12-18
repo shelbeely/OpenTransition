@@ -4,6 +4,8 @@ gen/
 out/
 build/
 /app/release
+/mobile/release
+/wear/release
 
 # Local configuration file (sdk path, etc)
 local.properties
@@ -36,6 +38,7 @@ _sandbox
 # Important files
 /secrets.properties
 /app/google-services.json
+/mobile/google-services.json
 release-keystore.jks
 
 # MkDocs

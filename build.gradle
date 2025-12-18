@@ -31,5 +31,6 @@ allprojects {
 
 task clean(type: Delete) {
     delete rootProject.buildDir
-    delete rootProject.projectDir.absolutePath + "/app/release"
+    delete rootProject.projectDir.absolutePath + "/mobile/release"
+    delete rootProject.projectDir.absolutePath + "/wear/release"
 }
