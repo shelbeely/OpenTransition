@@ -5,9 +5,9 @@ This repository automatically captures UI screenshots on multiple Android versio
 ## How It Works
 
 The GitHub Actions workflow (`.github/workflows/ui-screenshots.yml`) automatically runs when:
-- Pull requests modify layouts (`app/src/main/res/layout/**`)
-- Pull requests modify UI resources (`app/src/main/res/values/**`, `app/src/main/res/drawable/**`)
-- Pull requests modify UI code (`app/src/main/java/**/ui/**`, `app/src/main/java/**/widget/**`)
+- Pull requests modify layouts (`mobile/src/main/res/layout/**`)
+- Pull requests modify UI resources (`mobile/src/main/res/values/**`, `mobile/src/main/res/drawable/**`)
+- Pull requests modify UI code (`mobile/src/main/java/**/ui/**`, `mobile/src/main/java/**/widget/**`)
 
 ## Multi-Version Testing
 
@@ -148,13 +148,13 @@ matrix:
 To test screenshot capture locally with an emulator:
 ```bash
 # Build APK
-./gradlew assembleDebug
+./gradlew :mobile:assembleDebug
 
 # Start emulator with specific API level
 emulator -avd Pixel_5_API_31 -no-snapshot-load
 
 # Install on running emulator
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb install -r mobile/build/outputs/apk/debug/mobile-debug.apk
 
 # Capture a screenshot
 adb exec-out screencap -p > screenshot.png

@@ -23,7 +23,7 @@ It provides:
 - `README-CI.md` – this file
 - `.github/workflows/build-release.yml` – main CI/CD workflow
 - `.github/workflows/pr-debug.yml` – PR debug build workflow
-- `.github/ci-scripts/prepare-google-services.sh` – recreates `app/google-services.json`
+- `.github/ci-scripts/prepare-google-services.sh` – recreates `mobile/google-services.json`
 - `.github/ci-scripts/prepare-keystore.sh` – recreates `keys/release-keystore.jks`
 - `.github/ci-scripts/prepare-secrets.sh` – prepares `secrets.properties`
 
@@ -34,12 +34,12 @@ Go to **Settings → Secrets and variables → Actions** in your repo and create
 ### Firebase
 
 - `GOOGLE_SERVICES_JSON`  
-  Base64-encoded contents of your `app/google-services.json`.
+  Base64-encoded contents of your `mobile/google-services.json`.
 
   From your local machine:
 
   ```bash
-  base64 -w 0 app/google-services.json
+  base64 -w 0 mobile/google-services.json
   ```
 
   Copy the single-line output and paste it as the secret value.
@@ -79,7 +79,7 @@ These env vars are exported in the workflow as:
 - `KEY_ALIAS` → `ANDROID_KEY_ALIAS`
 - `KEY_PASS` → `ANDROID_KEY_ALIAS_PASSWORD`
 
-Make sure your `signingConfigs` in `app/build.gradle` use those names, e.g.:
+Make sure your `signingConfigs` in `mobile/build.gradle` use those names, e.g.:
 
 ```kotlin
 signingConfigs {
@@ -132,7 +132,10 @@ You can grab the PR’s APK from the **Artifacts** section of that workflow run.
 
 ## Notes
 
-- These workflows assume your Android project root contains the `app/` module.
+- These workflows are designed for a **monorepo** structure with `mobile/`, `wear/`, and `shared/` modules.
+- The main mobile app is in the `mobile/` module and the Wear OS app is in the `wear/` module.
 - `local.properties` is generated automatically in CI using the `ANDROID_SDK_ROOT` provided by `android-actions/setup-android`.
 - `google-services.json` is **not** checked into your repo; it is generated at build time from the `GOOGLE_SERVICES_JSON` secret.
 - The workflows use `actions/upload-artifact@v4` and `actions/download-artifact@v4` (no deprecated v3 usage).
+- Both mobile and wear APKs are built and uploaded as separate artifacts.
+- For tagged releases, both mobile and wear APKs are included in the GitHub release.
