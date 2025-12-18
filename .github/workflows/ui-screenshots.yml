@@ -4,11 +4,11 @@ on:
   workflow_dispatch:  # Allow manual workflow runs from GitHub Actions UI
   pull_request:
     paths:
-      - 'app/src/main/res/layout/**'
-      - 'app/src/main/res/values/**'
-      - 'app/src/main/res/drawable/**'
-      - 'app/src/main/java/**/ui/**'
-      - 'app/src/main/java/**/widget/**'
+      - 'mobile/src/main/res/layout/**'
+      - 'mobile/src/main/res/values/**'
+      - 'mobile/src/main/res/drawable/**'
+      - 'mobile/src/main/java/**/ui/**'
+      - 'mobile/src/main/java/**/widget/**'
       - '.github/workflows/ui-screenshots.yml'
 
 concurrency:
@@ -55,7 +55,8 @@ jobs:
       run: |
         if [ -z "$GOOGLE_SERVICES_JSON_64" ]; then
           # Create a dummy google-services.json for builds
-          cat > ./app/google-services.json << 'EOF'
+          mkdir -p mobile
+          cat > ./mobile/google-services.json << 'EOF'
         {
           "project_info": {
             "project_number": "123456789000",
@@ -87,14 +88,14 @@ jobs:
         }
         EOF
         else
-          echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./app/google-services.json
+          echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./mobile/google-services.json
         fi
 
     - name: 📝 Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: 👷‍♀️ Build Debug APK
-      run: ./gradlew assembleDebug --stacktrace
+      run: ./gradlew :mobile:assembleDebug --stacktrace
 
     - name: 🤖 Enable KVM for Android Emulator
       run: |
@@ -120,7 +121,7 @@ jobs:
           adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
           
           # Install APK
-          adb install -r app/build/outputs/apk/debug/app-debug.apk
+          adb install -r mobile/build/outputs/apk/debug/mobile-debug.apk
           
           # Create screenshots directory
           mkdir -p screenshots

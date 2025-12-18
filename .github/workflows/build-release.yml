@@ -68,8 +68,8 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Build APK
-        id: build_apk
+      - name: Build Mobile APK
+        id: build_mobile_apk
         env:
           STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
@@ -82,20 +82,49 @@ jobs:
           fi
 
           if [ "$BUILD_TYPE" = "debug" ]; then
-            ./gradlew --stacktrace assembleDebug
-            echo "apk_path=app/build/outputs/apk/debug/app-debug.apk" >> $GITHUB_OUTPUT
+            ./gradlew --stacktrace :mobile:assembleDebug
+            echo "apk_path=mobile/build/outputs/apk/debug/mobile-debug.apk" >> $GITHUB_OUTPUT
             echo "build_type=debug" >> $GITHUB_OUTPUT
           else
-            ./gradlew --stacktrace assembleRelease
-            echo "apk_path=app/build/outputs/apk/release/app-release.apk" >> $GITHUB_OUTPUT
+            ./gradlew --stacktrace :mobile:assembleRelease
+            echo "apk_path=mobile/build/outputs/apk/release/mobile-release.apk" >> $GITHUB_OUTPUT
             echo "build_type=release" >> $GITHUB_OUTPUT
           fi
 
-      - name: Upload APK artifact
+      - name: Build Wear APK
+        id: build_wear_apk
+        env:
+          STORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_ALIAS_PASSWORD }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BUILD_TYPE="${{ github.event.inputs.build_type }}"
+          else
+            BUILD_TYPE="release"
+          fi
+
+          if [ "$BUILD_TYPE" = "debug" ]; then
+            ./gradlew --stacktrace :wear:assembleDebug
+            echo "apk_path=wear/build/outputs/apk/debug/wear-debug.apk" >> $GITHUB_OUTPUT
+            echo "build_type=debug" >> $GITHUB_OUTPUT
+          else
+            ./gradlew --stacktrace :wear:assembleRelease
+            echo "apk_path=wear/build/outputs/apk/release/wear-release.apk" >> $GITHUB_OUTPUT
+            echo "build_type=release" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Mobile APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: transtracks-${{ steps.build_apk.outputs.build_type }}-apk
-          path: ${{ steps.build_apk.outputs.apk_path }}
+          name: transtracks-mobile-${{ steps.build_mobile_apk.outputs.build_type }}-apk
+          path: ${{ steps.build_mobile_apk.outputs.apk_path }}
+
+      - name: Upload Wear APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: transtracks-wear-${{ steps.build_wear_apk.outputs.build_type }}-apk
+          path: ${{ steps.build_wear_apk.outputs.apk_path }}
 
   release:
     needs: build
@@ -105,10 +134,16 @@ jobs:
       (github.event_name == 'workflow_dispatch' && github.event.inputs.build_type == 'release')
 
     steps:
-      - name: Download APK artifact
+      - name: Download Mobile APK artifact
         uses: actions/download-artifact@v4.1.3
         with:
-          name: transtracks-release-apk
+          name: transtracks-mobile-release-apk
+          path: ./dist
+
+      - name: Download Wear APK artifact
+        uses: actions/download-artifact@v4.1.3
+        with:
+          name: transtracks-wear-release-apk
           path: ./dist
 
       - name: Create GitHub Release

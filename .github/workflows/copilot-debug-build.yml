@@ -44,7 +44,8 @@ jobs:
         run: |
           if [ -z "$GOOGLE_SERVICES_JSON" ]; then
             echo "Creating dummy google-services.json for testing"
-            cat > app/google-services.json << 'EOF'
+            mkdir -p mobile
+            cat > mobile/google-services.json << 'EOF'
           {
             "project_info": {
               "project_number": "123456789",
@@ -84,11 +85,11 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Debug APK
-        run: ./gradlew --stacktrace assembleDebug
+        run: ./gradlew --stacktrace :mobile:assembleDebug
 
       - name: Upload Debug APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: opentransition-debug-${{ github.sha }}
-          path: app/build/outputs/apk/debug/app-debug.apk
+          path: mobile/build/outputs/apk/debug/mobile-debug.apk
           retention-days: 7
