@@ -432,23 +432,26 @@ class SettingsFragment : Fragment(R.layout.settings) {
         // Check if biometric is available for the biometric option
         val biometricAvailable = BiometricPromptHelper.isBiometricAvailable(view.context)
         
-        val options = mutableListOf(
-            view.getString(R.string.disabled),
-            view.getString(R.string.enabled_normal),
-            view.getString(R.string.enabled_trains)
+        // Create mapping of display options to lock types
+        val lockTypeOptions = mutableListOf(
+            LockType.off to view.getString(R.string.disabled),
+            LockType.normal to view.getString(R.string.enabled_normal),
+            LockType.trains to view.getString(R.string.enabled_trains)
         )
         
         if (biometricAvailable) {
-            options.add(view.getString(R.string.enabled_biometric))
+            lockTypeOptions.add(LockType.biometric to view.getString(R.string.enabled_biometric))
         }
+        
+        val selectedIndex = lockTypeOptions.indexOfFirst { it.first == lockMode }.coerceAtLeast(0)
 
         AlertDialog.Builder(view.context)
             .setTitle(R.string.select_lock_mode)
             .setSingleChoiceItems(
-                options.toTypedArray(),
-                lockMode.ordinal
+                lockTypeOptions.map { it.second }.toTypedArray(),
+                selectedIndex
             ) { dialog: DialogInterface, index: Int ->
-                val newLockType = LockType.values()[index]
+                val newLockType = lockTypeOptions[index].first
 
                 if (lockMode != newLockType) {
                     val hasCode = SettingsManager.getLockCode().isNotEmpty()
