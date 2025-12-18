@@ -17,9 +17,14 @@ import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
+import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.shared.WearableConstants
+import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 import java.io.File
 import java.io.FileOutputStream
+import java.time.LocalDate
+import java.time.ZoneId
 
 /**
  * Service to handle messages and data from the Wear OS companion app
@@ -141,10 +146,16 @@ class MobileWearableListenerService : WearableListenerService() {
             val dataMap = DataMapItem.fromDataItem(dataItem).dataMap
             val audioBytes = dataMap.getByteArray(WearableConstants.KEY_AUDIO_DATA)
             val filename = dataMap.getString(WearableConstants.KEY_AUDIO_FILENAME)
+            val timestamp = dataMap.getLong("timestamp", System.currentTimeMillis())
+            val autoSent = dataMap.getBoolean("auto_sent", false)
             
             if (audioBytes != null && filename != null) {
+                // Get current date for the photo entry
+                val currentDate = LocalDate.now()
+                val epochDay = currentDate.toEpochDay()
+                
                 // Save audio file to app's files directory
-                val audioDir = File(filesDir, "audio_recordings")
+                val audioDir = File(filesDir, "audio")
                 if (!audioDir.exists()) {
                     audioDir.mkdirs()
                 }
@@ -156,9 +167,36 @@ class MobileWearableListenerService : WearableListenerService() {
                 
                 Log.d(TAG, "Audio file saved: ${audioFile.absolutePath}")
                 
+                // Add audio to database as a Photo entry for current day
+                try {
+                    val config = RealmConfiguration.Builder(
+                        schema = setOf(Photo::class)
+                    ).build()
+                    
+                    val realm = Realm.open(config)
+                    
+                    realm.writeBlocking {
+                        val photo = Photo().apply {
+                            this.epochDay = epochDay
+                            this.timestamp = timestamp
+                            this.filePath = audioFile.absolutePath
+                            this.type = Photo.TYPE_AUDIO
+                        }
+                        copyToRealm(photo)
+                    }
+                    
+                    realm.close()
+                    
+                    Log.d(TAG, "Audio added to gallery for current day (epochDay: $epochDay)")
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error adding audio to database", e)
+                }
+                
                 // Broadcast that audio was received
                 val intent = Intent(ACTION_AUDIO_RECEIVED).apply {
                     putExtra(EXTRA_AUDIO_FILE, audioFile.absolutePath)
+                    putExtra("epoch_day", epochDay)
+                    putExtra("auto_sent", autoSent)
                 }
                 sendBroadcast(intent)
             }

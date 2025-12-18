@@ -34,7 +34,6 @@ import java.util.*
 class AudioRecordActivity : Activity() {
 
     private lateinit var recordButton: Button
-    private lateinit var sendButton: Button
     private lateinit var statusText: TextView
     private lateinit var durationText: TextView
     
@@ -58,7 +57,6 @@ class AudioRecordActivity : Activity() {
         capabilityClient = Wearable.getCapabilityClient(this)
 
         recordButton = findViewById(R.id.record_button)
-        sendButton = findViewById(R.id.send_button)
         statusText = findViewById(R.id.audio_status_text)
         durationText = findViewById(R.id.duration_text)
 
@@ -74,12 +72,6 @@ class AudioRecordActivity : Activity() {
                 startRecording()
             }
         }
-
-        sendButton.setOnClickListener {
-            sendAudioToPhone()
-        }
-        
-        sendButton.isEnabled = false
     }
 
     private fun checkPermissions() {
@@ -129,7 +121,6 @@ class AudioRecordActivity : Activity() {
             
             recordButton.text = "⏹️ Stop"
             statusText.text = "Recording..."
-            sendButton.isEnabled = false
             
             // Start duration timer
             updateDuration()
@@ -150,8 +141,12 @@ class AudioRecordActivity : Activity() {
             
             isRecording = false
             recordButton.text = "🎤 Record"
-            statusText.text = "Recording saved"
-            sendButton.isEnabled = true
+            statusText.text = "Sending to phone..."
+            
+            // Automatically send audio to phone
+            audioFile?.let { file ->
+                sendAudioToPhone(file)
+            }
             
         } catch (e: Exception) {
             Toast.makeText(this, "Stop failed: ${e.message}", Toast.LENGTH_SHORT).show()
@@ -167,28 +162,26 @@ class AudioRecordActivity : Activity() {
         }
     }
 
-    private fun sendAudioToPhone() {
-        audioFile?.let { file ->
-            if (!file.exists()) {
-                Toast.makeText(this, "No audio file to send", Toast.LENGTH_SHORT).show()
-                return
-            }
+    private fun sendAudioToPhone(file: File) {
+        if (!file.exists()) {
+            Toast.makeText(this, "No audio file to send", Toast.LENGTH_SHORT).show()
+            statusText.text = "Error: File not found"
+            return
+        }
 
-            capabilityClient
-                .getCapability(WearableConstants.CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_REACHABLE)
-                .addOnSuccessListener { capabilityInfo ->
-                    val nodes = capabilityInfo.nodes
-                    if (nodes.isNotEmpty()) {
-                        sendAudioData(file)
-                    } else {
-                        runOnUiThread {
-                            Toast.makeText(this, "Phone not connected", Toast.LENGTH_SHORT).show()
-                        }
+        capabilityClient
+            .getCapability(WearableConstants.CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_REACHABLE)
+            .addOnSuccessListener { capabilityInfo ->
+                val nodes = capabilityInfo.nodes
+                if (nodes.isNotEmpty()) {
+                    sendAudioData(file)
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(this, "Phone not connected", Toast.LENGTH_SHORT).show()
+                        statusText.text = "Phone disconnected"
                     }
                 }
-        } ?: run {
-            Toast.makeText(this, "No recording available", Toast.LENGTH_SHORT).show()
-        }
+            }
     }
 
     private fun sendAudioData(file: File) {
@@ -198,6 +191,14 @@ class AudioRecordActivity : Activity() {
             // Read audio file
             val audioBytes = FileInputStream(file).use { it.readBytes() }
             
+            // Get current date for association
+            val calendar = Calendar.getInstance()
+            val dateKey = String.format("%04d%02d%02d", 
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
+            
             // Create PutDataRequest with audio data
             val putDataMapRequest = PutDataMapRequest.create(WearableConstants.DATA_PATH_AUDIO)
             val dataMap = putDataMapRequest.dataMap
@@ -205,6 +206,8 @@ class AudioRecordActivity : Activity() {
             dataMap.putByteArray(WearableConstants.KEY_AUDIO_DATA, audioBytes)
             dataMap.putString(WearableConstants.KEY_AUDIO_FILENAME, file.name)
             dataMap.putLong("timestamp", System.currentTimeMillis())
+            dataMap.putString("date_key", dateKey)  // Add date association
+            dataMap.putBoolean("auto_sent", true)   // Mark as auto-sent
             
             val putDataRequest = putDataMapRequest.asPutDataRequest()
             putDataRequest.setUrgent()
@@ -212,14 +215,16 @@ class AudioRecordActivity : Activity() {
             dataClient.putDataItem(putDataRequest)
                 .addOnSuccessListener {
                     runOnUiThread {
-                        statusText.text = "Audio sent successfully"
-                        Toast.makeText(this, "Audio sent to phone", Toast.LENGTH_SHORT).show()
+                        statusText.text = "Sent to phone"
+                        Toast.makeText(this, "Audio saved to current day", Toast.LENGTH_SHORT).show()
                         
                         // Clean up
                         file.delete()
                         audioFile = null
-                        sendButton.isEnabled = false
                         durationText.text = "00:00"
+                        
+                        // Close activity after successful send
+                        durationText.postDelayed({ finish() }, 2000)
                     }
                 }
                 .addOnFailureListener { e ->
