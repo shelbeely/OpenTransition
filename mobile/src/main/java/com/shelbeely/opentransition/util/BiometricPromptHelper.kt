@@ -31,15 +31,6 @@ object BiometricPromptHelper {
     }
     
     /**
-     * Check if biometric credentials are enrolled
-     */
-    fun isBiometricEnrolled(context: Context): Boolean {
-        val biometricManager = BiometricManager.from(context)
-        return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == 
-                BiometricManager.BIOMETRIC_SUCCESS
-    }
-    
-    /**
      * Get the biometric availability status message
      */
     fun getBiometricStatusMessage(context: Context): String? {
