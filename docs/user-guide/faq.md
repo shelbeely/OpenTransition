@@ -44,7 +44,17 @@ No. OpenTransition does not:
 
 ### How secure is the app lock?
 
-The app lock uses industry-standard hashing to store your PIN or pattern securely. Your actual PIN/pattern is never stored—only a hashed version is saved, making it very difficult for anyone to access your data without your code.
+The app lock offers multiple security options:
+
+- **Password Lock**: Uses industry-standard hashing to securely store your password. Your actual password is never stored—only a hashed version is saved, making it very difficult for anyone to access your data without your code.
+
+- **Biometric Lock** (NEW): Uses your device's fingerprint or face recognition for quick and secure access. This option:
+  - Uses Android's BiometricPrompt API with BIOMETRIC_STRONG security
+  - Still requires a backup password for recovery
+  - Only works if your device supports biometric authentication
+  - Provides the fastest unlock experience while maintaining security
+
+Choose the lock type that works best for your device and privacy needs. Both options keep your transition journey private and secure.
 
 ### What is "Train Mode"?
 
