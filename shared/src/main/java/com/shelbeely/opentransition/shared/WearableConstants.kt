@@ -25,17 +25,38 @@ object WearableConstants {
     const val PATH_MILESTONE_UPDATE = "/opentransition/milestone_update"
     const val PATH_REQUEST_SYNC = "/opentransition/request_sync"
     
+    // Camera control paths
+    const val PATH_CAMERA_SHUTTER = "/opentransition/camera/shutter"
+    const val PATH_CAMERA_ZOOM = "/opentransition/camera/zoom"
+    const val PATH_CAMERA_FLASH = "/opentransition/camera/flash"
+    const val PATH_CAMERA_SWITCH = "/opentransition/camera/switch"
+    
+    // Audio recording paths
+    const val PATH_AUDIO_START = "/opentransition/audio/start"
+    const val PATH_AUDIO_STOP = "/opentransition/audio/stop"
+    const val PATH_AUDIO_DATA = "/opentransition/audio/data"
+    
     // Data item paths
     const val DATA_PATH_MILESTONES = "/opentransition/data/milestones"
     const val DATA_PATH_SETTINGS = "/opentransition/data/settings"
+    const val DATA_PATH_AUDIO = "/opentransition/data/audio"
     
     // Message keys
     const val KEY_PHOTO_TYPE = "photo_type"
     const val KEY_MILESTONE_DATA = "milestone_data"
     const val KEY_MILESTONE_COUNT = "milestone_count"
     const val KEY_LAST_SYNC = "last_sync"
+    const val KEY_ZOOM_LEVEL = "zoom_level"
+    const val KEY_FLASH_MODE = "flash_mode"
+    const val KEY_AUDIO_DATA = "audio_data"
+    const val KEY_AUDIO_FILENAME = "audio_filename"
     
     // Photo types
     const val PHOTO_TYPE_FACE = "face"
     const val PHOTO_TYPE_BODY = "body"
+    
+    // Camera control values
+    const val FLASH_MODE_AUTO = "auto"
+    const val FLASH_MODE_ON = "on"
+    const val FLASH_MODE_OFF = "off"
 }

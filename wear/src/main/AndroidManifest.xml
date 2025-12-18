@@ -16,6 +16,9 @@
 
     <!-- Required for Wearable Data Layer -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    
+    <!-- Required for audio recording -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -42,6 +45,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".CameraControlActivity"
+            android:exported="false"
+            android:label="Camera Controls" />
+
+        <activity
+            android:name=".AudioRecordActivity"
+            android:exported="false"
+            android:label="Audio Recording" />
 
         <!-- Service for handling messages from mobile app -->
         <service

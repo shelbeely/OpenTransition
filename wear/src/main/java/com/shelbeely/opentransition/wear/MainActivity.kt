@@ -12,6 +12,7 @@ package com.shelbeely.opentransition.wear
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -30,6 +31,8 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
     CapabilityClient.OnCapabilityChangedListener {
 
     private lateinit var triggerPhotoButton: Button
+    private lateinit var cameraControlButton: Button
+    private lateinit var audioRecordButton: Button
     private lateinit var syncButton: Button
     private lateinit var statusText: TextView
     private lateinit var milestoneCountText: TextView
@@ -46,6 +49,8 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
         setContentView(R.layout.activity_main)
 
         triggerPhotoButton = findViewById(R.id.trigger_photo_button)
+        cameraControlButton = findViewById(R.id.camera_control_button)
+        audioRecordButton = findViewById(R.id.audio_record_button)
         syncButton = findViewById(R.id.sync_button)
         statusText = findViewById(R.id.status_text)
         milestoneCountText = findViewById(R.id.milestone_count_text)
@@ -57,6 +62,16 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
 
         triggerPhotoButton.setOnClickListener {
             sendPhotoTriggerMessage()
+        }
+        
+        cameraControlButton.setOnClickListener {
+            val intent = Intent(this, CameraControlActivity::class.java)
+            startActivity(intent)
+        }
+        
+        audioRecordButton.setOnClickListener {
+            val intent = Intent(this, AudioRecordActivity::class.java)
+            startActivity(intent)
         }
         
         syncButton.setOnClickListener {
@@ -131,10 +146,14 @@ class MainActivity : Activity(), DataClient.OnDataChangedListener,
                     if (nodes.isNotEmpty()) {
                         statusText.text = getString(R.string.connected)
                         triggerPhotoButton.isEnabled = true
+                        cameraControlButton.isEnabled = true
+                        audioRecordButton.isEnabled = true
                         syncButton.isEnabled = true
                     } else {
                         statusText.text = getString(R.string.disconnected)
                         triggerPhotoButton.isEnabled = false
+                        cameraControlButton.isEnabled = false
+                        audioRecordButton.isEnabled = false
                         syncButton.isEnabled = false
                     }
                 }
