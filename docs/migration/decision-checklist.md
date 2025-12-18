@@ -229,17 +229,17 @@ Consider Flutter in the future if:
 
 ### Jetpack Compose
 ```
-Setup:              2 weeks    (Dependencies, theme)
-Simple screens:     2 weeks    (Lock, settings)
-List screens:       2 weeks    (Milestones, lists)
-Form screens:       2 weeks    (Add/edit milestone)
-Media screens:      3 weeks    (Gallery, photos)
-Camera/Advanced:    3 weeks    (Camera, editor)
-Navigation:         2 weeks    (Nav migration)
-Wear OS:            2 weeks    (Wear Compose)
-Testing/Polish:     4 weeks    (QA, cleanup)
+Setup:              1-2 weeks  (Dependencies, theme)
+Simple screens:     1-2 weeks  (Lock, settings)
+List screens:       1-2 weeks  (Milestones, lists)
+Form screens:       1-2 weeks  (Add/edit milestone)
+Media screens:      2-3 weeks  (Gallery, photos)
+Camera/Advanced:    2-3 weeks  (Camera, editor)
+Navigation:         1-2 weeks  (Nav migration)
+Wear OS:            1-2 weeks  (Wear Compose)
+Testing/Polish:     2-4 weeks  (QA, cleanup)
 ─────────────────────────────
-TOTAL:              22 weeks   (~5.5 months)
+TOTAL:              12-24 weeks (~3-6 months)
 ```
 
 ### Flutter
@@ -254,7 +254,7 @@ Polish/Launch:      4 weeks    (Final prep)
 TOTAL:              48 weeks   (~12 months)
 ```
 
-**Difference: 26 weeks (6.5 months)**
+**Difference: 24-36 weeks (6-9 months)**
 
 ---
 
