@@ -101,6 +101,16 @@ We welcome contributions! If you'd like to help improve OpenTransition:
 - Translations/localization
 - UI/UX improvements
 
+## 🔄 Technology Migration
+
+Interested in helping modernize OpenTransition's UI? We've created comprehensive migration guides:
+
+- **[Migration Analysis](MIGRATION_ANALYSIS.md)** - Complete analysis of Flutter vs Jetpack Compose migration
+- **[Jetpack Compose Guide](docs/migration/compose-migration-guide.md)** - Practical step-by-step migration guide
+- **[Decision Checklist](docs/migration/decision-checklist.md)** - Framework selection criteria
+
+**TL;DR:** We recommend **Jetpack Compose** for this project (3-6 months, incremental migration, keeps Wear OS support)
+
 ## 👥 Contributors
 
 We are grateful to everyone who has contributed to OpenTransition! Here are our code contributors:
