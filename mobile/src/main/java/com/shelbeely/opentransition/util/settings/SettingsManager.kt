@@ -420,13 +420,14 @@ enum class LockDelay {
 
 @Suppress("EnumEntryName") //These don't follow standard naming convention to match across platforms
 enum class LockType {
-    off, normal, trains;
+    off, normal, trains, biometric;
 
     @StringRes
     fun displayNameRes() = when (this) {
         off -> R.string.disabled
         normal -> R.string.enabled_normal
         trains -> R.string.enabled_trains
+        biometric -> R.string.enabled_biometric
     }
 
     companion object {

@@ -429,14 +429,23 @@ class SettingsFragment : Fragment(R.layout.settings) {
 
         val lockMode = SettingsManager.getLockType()
 
+        // Check if biometric is available for the biometric option
+        val biometricAvailable = BiometricPromptHelper.isBiometricAvailable(view.context)
+        
+        val options = mutableListOf(
+            view.getString(R.string.disabled),
+            view.getString(R.string.enabled_normal),
+            view.getString(R.string.enabled_trains)
+        )
+        
+        if (biometricAvailable) {
+            options.add(view.getString(R.string.enabled_biometric))
+        }
+
         AlertDialog.Builder(view.context)
             .setTitle(R.string.select_lock_mode)
             .setSingleChoiceItems(
-                arrayOf(
-                    view.getString(R.string.disabled),
-                    view.getString(R.string.enabled_normal),
-                    view.getString(R.string.enabled_trains)
-                ),
+                options.toTypedArray(),
                 lockMode.ordinal
             ) { dialog: DialogInterface, index: Int ->
                 val newLockType = LockType.values()[index]
@@ -448,6 +457,21 @@ class SettingsFragment : Fragment(R.layout.settings) {
                         newLockType == LockType.off -> {
                             //Turn off lock, and remove the code
                             showRemovePasswordDialog()
+                        }
+
+                        newLockType == LockType.biometric -> {
+                            // Check biometric availability before enabling
+                            val statusMessage = BiometricPromptHelper.getBiometricStatusMessage(view.context)
+                            if (statusMessage != null) {
+                                Snackbar.make(view, statusMessage, Snackbar.LENGTH_LONG).show()
+                            } else {
+                                // Biometric available, set up password for fallback
+                                if (hasCode) {
+                                    SettingsManager.setLockType(newLockType, requireActivity())
+                                } else {
+                                    showSetPasswordDialog(newLockType)
+                                }
+                            }
                         }
 
                         hasCode -> {
