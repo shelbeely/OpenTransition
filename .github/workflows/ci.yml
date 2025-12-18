@@ -34,7 +34,7 @@ jobs:
     - name: 📑 Create Google Services file
       env:
         GOOGLE_SERVICES_JSON_64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
-      run: echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./app/google-services.json
+      run: echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./mobile/google-services.json
 
     - name: 📝 Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -47,7 +47,7 @@ jobs:
       uses: actions/upload-artifact@v3.1.2
       with:
         name: Lint Results
-        path: app/build/reports/lint-results-debug.html
+        path: mobile/build/reports/lint-results-debug.html
 
 
   check-gradle-wrapper:
@@ -85,7 +85,7 @@ jobs:
     - name: 📑 Create Google Services file
       env:
         GOOGLE_SERVICES_JSON_64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
-      run: echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./app/google-services.json
+      run: echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./mobile/google-services.json
 
     - name: 📝 Grant execute permission for gradlew
       run: chmod +x gradlew
@@ -101,7 +101,7 @@ jobs:
         STORE_PASS: ${{ secrets.STORE_PASS }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASS: ${{ secrets.KEY_PASS }}
-      run: ./gradlew bundleRelease
+      run: ./gradlew :mobile:bundleRelease
 
     - name: 🛜 Upload Android Release to Play Store
       uses: r0adkll/upload-google-play@v1.1.1
