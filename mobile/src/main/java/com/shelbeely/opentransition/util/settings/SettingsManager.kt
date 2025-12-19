@@ -321,9 +321,15 @@ object SettingsManager {
                             enableCrashReports -> value is Boolean && value != getEnableCrashReports()
 
                             showAds -> value is Boolean && value != showAds()
+                            
+                            encryptedDatabaseEnabled -> value is Boolean && value != isEncryptedDatabaseEnabled()
+                            
+                            decoyVaultEnabled -> value is Boolean && value != isDecoyVaultEnabled()
+                            
+                            quickHideEnabled -> value is Boolean && value != isQuickHideEnabled()
 
                             saveToFirebase, showAccountWarning, showWelcome, userLastSeen,
-                            currentAndroidVersion, incorrectPasswordCount -> false
+                            currentAndroidVersion, incorrectPasswordCount, decoyLockCode -> false
                         }
                     }.map { (key, value) -> Key.valueOf(key) to value }
 
@@ -361,12 +367,61 @@ object SettingsManager {
         theme -> getTheme().name
         enableAnalytics -> getEnableAnalytics()
         enableCrashReports -> getEnableCrashReports()
+        encryptedDatabaseEnabled -> isEncryptedDatabaseEnabled()
+        decoyVaultEnabled -> isDecoyVaultEnabled()
+        quickHideEnabled -> isQuickHideEnabled()
 
         currentAndroidVersion, incorrectPasswordCount, saveToFirebase, showAccountWarning,
-        userLastSeen -> null
+        userLastSeen, decoyLockCode -> null
     }
 
     fun saveToFirebase(): Boolean = PrefUtil.getBoolean(saveToFirebase, false)
+    //endregion
+    
+    //region Encrypted Database Settings
+    fun isEncryptedDatabaseEnabled(): Boolean = PrefUtil.getBoolean(encryptedDatabaseEnabled, false)
+    
+    fun setEncryptedDatabaseEnabled(enabled: Boolean, context: Context?) {
+        PrefUtil.setBoolean(encryptedDatabaseEnabled, enabled)
+        userSettingsUpdatedRelay.accept(Unit)
+        
+        if (saveToFirebase()) {
+            FirebaseSettingUtil.setBool(encryptedDatabaseEnabled, enabled, context)
+        }
+    }
+    
+    fun isDecoyVaultEnabled(): Boolean = PrefUtil.getBoolean(decoyVaultEnabled, false)
+    
+    fun setDecoyVaultEnabled(enabled: Boolean, context: Context?) {
+        PrefUtil.setBoolean(decoyVaultEnabled, enabled)
+        userSettingsUpdatedRelay.accept(Unit)
+        
+        if (saveToFirebase()) {
+            FirebaseSettingUtil.setBool(decoyVaultEnabled, enabled, context)
+        }
+    }
+    
+    fun getDecoyLockCode(): String = PrefUtil.getString(decoyLockCode, "")!!
+    
+    fun setDecoyLockCode(newDecoyLockCode: String, activity: Activity) {
+        PrefUtil.setString(decoyLockCode, newDecoyLockCode)
+        userSettingsUpdatedRelay.accept(Unit)
+        
+        if (saveToFirebase()) {
+            FirebaseSettingUtil.setString(decoyLockCode, newDecoyLockCode, activity)
+        }
+    }
+    
+    fun isQuickHideEnabled(): Boolean = PrefUtil.getBoolean(quickHideEnabled, false)
+    
+    fun setQuickHideEnabled(enabled: Boolean, context: Context?) {
+        PrefUtil.setBoolean(quickHideEnabled, enabled)
+        userSettingsUpdatedRelay.accept(Unit)
+        
+        if (saveToFirebase()) {
+            FirebaseSettingUtil.setBool(quickHideEnabled, enabled, context)
+        }
+    }
     //endregion
 
     @Suppress("EnumEntryName") //These don't follow standard naming convention to match across platforms
@@ -384,7 +439,11 @@ object SettingsManager {
         theme,
         userLastSeen,
         enableAnalytics,
-        enableCrashReports
+        enableCrashReports,
+        encryptedDatabaseEnabled,
+        decoyVaultEnabled,
+        decoyLockCode,
+        quickHideEnabled
     }
 }
 

@@ -187,9 +187,33 @@ object SettingsConflictDialog {
                             (serverConflictValue as Boolean).displayNameRes()
                         )
                     }
+                    
+                    encryptedDatabaseEnabled -> {
+                        nameRes = R.string.encrypted_database
+                        localValue = itemView.getString(SettingsManager.isEncryptedDatabaseEnabled().displayNameRes())
+                        serverValue = itemView.getString(
+                            (serverConflictValue as Boolean).displayNameRes()
+                        )
+                    }
+                    
+                    decoyVaultEnabled -> {
+                        nameRes = R.string.decoy_vault
+                        localValue = itemView.getString(SettingsManager.isDecoyVaultEnabled().displayNameRes())
+                        serverValue = itemView.getString(
+                            (serverConflictValue as Boolean).displayNameRes()
+                        )
+                    }
+                    
+                    quickHideEnabled -> {
+                        nameRes = R.string.quick_hide
+                        localValue = itemView.getString(SettingsManager.isQuickHideEnabled().displayNameRes())
+                        serverValue = itemView.getString(
+                            (serverConflictValue as Boolean).displayNameRes()
+                        )
+                    }
 
                     currentAndroidVersion, incorrectPasswordCount, saveToFirebase,
-                    showAccountWarning, showWelcome, userLastSeen -> throw IllegalArgumentException(
+                    showAccountWarning, showWelcome, userLastSeen, decoyLockCode -> throw IllegalArgumentException(
                         "This settings should not be in conflict because they don't get synced"
                     )
                 }

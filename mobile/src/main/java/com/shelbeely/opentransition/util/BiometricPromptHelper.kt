@@ -21,6 +21,7 @@ object BiometricPromptHelper {
     
     /**
      * Check if biometric authentication is available on the device
+     * Supports fingerprint, face, and iris recognition
      */
     fun isBiometricAvailable(context: Context): Boolean {
         val biometricManager = BiometricManager.from(context)

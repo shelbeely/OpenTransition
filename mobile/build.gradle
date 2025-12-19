@@ -5,6 +5,7 @@ plugins {
     id 'io.realm.kotlin'
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-parcelize'
+    id 'com.google.devtools.ksp' version '2.0.20-1.0.25'
 
     id 'com.google.gms.google-services' //Should be second last
     id 'com.google.firebase.crashlytics' // Should be last
@@ -126,6 +127,19 @@ dependencies {
     
     // Biometric authentication
     implementation 'androidx.biometric:biometric:1.1.0'
+    
+    // Security library for encrypted shared preferences
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+    
+    // Room + SQLCipher for encrypted database
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    
+    // SQLCipher for database encryption
+    implementation "net.zetetic:android-database-sqlcipher:4.5.4"
+    implementation "androidx.sqlite:sqlite:2.4.0"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
