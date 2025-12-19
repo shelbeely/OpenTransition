@@ -35,6 +35,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
+import com.shelbeely.opentransition.util.security.VaultManager
+
 class LockFragment : Fragment() {
     private val viewDisposables: CompositeDisposable = CompositeDisposable()
 
@@ -83,9 +85,26 @@ class LockFragment : Fragment() {
         viewDisposables += view.events
             .ofType<LockUiEvent.Unlock>()
             .subscribe { event ->
-                if (SettingsManager.getLockCode() == EncryptionUtil
-                        .encryptAndEncode(event.code, PrefUtil.CODE_SALT)
-                ) {
+                val realCodeHash = SettingsManager.getLockCode()
+                val enteredCodeHash = EncryptionUtil
+                    .encryptAndEncode(event.code, PrefUtil.CODE_SALT)
+                
+                // Determine which vault to open based on passcode
+                val vaultType = VaultManager.determineVaultType(
+                    requireContext(),
+                    event.code,
+                    realCodeHash
+                )
+                
+                if (enteredCodeHash == realCodeHash) {
+                    // Real vault passcode
+                    VaultManager.setCurrentVault(requireContext(), VaultManager.VaultType.REAL)
+                    view.hideKeyboard()
+                    requireActivity().supportFragmentManager.popBackStackImmediate()
+                    activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
+                } else if (vaultType == VaultManager.VaultType.DECOY) {
+                    // Decoy vault passcode
+                    VaultManager.setCurrentVault(requireContext(), VaultManager.VaultType.DECOY)
                     view.hideKeyboard()
                     requireActivity().supportFragmentManager.popBackStackImmediate()
                     activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
@@ -93,6 +112,7 @@ class LockFragment : Fragment() {
                         .encryptAndEncode(event.code, "tzDEzR6dHptPbKwgkvdCIsY1NPT9YZ6c")
                 ) {
                     // Also checking the example salt... for that time we accidentally sent it to production...
+                    VaultManager.setCurrentVault(requireContext(), VaultManager.VaultType.REAL)
                     view.hideKeyboard()
                     requireActivity().supportFragmentManager.popBackStackImmediate()
                     activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }

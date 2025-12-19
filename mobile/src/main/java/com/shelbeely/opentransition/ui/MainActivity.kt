@@ -100,6 +100,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        
+        // Register with QuickHideManager for security features
+        com.shelbeely.opentransition.util.security.QuickHideManager.registerActivity(this)
 
         if (!BuildConfig.DEBUG) {
             FirebaseAnalytics.getInstance(this)
@@ -262,6 +265,16 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
 
         SettingsManager.updateUserLastSeen()
+        
+        // Quick hide content when app goes to background
+        if (SettingsManager.getLockType() != LockType.off) {
+            com.shelbeely.opentransition.util.security.QuickHideManager.showHideOverlay()
+        }
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        com.shelbeely.opentransition.util.security.QuickHideManager.unregisterActivity()
     }
 
     private fun showLockControllerIfNotAlreadyShowing() {

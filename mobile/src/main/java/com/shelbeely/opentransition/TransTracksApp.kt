@@ -46,6 +46,9 @@ class TransTracksApp : Application() {
         FileUtil.clearTempFolder()
 
         SettingsManager.startFirbaseSyncIfLoggedIn(this)
+        
+        // Initialize security features
+        com.shelbeely.opentransition.util.security.QuickHideManager.initialize()
 
         //Clearing these, as we don't want to maintain this state across launches
         PrefUtil.setSelectPhotoFirstVisible("")

@@ -126,6 +126,9 @@ dependencies {
     
     // Biometric authentication
     implementation 'androidx.biometric:biometric:1.1.0'
+    
+    // Security - Keystore and encryption
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
