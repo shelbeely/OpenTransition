@@ -83,16 +83,28 @@ class LockFragment : Fragment() {
         viewDisposables += view.events
             .ofType<LockUiEvent.Unlock>()
             .subscribe { event ->
-                if (SettingsManager.getLockCode() == EncryptionUtil
-                        .encryptAndEncode(event.code, PrefUtil.CODE_SALT)
-                ) {
+                val enteredCode = event.code
+                val encryptedCode = EncryptionUtil.encryptAndEncode(enteredCode, PrefUtil.CODE_SALT)
+                val isRealCode = SettingsManager.getLockCode() == encryptedCode
+                val isDecoyCode = com.shelbeely.opentransition.database.DatabaseManager.isDecoyPasscode(enteredCode)
+                
+                if (isRealCode) {
+                    // Real passcode entered - open real vault
+                    com.shelbeely.opentransition.database.DatabaseManager.switchToRealVault(requireContext())
+                    view.hideKeyboard()
+                    requireActivity().supportFragmentManager.popBackStackImmediate()
+                    activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
+                } else if (isDecoyCode) {
+                    // Decoy passcode entered - open decoy vault
+                    com.shelbeely.opentransition.database.DatabaseManager.switchToDecoyVault(requireContext())
                     view.hideKeyboard()
                     requireActivity().supportFragmentManager.popBackStackImmediate()
                     activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
                 } else if (SettingsManager.getLockCode() == EncryptionUtil
-                        .encryptAndEncode(event.code, "tzDEzR6dHptPbKwgkvdCIsY1NPT9YZ6c")
+                        .encryptAndEncode(enteredCode, "tzDEzR6dHptPbKwgkvdCIsY1NPT9YZ6c")
                 ) {
                     // Also checking the example salt... for that time we accidentally sent it to production...
+                    com.shelbeely.opentransition.database.DatabaseManager.switchToRealVault(requireContext())
                     view.hideKeyboard()
                     requireActivity().supportFragmentManager.popBackStackImmediate()
                     activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }

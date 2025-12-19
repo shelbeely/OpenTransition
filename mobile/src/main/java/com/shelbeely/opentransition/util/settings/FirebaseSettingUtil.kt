@@ -141,7 +141,8 @@ class FirebaseSettingUtil {
                                 else -> Log.d(LOG_TAG, "${key.name} is not a String : '$value'")
                             }
 
-                            enableCrashReports, enableAnalytics, showAds, showWelcome -> when (value) {
+                            enableCrashReports, enableAnalytics, showAds, showWelcome, 
+                            encryptedDatabaseEnabled, decoyVaultEnabled, quickHideEnabled -> when (value) {
                                 is Boolean -> PrefUtil.setBoolean(key, value)
                                 else -> Log.d(LOG_TAG, "${key.name} is not a Boolean : '$value'")
                             }
@@ -168,7 +169,7 @@ class FirebaseSettingUtil {
                             }
 
                             currentAndroidVersion, incorrectPasswordCount, saveToFirebase,
-                            showAccountWarning, userLastSeen -> {
+                            showAccountWarning, userLastSeen, decoyLockCode -> {
                                 //No-op
                             }
                         }

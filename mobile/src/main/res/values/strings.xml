@@ -341,4 +341,15 @@
     <!-- Camera with Face Detection -->
     <string name="toggle_overlay">Toggle overlay</string>
     <string name="back">Back</string>
+    
+    <!-- Encrypted Database & Security -->
+    <string name="encrypted_database">Encrypted Database</string>
+    <string name="decoy_vault">Decoy Vault</string>
+    <string name="quick_hide">Quick Hide</string>
+    <string name="encrypted_database_description">Encrypt all sensitive data at rest using SQLCipher</string>
+    <string name="decoy_vault_description">Create a separate vault that opens with a different passcode</string>
+    <string name="quick_hide_description">Instantly hide app content when triggered</string>
+    <string name="set_decoy_passcode">Set Decoy Passcode</string>
+    <string name="decoy_passcode_hint">Enter a different passcode for the decoy vault</string>
+    <string name="decoy_passcode_saved">Decoy passcode saved</string>
 </resources>
