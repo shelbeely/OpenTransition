@@ -1,5 +1,5 @@
 /*
- * Copyright © 2023 TransTracks. All rights reserved.
+ * Copyright © 2023-2025 TransTracks. All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *
@@ -79,7 +79,9 @@ abstract class EncryptedDatabase : RoomDatabase() {
                 dbName
             )
                 .openHelperFactory(factory)
-                .fallbackToDestructiveMigration() // For development; remove in production
+                // TODO: Replace with proper migration strategy before production use
+                // Currently using fallbackToDestructiveMigration for initial development
+                .fallbackToDestructiveMigration()
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
