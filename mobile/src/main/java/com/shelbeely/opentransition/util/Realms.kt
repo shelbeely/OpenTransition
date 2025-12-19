@@ -10,7 +10,28 @@
 
 package com.shelbeely.opentransition.util
 
+import android.content.Context
+import com.shelbeely.opentransition.util.security.VaultManager
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 
+/**
+ * Opens the default encrypted Realm database.
+ */
 fun Realm.Companion.openDefault() = Realm.open(RealmConfiguration.default)
+
+/**
+ * Opens the decoy encrypted Realm database.
+ */
+fun Realm.Companion.openDecoy() = Realm.open(RealmConfiguration.decoy)
+
+/**
+ * Opens the appropriate Realm database based on the current vault selection.
+ */
+fun Realm.Companion.openForCurrentVault(context: Context): Realm {
+    val vaultType = VaultManager.getCurrentVault(context)
+    return when (vaultType) {
+        VaultManager.VaultType.REAL -> openDefault()
+        VaultManager.VaultType.DECOY -> openDecoy()
+    }
+}

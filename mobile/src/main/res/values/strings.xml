@@ -341,4 +341,24 @@
     <!-- Camera with Face Detection -->
     <string name="toggle_overlay">Toggle overlay</string>
     <string name="back">Back</string>
+    
+    <!-- Decoy Vault & Security Features -->
+    <string name="decoy_vault">Decoy Vault</string>
+    <string name="decoy_vault_enabled">Decoy Vault Enabled</string>
+    <string name="decoy_vault_disabled">Decoy Vault Disabled</string>
+    <string name="setup_decoy_vault">Setup Decoy Vault</string>
+    <string name="remove_decoy_vault">Remove Decoy Vault</string>
+    <string name="decoy_vault_description">Create a second passcode that opens a harmless/empty vault for plausible deniability</string>
+    <string name="decoy_vault_warning">When enabled, a separate passcode will open a decoy vault instead of your real data. This provides protection in coercion scenarios.</string>
+    <string name="enter_decoy_password">Enter decoy password</string>
+    <string name="confirm_decoy_password">Confirm decoy password</string>
+    <string name="decoy_passwords_dont_match">Decoy passwords don\'t match</string>
+    <string name="decoy_password_cannot_match_real">Decoy password cannot be the same as your real password</string>
+    <string name="decoy_vault_setup_success">Decoy vault setup successfully</string>
+    <string name="decoy_vault_removed_success">Decoy vault removed successfully</string>
+    <string name="quick_hide">Quick Hide</string>
+    <string name="quick_hide_description">Instantly hide app content when needed</string>
+    <string name="database_encrypted">Database encrypted with Android Keystore</string>
+    <string name="security_info">Security Information</string>
+    <string name="security_info_description">Your data is encrypted at rest using keys stored in Android Keystore. Backups and screenshots are allowed per user preference.</string>
 </resources>
