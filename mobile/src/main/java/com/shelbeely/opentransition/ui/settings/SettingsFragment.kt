@@ -24,6 +24,7 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.shelbeely.opentransition.BuildConfig
 import com.shelbeely.opentransition.R
@@ -47,6 +48,7 @@ import com.google.firebase.auth.*
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.util.*
 
@@ -260,6 +262,26 @@ class SettingsFragment : Fragment(R.layout.settings) {
 
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleCrashReports>()
             .subscribe { SettingsManager.toggleEnableCrashReports(requireActivity()) }
+            
+        // Security settings event handlers
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleEncryptedDatabase>()
+            .subscribe { SettingsManager.setEncryptedDatabaseEnabled(!SettingsManager.isEncryptedDatabaseEnabled(), requireActivity()) }
+            
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleDecoyVault>()
+            .subscribe { 
+                if (SettingsManager.isEncryptedDatabaseEnabled()) {
+                    SettingsManager.setDecoyVaultEnabled(!SettingsManager.isDecoyVaultEnabled(), requireActivity())
+                }
+            }
+            
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.SetDecoyPasscode>()
+            .subscribe { showSetDecoyPasscodeDialog(view) }
+            
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleQuickHide>()
+            .subscribe { SettingsManager.setQuickHideEnabled(!SettingsManager.isQuickHideEnabled(), requireActivity()) }
+            
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.MigrateDatabase>()
+            .subscribe { showMigrationDialog(view) }
 
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.Contribute>()
             .subscribe {
@@ -744,6 +766,84 @@ class SettingsFragment : Fragment(R.layout.settings) {
             .setNegativeButton(R.string.no, null)
             .show()
     }
+    
+    /**
+     * Show dialog to set decoy passcode
+     */
+    private fun showSetDecoyPasscodeDialog(view: View) {
+        val editText = EditText(view.context)
+        editText.hint = getString(R.string.decoy_passcode_hint)
+        editText.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        
+        val dialog = AlertDialog.Builder(view.context)
+            .setTitle(R.string.set_decoy_passcode)
+            .setView(editText)
+            .setPositiveButton(R.string.update) { _, _ ->
+                val code = editText.text.toString()
+                if (code.isNotEmpty()) {
+                    val encryptedCode = com.shelbeely.opentransition.util.EncryptionUtil.encryptAndEncode(
+                        code,
+                        com.shelbeely.opentransition.util.settings.PrefUtil.CODE_SALT
+                    )
+                    SettingsManager.setDecoyLockCode(encryptedCode, requireActivity())
+                    Snackbar.make(view, R.string.decoy_passcode_saved, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .create()
+        
+        dialog.show()
+    }
+    
+    /**
+     * Show migration dialog with progress
+     */
+    private fun showMigrationDialog(view: View) {
+        // Check if encrypted database is enabled
+        if (!SettingsManager.isEncryptedDatabaseEnabled()) {
+            Snackbar.make(view, R.string.enable_encrypted_db_first, Snackbar.LENGTH_LONG).show()
+            return
+        }
+        
+        // Check if migration is already complete
+        if (com.shelbeely.opentransition.database.migration.RealmToRoomMigration.isMigrationComplete(requireContext())) {
+            Snackbar.make(view, R.string.migration_already_complete, Snackbar.LENGTH_LONG).show()
+            return
+        }
+        
+        val progressDialog = AlertDialog.Builder(view.context)
+            .setTitle(R.string.migrate_database)
+            .setMessage(R.string.migration_in_progress)
+            .setCancelable(false)
+            .create()
+        
+        progressDialog.show()
+        
+        // Launch migration in coroutine using viewLifecycleOwner
+        viewLifecycleOwner.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            try {
+                val result = com.shelbeely.opentransition.database.migration.RealmToRoomMigration.migrate(requireContext())
+                
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    
+                    if (result.success) {
+                        val message = getString(R.string.migration_complete, result.totalSuccess)
+                        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
+                    } else {
+                        val message = getString(R.string.migration_failed, result.error ?: "Unknown error")
+                        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            } catch (e: Exception) {
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    progressDialog.dismiss()
+                    val message = getString(R.string.migration_failed, e.message ?: "Unknown error")
+                    Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 }
 
 fun settingsResultsToStates(context: Context) =
@@ -765,7 +865,10 @@ fun settingsResultsToStates(context: Context) =
                     R.string.copyright, Calendar.getInstance().get(Calendar.YEAR).toString()
                 ),
                 enableAnalytics = content.enableAnalytics,
-                enableCrashReports = content.enableCrashReports
+                enableCrashReports = content.enableCrashReports,
+                encryptedDatabaseEnabled = content.encryptedDatabaseEnabled,
+                decoyVaultEnabled = content.decoyVaultEnabled,
+                quickHideEnabled = content.quickHideEnabled
             )
         }
 

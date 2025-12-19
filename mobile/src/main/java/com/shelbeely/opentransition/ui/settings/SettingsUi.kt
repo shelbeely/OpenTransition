@@ -54,6 +54,11 @@ sealed class SettingsUiEvent {
     object Export : SettingsUiEvent()
     object ToggleAnalytics : SettingsUiEvent()
     object ToggleCrashReports : SettingsUiEvent()
+    object ToggleEncryptedDatabase : SettingsUiEvent()
+    object ToggleDecoyVault : SettingsUiEvent()
+    object SetDecoyPasscode : SettingsUiEvent()
+    object ToggleQuickHide : SettingsUiEvent()
+    object MigrateDatabase : SettingsUiEvent()
     object Contribute : SettingsUiEvent()
     object PrivacyPolicy : SettingsUiEvent()
 }
@@ -67,7 +72,8 @@ sealed class SettingsUiState {
         val userDetails: SettingsUIUserDetails?, val startDate: LocalDate, val theme: String,
         val lockMode: String, val enableLockDelay: Boolean, val lockDelay: String,
         val appVersion: String, val copyright: String,
-        val enableAnalytics: Boolean, val enableCrashReports: Boolean
+        val enableAnalytics: Boolean, val enableCrashReports: Boolean,
+        val encryptedDatabaseEnabled: Boolean, val decoyVaultEnabled: Boolean, val quickHideEnabled: Boolean
     ) : SettingsUiState()
 
     data class Loading(val content: Content, val overallProgress: Int, val stepProgress: Int) :
@@ -99,6 +105,14 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
                 .filter { userAction }.map { SettingsUiEvent.ToggleAnalytics },
             binding.settingsCrashReports.checkedChanges().toV3()
                 .filter { userAction }.map { SettingsUiEvent.ToggleCrashReports },
+            binding.settingsEncryptedDatabase.checkedChanges().toV3()
+                .filter { userAction }.map { SettingsUiEvent.ToggleEncryptedDatabase },
+            binding.settingsDecoyVault.checkedChanges().toV3()
+                .filter { userAction }.map { SettingsUiEvent.ToggleDecoyVault },
+            binding.settingsSetDecoyPasscode.clicks().toV3().map { SettingsUiEvent.SetDecoyPasscode },
+            binding.settingsQuickHide.checkedChanges().toV3()
+                .filter { userAction }.map { SettingsUiEvent.ToggleQuickHide },
+            binding.settingsMigrateDatabase.clicks().toV3().map { SettingsUiEvent.MigrateDatabase },
             binding.settingsContribute.clicks().toV3().map { SettingsUiEvent.Contribute },
             binding.settingsPrivacyPolicy.clicks().toV3().map { SettingsUiEvent.PrivacyPolicy }
         )
@@ -145,6 +159,8 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
         // Secondary action buttons
         binding.settingsAccountDeleteAccount.bounceOnClick { /* handled by event stream */ }
         binding.settingsAccountSignOut.bounceOnClick { /* handled by event stream */ }
+        binding.settingsSetDecoyPasscode.bounceOnClick { /* handled by event stream */ }
+        binding.settingsMigrateDatabase.bounceOnClick { /* handled by event stream */ }
         
         // Text buttons - subtle bounce
         binding.settingsAccountName.bounceOnClick { /* handled by event stream */ }
@@ -205,6 +221,13 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
 
         binding.settingsAnalytics.isChecked = content.enableAnalytics
         binding.settingsCrashReports.isChecked = content.enableCrashReports
+        
+        // Security settings
+        binding.settingsEncryptedDatabase.isChecked = content.encryptedDatabaseEnabled
+        binding.settingsDecoyVault.isChecked = content.decoyVaultEnabled
+        binding.settingsDecoyVault.isEnabled = content.encryptedDatabaseEnabled
+        binding.settingsSetDecoyPasscode.isEnabled = content.encryptedDatabaseEnabled && content.decoyVaultEnabled
+        binding.settingsQuickHide.isChecked = content.quickHideEnabled
 
         binding.settingsAppVersion.text = content.appVersion
 

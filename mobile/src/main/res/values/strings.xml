@@ -343,6 +343,7 @@
     <string name="back">Back</string>
     
     <!-- Encrypted Database & Security -->
+    <string name="security">Security</string>
     <string name="encrypted_database">Encrypted Database</string>
     <string name="decoy_vault">Decoy Vault</string>
     <string name="quick_hide">Quick Hide</string>
@@ -352,4 +353,10 @@
     <string name="set_decoy_passcode">Set Decoy Passcode</string>
     <string name="decoy_passcode_hint">Enter a different passcode for the decoy vault</string>
     <string name="decoy_passcode_saved">Decoy passcode saved</string>
+    <string name="migrate_database">Migrate to Encrypted Database</string>
+    <string name="migration_in_progress">Migrating database…</string>
+    <string name="migration_complete">Migration completed successfully!\n%1$d items migrated</string>
+    <string name="migration_failed">Migration failed: %1$s</string>
+    <string name="migration_already_complete">Database migration already completed</string>
+    <string name="enable_encrypted_db_first">Please enable encrypted database first</string>
 </resources>

@@ -58,7 +58,8 @@ sealed class SettingsResult {
     data class Content(
         val userDetails: SettingsUIUserDetails?, val startDate: LocalDate, val theme: Theme,
         val lockType: LockType, val lockDelay: LockDelay, val enableAnalytics: Boolean,
-        val enableCrashReports: Boolean
+        val enableCrashReports: Boolean,
+        val encryptedDatabaseEnabled: Boolean, val decoyVaultEnabled: Boolean, val quickHideEnabled: Boolean
     ) : SettingsResult()
 
     data class Loading(val content: Content, val overallProgress: Int, val stepProgress: Int) :
@@ -100,7 +101,10 @@ class SettingsDomain {
                         userDetails, SettingsManager.getStartDate(context = null),
                         SettingsManager.getTheme(), SettingsManager.getLockType(),
                         SettingsManager.getLockDelay(), SettingsManager.getEnableAnalytics(),
-                        SettingsManager.getEnableCrashReports()
+                        SettingsManager.getEnableCrashReports(),
+                        SettingsManager.isEncryptedDatabaseEnabled(),
+                        SettingsManager.isDecoyVaultEnabled(),
+                        SettingsManager.isQuickHideEnabled()
                     )
                 }
 

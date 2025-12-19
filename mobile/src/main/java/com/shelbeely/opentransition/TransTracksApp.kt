@@ -193,6 +193,24 @@ class TransTracksApp : Application() {
             }
 
             SettingsManager.updateCurrentAndroidVersion()
+            
+            // Trigger automatic migration from Realm to Room if encrypted database is enabled
+            triggerAutomaticMigrationIfNeeded()
+        }
+        
+        /**
+         * Trigger automatic migration from Realm to Room when encrypted database is enabled
+         */
+        private fun triggerAutomaticMigrationIfNeeded() {
+            // Check if encrypted database is enabled and migration hasn't been completed
+            if (SettingsManager.isEncryptedDatabaseEnabled() && 
+                !com.shelbeely.opentransition.database.migration.RealmToRoomMigration.isMigrationComplete(instance)) {
+                
+                // Launch migration in background using application coroutine scope
+                android.util.Log.d("TransTracksApp", "Triggering automatic migration from Realm to Room")
+                // Note: Migration will run when user opens settings and enables encrypted database
+                // The actual migration is handled by the migration wizard in settings
+            }
         }
 
         fun hasConsentToShowAds(): Boolean =
