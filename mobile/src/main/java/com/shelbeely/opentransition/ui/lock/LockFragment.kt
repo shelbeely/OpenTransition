@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.AnalyticsUtil
+import com.shelbeely.opentransition.util.BiometricPromptHelper
 import com.shelbeely.opentransition.util.EncryptionUtil
 import com.shelbeely.opentransition.util.Event
 import com.shelbeely.opentransition.util.hideKeyboard
@@ -54,6 +55,7 @@ class LockFragment : Fragment() {
     ): View? {
         @LayoutRes val layoutRes: Int = when (SettingsManager.getLockType()) {
             LockType.normal -> R.layout.normal_lock
+            LockType.biometric -> R.layout.biometric_lock
             else -> R.layout.train_lock
         }
 
@@ -65,6 +67,18 @@ class LockFragment : Fragment() {
         val view = view as? LockView ?: throw AssertionError("View must be LockView")
 
         AnalyticsUtil.logEvent(Event.LockControllerShown(SettingsManager.getLockType()))
+
+        // Handle biometric authentication
+        if (SettingsManager.getLockType() == LockType.biometric) {
+            // Automatically show biometric prompt when screen is shown
+            showBiometricPrompt(view)
+            
+            viewDisposables += view.events
+                .ofType<LockUiEvent.UseBiometric>()
+                .subscribe {
+                    showBiometricPrompt(view)
+                }
+        }
 
         viewDisposables += view.events
             .ofType<LockUiEvent.Unlock>()
@@ -89,7 +103,7 @@ class LockFragment : Fragment() {
                     //TODO We may want to notify users to update their passcodes in this case
                 } else {
                     @StringRes val messageRes: Int = when (SettingsManager.getLockType()) {
-                        LockType.normal -> R.string.incorrect_password
+                        LockType.normal, LockType.biometric -> R.string.incorrect_password
                         else -> R.string.train_incorrect
                     }
 
@@ -126,6 +140,23 @@ class LockFragment : Fragment() {
                 dialog.dismiss()
             }
             .show()
+    }
+
+    private fun showBiometricPrompt(view: View) {
+        BiometricPromptHelper.showBiometricPrompt(
+            fragment = this,
+            onSuccess = {
+                requireActivity().supportFragmentManager.popBackStackImmediate()
+                activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
+            },
+            onError = { errorMessage ->
+                Snackbar.make(view, errorMessage, Snackbar.LENGTH_LONG).show()
+            },
+            onFallback = {
+                // User chose to use password instead
+                // The password field is already visible in biometric_lock layout
+            }
+        )
     }
 
     companion object {

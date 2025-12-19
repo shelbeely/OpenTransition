@@ -29,6 +29,7 @@ import kotterknife.bindView
 
 sealed class LockUiEvent {
     data class Unlock(val code: String) : LockUiEvent()
+    object UseBiometric : LockUiEvent()
 }
 
 class LockView(
@@ -37,9 +38,10 @@ class LockView(
     private val background: ImageView? by bindOptionalView(R.id.lock_background_image)
     private val code: EditText by bindView(R.id.lock_code)
     private val go: Button by bindView(R.id.lock_go)
+    private val biometricButton: Button? by bindOptionalView(R.id.lock_biometric_button)
 
     val events: Observable<LockUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge<LockUiEvent>(
+        val baseEvents = listOf(
             code.editorActions().toV3()
                 .filter { action ->
                     action == EditorInfo.IME_ACTION_SEARCH || action == EditorInfo.IME_ACTION_DONE
@@ -52,7 +54,14 @@ class LockView(
                         else -> throw IllegalArgumentException("Unhandled IME Action '$action'")
                     }
                 },
-            go.clicks().toV3().map { LockUiEvent.Unlock(code.text.toString()) })
+            go.clicks().toV3().map { LockUiEvent.Unlock(code.text.toString()) }
+        )
+        
+        val biometricEvents = biometricButton?.let { button ->
+            listOf(button.clicks().toV3().map { LockUiEvent.UseBiometric })
+        } ?: emptyList()
+        
+        Observable.merge(baseEvents + biometricEvents)
     }
 
     override fun onAttachedToWindow() {

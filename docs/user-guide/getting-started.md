@@ -147,15 +147,20 @@ Milestones help you remember important events in your transition.
 
 ### Using App Lock
 
-Protect your photos with a PIN or pattern:
+Protect your photos with multiple security options:
 
 1. Go to **Settings**
-2. Tap **Security**
-3. Enable **App Lock**
-4. Choose PIN or Pattern
-5. Set your code
+2. Tap **Lock Mode**
+3. Choose your preferred lock type:
+   - **Normal**: Password-based lock
+   - **Train Tracks**: Password lock with train theme
+   - **Biometric**: Fingerprint or face unlock (if your device supports it)
+4. Set your password
+5. If using biometric, your device's fingerprint/face will unlock the app
 
 Now the app will lock when you close it!
+
+**Note**: Biometric lock option only appears if your device has fingerprint or face recognition set up. It still requires a password for fallback security.
 
 ### Disguised Mode (Train Icon)
 

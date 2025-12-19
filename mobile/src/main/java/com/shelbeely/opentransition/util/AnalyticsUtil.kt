@@ -81,6 +81,7 @@ object AnalyticsUtil {
                 LockType.off -> "Off"
                 LockType.normal -> "Normal"
                 LockType.trains -> "Trains"
+                LockType.biometric -> "Biometric"
             }
             putString(TYPE, type)
         }
