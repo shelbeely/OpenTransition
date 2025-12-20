@@ -43,29 +43,31 @@ object RealmBackupImporter {
      */
     suspend fun importFromBackup(context: Context, backupUri: Uri): ImportResult = withContext(Dispatchers.IO) {
         val result = ImportResult()
+        val tempRealmFile = File(context.cacheDir, TEMP_REALM_FILE)
         
         try {
             Log.d(TAG, "Starting Realm backup import from URI: $backupUri")
             
             // Copy the backup file to a temporary location
-            val tempRealmFile = File(context.cacheDir, TEMP_REALM_FILE)
             copyBackupToTemp(context, backupUri, tempRealmFile)
             
             // Open the Realm backup
             val config = RealmConfiguration.Builder(
                 schema = setOf(Milestone::class, Photo::class, AudioAnalysis::class)
             )
-                .name(tempRealmFile.absolutePath)
+                .directory(context.cacheDir.absolutePath)
+                .name(TEMP_REALM_FILE)
                 .build()
             
             val realm = Realm.open(config)
             
-            // Get Room database
-            val roomDb = DatabaseManager.getDatabase(context)
-            
-            // Import Milestones
-            val realmMilestones = realm.query(Milestone::class).find()
-            Log.d(TAG, "Importing ${realmMilestones.size} milestones")
+            try {
+                // Get Room database
+                val roomDb = DatabaseManager.getDatabase(context)
+                
+                // Import Milestones
+                val realmMilestones = realm.query(Milestone::class).find()
+                Log.d(TAG, "Importing ${realmMilestones.size} milestones")
             
             realmMilestones.forEach { realmMilestone ->
                 try {
@@ -133,18 +135,23 @@ object RealmBackupImporter {
                 }
             }
             
-            realm.close()
-            
-            // Clean up temp file
-            tempRealmFile.delete()
-            
             result.success = true
             Log.d(TAG, "Import completed successfully: $result")
+            
+            } finally {
+                // Always close realm and clean up temp file
+                realm.close()
+            }
             
         } catch (e: Exception) {
             Log.e(TAG, "Import failed", e)
             result.success = false
             result.error = e.message
+        } finally {
+            // Ensure temp file is deleted even if import fails
+            if (tempRealmFile.exists()) {
+                tempRealmFile.delete()
+            }
         }
         
         result
@@ -158,7 +165,7 @@ object RealmBackupImporter {
             FileOutputStream(destFile).use { output ->
                 input.copyTo(output)
             }
-        } ?: throw IllegalArgumentException("Could not open backup file")
+        } ?: throw IllegalArgumentException("Unable to read the selected backup file. Please ensure the file is accessible and not corrupted.")
     }
     
     /**
