@@ -14,22 +14,18 @@ import android.content.Context
 import com.shelbeely.opentransition.util.settings.SettingsManager
 
 /**
- * Manages access to the correct database (real or decoy)
- * Handles switching between vaults based on authentication
+ * Manages access to the app database (real or decoy vault)
+ * Always uses Room database with optional encryption
  */
 object DatabaseManager {
     private var currentVaultIsDecoy = false
     
     /**
      * Get the current active database
+     * Always returns Room database with optional encryption
      */
-    fun getDatabase(context: Context): EncryptedDatabase {
-        return if (SettingsManager.isEncryptedDatabaseEnabled()) {
-            EncryptedDatabase.getInstance(context, currentVaultIsDecoy)
-        } else {
-            // If encryption is not enabled, always use the real database
-            EncryptedDatabase.getInstance(context, false)
-        }
+    fun getDatabase(context: Context): AppDatabase {
+        return AppDatabase.getInstance(context, currentVaultIsDecoy)
     }
     
     /**

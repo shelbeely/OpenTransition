@@ -21,7 +21,7 @@ import com.shelbeely.opentransition.database.room.dao.PhotoDao
 import com.shelbeely.opentransition.database.room.entities.AudioAnalysisEntity
 import com.shelbeely.opentransition.database.room.entities.MilestoneEntity
 import com.shelbeely.opentransition.database.room.entities.PhotoEntity
-import net.sqlcipher.database.SQLiteDatabase
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import net.sqlcipher.database.SupportFactory
 
 @Database(
@@ -33,25 +33,26 @@ import net.sqlcipher.database.SupportFactory
     version = 1,
     exportSchema = false
 )
-abstract class EncryptedDatabase : RoomDatabase() {
+abstract class AppDatabase : RoomDatabase() {
     abstract fun milestoneDao(): MilestoneDao
     abstract fun photoDao(): PhotoDao
     abstract fun audioAnalysisDao(): AudioAnalysisDao
     
     companion object {
-        private const val DATABASE_NAME = "opentransition_encrypted.db"
+        private const val DATABASE_NAME = "opentransition.db"
         private const val DECOY_DATABASE_NAME = "opentransition_decoy.db"
         
         @Volatile
-        private var INSTANCE: EncryptedDatabase? = null
+        private var INSTANCE: AppDatabase? = null
         
         @Volatile
-        private var DECOY_INSTANCE: EncryptedDatabase? = null
+        private var DECOY_INSTANCE: AppDatabase? = null
         
         /**
          * Get the database instance (real or decoy based on parameter)
+         * Supports both encrypted and unencrypted modes
          */
-        fun getInstance(context: Context, isDecoy: Boolean = false): EncryptedDatabase {
+        fun getInstance(context: Context, isDecoy: Boolean = false): AppDatabase {
             if (isDecoy) {
                 return DECOY_INSTANCE ?: synchronized(this) {
                     DECOY_INSTANCE ?: buildDatabase(context, isDecoy).also { DECOY_INSTANCE = it }
@@ -64,21 +65,27 @@ abstract class EncryptedDatabase : RoomDatabase() {
         }
         
         /**
-         * Build the encrypted database with SQLCipher
+         * Build the database with optional encryption
+         * Encryption is controlled by SettingsManager.isEncryptedDatabaseEnabled()
          */
-        private fun buildDatabase(context: Context, isDecoy: Boolean): EncryptedDatabase {
+        private fun buildDatabase(context: Context, isDecoy: Boolean): AppDatabase {
             val dbName = if (isDecoy) DECOY_DATABASE_NAME else DATABASE_NAME
+            val isEncrypted = SettingsManager.isEncryptedDatabaseEnabled()
             
-            // Get encryption key from Android Keystore
-            val passphrase = KeystoreManager.getOrCreateDatabaseKey(context, isDecoy)
-            val factory = SupportFactory(passphrase)
-            
-            return Room.databaseBuilder(
+            val builder = Room.databaseBuilder(
                 context.applicationContext,
-                EncryptedDatabase::class.java,
+                AppDatabase::class.java,
                 dbName
             )
-                .openHelperFactory(factory)
+            
+            // Add encryption if enabled
+            if (isEncrypted) {
+                val passphrase = KeystoreManager.getOrCreateDatabaseKey(context, isDecoy)
+                val factory = SupportFactory(passphrase)
+                builder.openHelperFactory(factory)
+            }
+            
+            return builder
                 // TODO: Replace with proper migration strategy before production use
                 // Currently using fallbackToDestructiveMigration for initial development
                 .fallbackToDestructiveMigration()
