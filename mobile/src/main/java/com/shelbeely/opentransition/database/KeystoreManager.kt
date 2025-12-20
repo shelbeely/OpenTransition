@@ -72,8 +72,12 @@ object KeystoreManager {
             encryptedPrefs.edit()
                 .remove(prefKey)
                 .apply()
-        } catch (e: Exception) {
-            // Ignore errors during deletion
+        } catch (e: java.security.GeneralSecurityException) {
+            // Log and ignore security errors during deletion
+            android.util.Log.w("KeystoreManager", "Failed to delete database key", e)
+        } catch (e: java.io.IOException) {
+            // Log and ignore IO errors during deletion
+            android.util.Log.w("KeystoreManager", "Failed to delete database key", e)
         }
     }
     
@@ -86,7 +90,11 @@ object KeystoreManager {
         return try {
             val encryptedPrefs = getEncryptedPrefs(context)
             encryptedPrefs.contains(prefKey)
-        } catch (e: Exception) {
+        } catch (e: java.security.GeneralSecurityException) {
+            android.util.Log.w("KeystoreManager", "Failed to check database key", e)
+            false
+        } catch (e: java.io.IOException) {
+            android.util.Log.w("KeystoreManager", "Failed to check database key", e)
             false
         }
     }
