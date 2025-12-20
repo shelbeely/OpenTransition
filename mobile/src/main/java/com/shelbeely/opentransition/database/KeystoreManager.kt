@@ -11,20 +11,14 @@
 package com.shelbeely.opentransition.database
 
 import android.content.Context
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
+import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import java.security.KeyStore
 import java.security.SecureRandom
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.GCMParameterSpec
 
 /**
- * Manages encryption keys using Android Keystore
- * Keys are protected by hardware-backed security when available
+ * Manages encryption keys using EncryptedSharedPreferences
+ * Passphrases are protected by hardware-backed MasterKey when available
  */
 object KeystoreManager {
     private const val ENCRYPTED_PREFS_NAME = "opentransition_db_keys"
@@ -37,16 +31,7 @@ object KeystoreManager {
      */
     fun getOrCreateDatabaseKey(context: Context, isDecoy: Boolean = false): ByteArray {
         val prefKey = if (isDecoy) KEY_DECOY_DB else KEY_REAL_DB
-        
-        // Get EncryptedSharedPreferences
-        val masterKey = getMasterKey(context)
-        val encryptedPrefs = EncryptedSharedPreferences.create(
-            context,
-            ENCRYPTED_PREFS_NAME,
-            masterKey,
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-        )
+        val encryptedPrefs = getEncryptedPrefs(context)
         
         // Check if passphrase already exists
         val existingPassphrase = encryptedPrefs.getString(prefKey, null)
@@ -83,15 +68,7 @@ object KeystoreManager {
         val prefKey = if (isDecoy) KEY_DECOY_DB else KEY_REAL_DB
         
         try {
-            val masterKey = getMasterKey(context)
-            val encryptedPrefs = EncryptedSharedPreferences.create(
-                context,
-                ENCRYPTED_PREFS_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-            
+            val encryptedPrefs = getEncryptedPrefs(context)
             encryptedPrefs.edit()
                 .remove(prefKey)
                 .apply()
@@ -107,15 +84,7 @@ object KeystoreManager {
         val prefKey = if (isDecoy) KEY_DECOY_DB else KEY_REAL_DB
         
         return try {
-            val masterKey = getMasterKey(context)
-            val encryptedPrefs = EncryptedSharedPreferences.create(
-                context,
-                ENCRYPTED_PREFS_NAME,
-                masterKey,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            )
-            
+            val encryptedPrefs = getEncryptedPrefs(context)
             encryptedPrefs.contains(prefKey)
         } catch (e: Exception) {
             false
@@ -123,9 +92,23 @@ object KeystoreManager {
     }
     
     /**
+     * Get EncryptedSharedPreferences instance
+     */
+    private fun getEncryptedPrefs(context: Context): SharedPreferences {
+        val masterKey = getMasterKey(context)
+        return EncryptedSharedPreferences.create(
+            context,
+            ENCRYPTED_PREFS_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+    
+    /**
      * Get a master key for EncryptedSharedPreferences
      */
-    fun getMasterKey(context: Context): MasterKey {
+    private fun getMasterKey(context: Context): MasterKey {
         return MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
