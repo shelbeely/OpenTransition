@@ -539,13 +539,13 @@
                 android:textColor="@color/transparent_white_90" />
                 
             <Button
-                android:id="@+id/settings_migrate_database"
+                android:id="@+id/settings_import_backup"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="@dimen/spacer_grid"
-                android:text="@string/migrate_database"
+                android:text="@string/import_backup"
                 android:textAllCaps="false"
                 android:textSize="16sp" />
 

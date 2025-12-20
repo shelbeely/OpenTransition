@@ -58,7 +58,7 @@ sealed class SettingsUiEvent {
     object ToggleDecoyVault : SettingsUiEvent()
     object SetDecoyPasscode : SettingsUiEvent()
     object ToggleQuickHide : SettingsUiEvent()
-    object MigrateDatabase : SettingsUiEvent()
+    object ImportRealmBackup : SettingsUiEvent()
     object Contribute : SettingsUiEvent()
     object PrivacyPolicy : SettingsUiEvent()
 }
@@ -112,7 +112,7 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
             binding.settingsSetDecoyPasscode.clicks().toV3().map { SettingsUiEvent.SetDecoyPasscode },
             binding.settingsQuickHide.checkedChanges().toV3()
                 .filter { userAction }.map { SettingsUiEvent.ToggleQuickHide },
-            binding.settingsMigrateDatabase.clicks().toV3().map { SettingsUiEvent.MigrateDatabase },
+            binding.settingsImportBackup.clicks().toV3().map { SettingsUiEvent.ImportRealmBackup },
             binding.settingsContribute.clicks().toV3().map { SettingsUiEvent.Contribute },
             binding.settingsPrivacyPolicy.clicks().toV3().map { SettingsUiEvent.PrivacyPolicy }
         )
@@ -160,7 +160,7 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
         binding.settingsAccountDeleteAccount.bounceOnClick { /* handled by event stream */ }
         binding.settingsAccountSignOut.bounceOnClick { /* handled by event stream */ }
         binding.settingsSetDecoyPasscode.bounceOnClick { /* handled by event stream */ }
-        binding.settingsMigrateDatabase.bounceOnClick { /* handled by event stream */ }
+        binding.settingsImportBackup.bounceOnClick { /* handled by event stream */ }
         
         // Text buttons - subtle bounce
         binding.settingsAccountName.bounceOnClick { /* handled by event stream */ }
