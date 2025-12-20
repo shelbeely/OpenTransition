@@ -28,8 +28,13 @@ import java.io.File
 import java.io.FileOutputStream
 
 /**
- * Handles importing Realm backup files into Room database
- * This allows users to migrate data from the forked version
+ * Handles importing Realm backup files into Room database.
+ * 
+ * **BACKWARDS COMPATIBILITY**: This importer is for compatibility with the old app.
+ * It allows users to import Realm backup files (.realm files) from the forked version
+ * into the new Room-based database.
+ * 
+ * Use this to import backup files created by exporting data from the old app.
  */
 object RealmBackupImporter {
     private const val TAG = "RealmBackupImporter"

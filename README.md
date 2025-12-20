@@ -43,9 +43,40 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 - 🎯 **Milestone Management** - Record and celebrate important events
 - 🖼️ **Gallery View** - Browse and compare your progress photos
 - 🔒 **Privacy First** - App lock, disguised mode, and local storage
+- 🔐 **Optional Encryption** - Encrypt your database with SQLCipher (optional)
+- 🎭 **Decoy Vault** - Create a separate vault with different passcode for added security
 - 💾 **Data Control** - Export, backup, and sync on your terms
+- 🔄 **Import Backups** - Import data from the original TransTracks app
 - 🎨 **Customizable** - Multiple themes and personalization options
 - ⌚ **Wear OS Companion** - Access key features from your smartwatch
+
+## 🔄 Importing from TransTracks
+
+OpenTransition maintains **backwards compatibility** with TransTracks. You can easily import your existing data:
+
+### Import Process
+
+1. **Export from TransTracks**: In TransTracks, go to Settings → Export Data
+2. **Save the backup file**: This creates a `.realm` backup file
+3. **Import to OpenTransition**: 
+   - Open OpenTransition
+   - Go to Settings
+   - Tap "Import Backup"
+   - Select your `.realm` backup file
+   - Wait for import to complete
+
+### Technical Details
+
+OpenTransition uses **Room database** (modern Android database) instead of Realm. However, we maintain full backwards compatibility with TransTracks:
+
+- **Realm data models preserved**: Used only for importing TransTracks backups
+- **Migration utilities included**: Automatic conversion from Realm to Room format
+- **No data loss**: All photos, milestones, and audio analyses are preserved
+- **One-time process**: After import, everything runs on the new Room database
+
+All Realm-related code is marked with `BACKWARDS COMPATIBILITY` comments and is maintained solely for importing data from TransTracks.
+
+See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for more details on the database architecture.
 
 ## 🚀 Quick Start for Development
 

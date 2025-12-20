@@ -17,9 +17,18 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import java.util.UUID
 
 /**
+ * AudioAnalysis data model.
  * Stores formant analysis results for an audio recording.
  * Formants are resonant frequencies of the vocal tract that characterize voice quality.
  * F1 and F2 are particularly important for vowel sounds and voice feminization/masculinization tracking.
+ * 
+ * **BACKWARDS COMPATIBILITY**: This class extends RealmObject for compatibility with the old app.
+ * The new app uses Room database (see AudioAnalysisEntity), but this class is retained to support:
+ * - Importing backups from the forked version
+ * - Reading legacy Realm database files
+ * - Data migration utilities (RealmToRoomMigration, RealmBackupImporter)
+ * 
+ * Do not use this class for new database operations. Use AudioAnalysisEntity with DatabaseManager instead.
  */
 class AudioAnalysis : RealmObject {
     @PrimaryKey

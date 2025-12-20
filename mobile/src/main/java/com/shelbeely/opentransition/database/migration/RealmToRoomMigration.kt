@@ -25,7 +25,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 /**
- * Handles migration from Realm database to Room encrypted database
+ * Handles migration from Realm database to Room database.
+ * 
+ * **BACKWARDS COMPATIBILITY**: This migration utility is for compatibility with the old app.
+ * It reads data from the legacy Realm database and migrates it to the new Room database.
+ * 
+ * Note: This is for in-place migration of an existing Realm database on the device.
+ * For importing backup files, use RealmBackupImporter instead.
  */
 object RealmToRoomMigration {
     private const val TAG = "RealmToRoomMigration"

@@ -16,6 +16,17 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.PrimaryKey
 import java.util.UUID
 
+/**
+ * Milestone data model.
+ * 
+ * **BACKWARDS COMPATIBILITY**: This class extends RealmObject for compatibility with the old app.
+ * The new app uses Room database (see MilestoneEntity), but this class is retained to support:
+ * - Importing backups from the forked version
+ * - Reading legacy Realm database files
+ * - Data migration utilities (RealmToRoomMigration, RealmBackupImporter)
+ * 
+ * Do not use this class for new database operations. Use MilestoneEntity with DatabaseManager instead.
+ */
 class Milestone : RealmObject {
     @PrimaryKey
     var id: String = UUID.randomUUID().toString()
