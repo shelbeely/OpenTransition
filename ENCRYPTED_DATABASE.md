@@ -34,6 +34,8 @@ OpenTransition now includes advanced security features for protecting sensitive 
 
 ### Database Architecture
 
+OpenTransition uses **Room database** with optional SQLCipher encryption. This is a modern replacement for the Realm database used in TransTracks.
+
 ```
 ┌─────────────────────────────────────┐
 │     Android Keystore (Secure)       │
@@ -45,7 +47,9 @@ OpenTransition now includes advanced security features for protecting sensitive 
            ▼                 ▼
 ┌──────────────────┐  ┌──────────────────┐
 │  Real Database   │  │  Decoy Database  │
-│  (SQLCipher)     │  │  (SQLCipher)     │
+│  (Room/SQLite)   │  │  (Room/SQLite)   │
+│  Optional:       │  │  Optional:       │
+│  + SQLCipher     │  │  + SQLCipher     │
 │                  │  │                  │
 │  - Milestones    │  │  - Empty or      │
 │  - Photos        │  │    Generic Data  │
@@ -53,12 +57,15 @@ OpenTransition now includes advanced security features for protecting sensitive 
 └──────────────────┘  └──────────────────┘
 ```
 
+**Backwards Compatibility**: OpenTransition maintains Realm data models and utilities to import backups from TransTracks. See the "Importing from TransTracks" section below.
+
 ### Key Components
 
-1. **EncryptedDatabase.kt**: Room database with SQLCipher integration
-2. **KeystoreManager.kt**: Manages encryption keys in Android Keystore
+1. **AppDatabase.kt**: Room database with optional SQLCipher encryption
+2. **KeystoreManager.kt**: Manages encryption keys in EncryptedSharedPreferences
 3. **DatabaseManager.kt**: Handles switching between real and decoy vaults
 4. **QuickHideManager.kt**: Implements quick hide functionality
+5. **RealmBackupImporter.kt**: Imports TransTracks backups (backwards compatibility)
 
 ### Security Model
 
@@ -115,14 +122,51 @@ QuickHideManager.enableSecureMode(activity)
 QuickHideManager.applyQuickHide(activity)
 ```
 
-## Migration from Realm
+## Importing from TransTracks
 
-The encrypted database infrastructure is **optional** and can coexist with the existing Realm database. To migrate:
+OpenTransition supports importing backups from TransTracks. The app maintains backwards compatibility with Realm database format.
 
-1. Enable encrypted database in settings
-2. Copy data from Realm to Room (migration utility needed)
-3. Switch app to use Room DAOs instead of Realm queries
-4. Optionally remove Realm dependency
+### How to Import
+
+1. **In TransTracks**: Export your data (Settings → Export)
+2. **Save the backup file**: A `.realm` file will be created
+3. **In OpenTransition**: 
+   - Go to Settings
+   - Tap "Import Backup"
+   - Select your `.realm` backup file
+   - Wait for the import to complete
+
+### What Gets Imported
+
+✅ All milestones  
+✅ All photos (face, body, audio)  
+✅ Audio analysis data  
+✅ Timestamps and metadata  
+
+### Technical Details
+
+- **Realm → Room conversion**: Automatic conversion during import
+- **No data loss**: All fields are mapped correctly
+- **One-time process**: After import, data lives in Room database
+- **Backwards compatibility code**: All Realm code is marked with `BACKWARDS COMPATIBILITY` comments
+- **Source files**:
+  - `RealmBackupImporter.kt` - Imports `.realm` backup files
+  - `RealmToRoomMigration.kt` - Migrates existing Realm database on device
+  - Data models (`Milestone.kt`, `Photo.kt`, `AudioAnalysis.kt`) - Retained for import only
+
+### Optional: Enable Encryption After Import
+
+After importing your data, you can optionally enable encryption:
+
+```kotlin
+// Enable encrypted database
+SettingsManager.setEncryptedDatabaseEnabled(true, context)
+
+// Optionally enable decoy vault
+SettingsManager.setDecoyVaultEnabled(true, context)
+```
+
+Encryption is **optional** - the Room database works fine without it.
 
 ## Security Considerations
 
@@ -189,23 +233,27 @@ To test decoy vault:
 Added to `mobile/build.gradle`:
 
 ```gradle
-// Room + SQLCipher
+// Room database (replaces Realm)
 def room_version = "2.6.1"
 implementation "androidx.room:room-runtime:$room_version"
 implementation "androidx.room:room-ktx:$room_version"
 ksp "androidx.room:room-compiler:$room_version"
 
-// SQLCipher for database encryption
+// SQLCipher for optional database encryption
 implementation "net.zetetic:android-database-sqlcipher:4.5.4"
 implementation "androidx.sqlite:sqlite:2.4.0"
 
-// Security library
+// Security library for key management
 implementation 'androidx.security:security-crypto:1.1.0-alpha06'
+
+// Realm (backwards compatibility only - for importing TransTracks backups)
+id 'io.realm.kotlin'
+// Realm data models maintained in com.shelbeely.opentransition.data.*
 ```
 
 ## Future Enhancements
 
-- [ ] Migration utility from Realm to Room
+- [x] ~~Migration utility from Realm to Room~~ ✅ Implemented as RealmBackupImporter
 - [ ] Biometric-gated key access (require biometric for every DB access)
 - [ ] Gesture-based quick hide triggers
 - [ ] Custom decoy vault content

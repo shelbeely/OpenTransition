@@ -11,100 +11,112 @@
 package com.shelbeely.opentransition.database
 
 import android.content.Context
-import android.security.keystore.KeyGenParameterSpec
-import android.security.keystore.KeyProperties
+import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import java.security.KeyStore
-import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
-import javax.crypto.spec.GCMParameterSpec
+import java.security.SecureRandom
 
 /**
- * Manages encryption keys using Android Keystore
- * Keys are protected by hardware-backed security when available
+ * Manages encryption keys using EncryptedSharedPreferences
+ * Passphrases are protected by hardware-backed MasterKey when available
  */
 object KeystoreManager {
-    private const val KEYSTORE_PROVIDER = "AndroidKeyStore"
-    private const val KEY_ALIAS = "opentransition_db_key"
-    private const val DECOY_KEY_ALIAS = "opentransition_decoy_db_key"
-    private const val TRANSFORMATION = "AES/GCM/NoPadding"
-    private const val GCM_TAG_LENGTH = 128
+    private const val ENCRYPTED_PREFS_NAME = "opentransition_db_keys"
+    private const val KEY_REAL_DB = "real_db_passphrase"
+    private const val KEY_DECOY_DB = "decoy_db_passphrase"
     
     /**
-     * Get or generate the master key for database encryption
+     * Get or generate the passphrase for database encryption
+     * The passphrase is stored securely in EncryptedSharedPreferences
      */
     fun getOrCreateDatabaseKey(context: Context, isDecoy: Boolean = false): ByteArray {
-        val keyAlias = if (isDecoy) DECOY_KEY_ALIAS else KEY_ALIAS
+        val prefKey = if (isDecoy) KEY_DECOY_DB else KEY_REAL_DB
+        val encryptedPrefs = getEncryptedPrefs(context)
         
-        val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER)
-        keyStore.load(null)
-        
-        // Check if key already exists
-        if (!keyStore.containsAlias(keyAlias)) {
-            generateDatabaseKey(keyAlias)
+        // Check if passphrase already exists
+        val existingPassphrase = encryptedPrefs.getString(prefKey, null)
+        if (existingPassphrase != null) {
+            return existingPassphrase.toByteArray(Charsets.UTF_8)
         }
         
-        // Get the key from keystore
-        val secretKey = keyStore.getKey(keyAlias, null) as SecretKey
-        return secretKey.encoded
+        // Generate a new random passphrase
+        val passphrase = generateRandomPassphrase()
+        
+        // Store it securely
+        encryptedPrefs.edit()
+            .putString(prefKey, passphrase)
+            .apply()
+        
+        return passphrase.toByteArray(Charsets.UTF_8)
     }
     
     /**
-     * Generate a new encryption key in the Android Keystore
+     * Generate a secure random passphrase for the database
      */
-    private fun generateDatabaseKey(alias: String) {
-        val keyGenerator = KeyGenerator.getInstance(
-            KeyProperties.KEY_ALGORITHM_AES,
-            KEYSTORE_PROVIDER
-        )
-        
-        val spec = KeyGenParameterSpec.Builder(
-            alias,
-            KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
-        )
-            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
-            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
-            .setKeySize(256)
-            // Require user authentication to use the key
-            .setUserAuthenticationRequired(false) // Set to true if requiring biometric for every access
-            .build()
-        
-        keyGenerator.init(spec)
-        keyGenerator.generateKey()
+    private fun generateRandomPassphrase(): String {
+        val random = SecureRandom()
+        val bytes = ByteArray(32) // 256 bits
+        random.nextBytes(bytes)
+        // Convert to hex string for storage
+        return bytes.joinToString("") { "%02x".format(it) }
     }
     
     /**
-     * Delete the database key from keystore
+     * Delete the database passphrase
      */
-    fun deleteDatabaseKey(isDecoy: Boolean = false) {
-        val keyAlias = if (isDecoy) DECOY_KEY_ALIAS else KEY_ALIAS
+    fun deleteDatabaseKey(context: Context, isDecoy: Boolean = false) {
+        val prefKey = if (isDecoy) KEY_DECOY_DB else KEY_REAL_DB
         
-        val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER)
-        keyStore.load(null)
-        
-        if (keyStore.containsAlias(keyAlias)) {
-            keyStore.deleteEntry(keyAlias)
+        try {
+            val encryptedPrefs = getEncryptedPrefs(context)
+            encryptedPrefs.edit()
+                .remove(prefKey)
+                .apply()
+        } catch (e: java.security.GeneralSecurityException) {
+            // Log and ignore security errors during deletion
+            android.util.Log.w("KeystoreManager", "Failed to delete database key", e)
+        } catch (e: java.io.IOException) {
+            // Log and ignore IO errors during deletion
+            android.util.Log.w("KeystoreManager", "Failed to delete database key", e)
         }
     }
     
     /**
-     * Check if a database key exists
+     * Check if a database passphrase exists
      */
-    fun hasDatabaseKey(isDecoy: Boolean = false): Boolean {
-        val keyAlias = if (isDecoy) DECOY_KEY_ALIAS else KEY_ALIAS
+    fun hasDatabaseKey(context: Context, isDecoy: Boolean = false): Boolean {
+        val prefKey = if (isDecoy) KEY_DECOY_DB else KEY_REAL_DB
         
-        val keyStore = KeyStore.getInstance(KEYSTORE_PROVIDER)
-        keyStore.load(null)
-        
-        return keyStore.containsAlias(keyAlias)
+        return try {
+            val encryptedPrefs = getEncryptedPrefs(context)
+            encryptedPrefs.contains(prefKey)
+        } catch (e: java.security.GeneralSecurityException) {
+            android.util.Log.w("KeystoreManager", "Failed to check database key", e)
+            false
+        } catch (e: java.io.IOException) {
+            android.util.Log.w("KeystoreManager", "Failed to check database key", e)
+            false
+        }
+    }
+    
+    /**
+     * Get EncryptedSharedPreferences instance
+     */
+    private fun getEncryptedPrefs(context: Context): SharedPreferences {
+        val masterKey = getMasterKey(context)
+        return EncryptedSharedPreferences.create(
+            context,
+            ENCRYPTED_PREFS_NAME,
+            masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
     }
     
     /**
      * Get a master key for EncryptedSharedPreferences
      */
-    fun getMasterKey(context: Context): MasterKey {
+    private fun getMasterKey(context: Context): MasterKey {
         return MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()

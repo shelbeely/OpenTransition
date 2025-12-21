@@ -11,6 +11,7 @@
 package com.shelbeely.opentransition.database.migration
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import com.shelbeely.opentransition.data.AudioAnalysis
 import com.shelbeely.opentransition.data.Milestone
@@ -19,59 +20,59 @@ import com.shelbeely.opentransition.database.DatabaseManager
 import com.shelbeely.opentransition.database.room.entities.AudioAnalysisEntity
 import com.shelbeely.opentransition.database.room.entities.MilestoneEntity
 import com.shelbeely.opentransition.database.room.entities.PhotoEntity
-import com.shelbeely.opentransition.util.openDefault
 import io.realm.kotlin.Realm
+import io.realm.kotlin.RealmConfiguration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 
 /**
- * Handles migration from Realm database to Room database.
+ * Handles importing Realm backup files into Room database.
  * 
- * **BACKWARDS COMPATIBILITY**: This migration utility is for compatibility with the old app.
- * It reads data from the legacy Realm database and migrates it to the new Room database.
+ * **BACKWARDS COMPATIBILITY**: This importer is for compatibility with the old app.
+ * It allows users to import Realm backup files (.realm files) from the forked version
+ * into the new Room-based database.
  * 
- * Note: This is for in-place migration of an existing Realm database on the device.
- * For importing backup files, use RealmBackupImporter instead.
+ * Use this to import backup files created by exporting data from the old app.
  */
-object RealmToRoomMigration {
-    private const val TAG = "RealmToRoomMigration"
-    private const val MIGRATION_PREFS_KEY = "realm_to_room_migration_completed"
+object RealmBackupImporter {
+    private const val TAG = "RealmBackupImporter"
+    private const val TEMP_REALM_FILE = "temp_import_realm.realm"
     
     /**
-     * Check if migration has been completed
+     * Import a Realm backup file from URI
+     * @param context Application context
+     * @param backupUri URI of the Realm backup file
+     * @return Import result with statistics
      */
-    fun isMigrationComplete(context: Context): Boolean {
-        val prefs = context.getSharedPreferences("migration_prefs", Context.MODE_PRIVATE)
-        return prefs.getBoolean(MIGRATION_PREFS_KEY, false)
-    }
-    
-    /**
-     * Mark migration as complete
-     */
-    private fun markMigrationComplete(context: Context) {
-        val prefs = context.getSharedPreferences("migration_prefs", Context.MODE_PRIVATE)
-        prefs.edit().putBoolean(MIGRATION_PREFS_KEY, true).apply()
-    }
-    
-    /**
-     * Perform migration from Realm to Room
-     * @return Migration result with statistics
-     */
-    suspend fun migrate(context: Context): MigrationResult = withContext(Dispatchers.IO) {
-        val result = MigrationResult()
+    suspend fun importFromBackup(context: Context, backupUri: Uri): ImportResult = withContext(Dispatchers.IO) {
+        val result = ImportResult()
+        val tempRealmFile = File(context.cacheDir, TEMP_REALM_FILE)
         
         try {
-            Log.d(TAG, "Starting Realm to Room migration")
+            Log.d(TAG, "Starting Realm backup import from URI: $backupUri")
             
-            // Open Realm database
-            val realm = Realm.openDefault()
+            // Copy the backup file to a temporary location
+            copyBackupToTemp(context, backupUri, tempRealmFile)
             
-            // Get Room database
-            val roomDb = DatabaseManager.getDatabase(context)
+            // Open the Realm backup
+            val config = RealmConfiguration.Builder(
+                schema = setOf(Milestone::class, Photo::class, AudioAnalysis::class)
+            )
+                .directory(context.cacheDir.absolutePath)
+                .name(TEMP_REALM_FILE)
+                .build()
             
-            // Migrate Milestones
-            val realmMilestones = realm.query(Milestone::class).find()
-            Log.d(TAG, "Migrating ${realmMilestones.size} milestones")
+            val realm = Realm.open(config)
+            
+            try {
+                // Get Room database
+                val roomDb = DatabaseManager.getDatabase(context)
+                
+                // Import Milestones
+                val realmMilestones = realm.query(Milestone::class).find()
+                Log.d(TAG, "Importing ${realmMilestones.size} milestones")
             
             realmMilestones.forEach { realmMilestone ->
                 try {
@@ -85,14 +86,14 @@ object RealmToRoomMigration {
                     roomDb.milestoneDao().insertMilestone(roomMilestone)
                     result.milestonesSuccess++
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error migrating milestone ${realmMilestone.id}", e)
+                    Log.e(TAG, "Error importing milestone ${realmMilestone.id}", e)
                     result.milestonesFailed++
                 }
             }
             
-            // Migrate Photos
+            // Import Photos
             val realmPhotos = realm.query(Photo::class).find()
-            Log.d(TAG, "Migrating ${realmPhotos.size} photos")
+            Log.d(TAG, "Importing ${realmPhotos.size} photos")
             
             realmPhotos.forEach { realmPhoto ->
                 try {
@@ -106,14 +107,14 @@ object RealmToRoomMigration {
                     roomDb.photoDao().insertPhoto(roomPhoto)
                     result.photosSuccess++
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error migrating photo ${realmPhoto.id}", e)
+                    Log.e(TAG, "Error importing photo ${realmPhoto.id}", e)
                     result.photosFailed++
                 }
             }
             
-            // Migrate Audio Analyses
+            // Import Audio Analyses
             val realmAudioAnalyses = realm.query(AudioAnalysis::class).find()
-            Log.d(TAG, "Migrating ${realmAudioAnalyses.size} audio analyses")
+            Log.d(TAG, "Importing ${realmAudioAnalyses.size} audio analyses")
             
             realmAudioAnalyses.forEach { realmAudio ->
                 try {
@@ -134,32 +135,48 @@ object RealmToRoomMigration {
                     roomDb.audioAnalysisDao().insertAudioAnalysis(roomAudio)
                     result.audioAnalysesSuccess++
                 } catch (e: Exception) {
-                    Log.e(TAG, "Error migrating audio analysis ${realmAudio.id}", e)
+                    Log.e(TAG, "Error importing audio analysis ${realmAudio.id}", e)
                     result.audioAnalysesFailed++
                 }
             }
             
-            realm.close()
-            
-            // Mark migration as complete
-            markMigrationComplete(context)
-            
             result.success = true
-            Log.d(TAG, "Migration completed successfully: $result")
+            Log.d(TAG, "Import completed successfully: $result")
+            
+            } finally {
+                // Always close realm and clean up temp file
+                realm.close()
+            }
             
         } catch (e: Exception) {
-            Log.e(TAG, "Migration failed", e)
+            Log.e(TAG, "Import failed", e)
             result.success = false
             result.error = e.message
+        } finally {
+            // Ensure temp file is deleted even if import fails
+            if (tempRealmFile.exists()) {
+                tempRealmFile.delete()
+            }
         }
         
         result
     }
     
     /**
-     * Migration result with statistics
+     * Copy backup file from URI to temporary location
      */
-    data class MigrationResult(
+    private fun copyBackupToTemp(context: Context, uri: Uri, destFile: File) {
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            FileOutputStream(destFile).use { output ->
+                input.copyTo(output)
+            }
+        } ?: throw IllegalArgumentException("Unable to read the selected backup file. Please ensure the file is accessible and not corrupted.")
+    }
+    
+    /**
+     * Import result with statistics
+     */
+    data class ImportResult(
         var success: Boolean = false,
         var error: String? = null,
         var milestonesSuccess: Int = 0,

@@ -20,6 +20,7 @@ import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
@@ -280,8 +281,8 @@ class SettingsFragment : Fragment(R.layout.settings) {
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.ToggleQuickHide>()
             .subscribe { SettingsManager.setQuickHideEnabled(!SettingsManager.isQuickHideEnabled(), requireActivity()) }
             
-        viewDisposables += sharedEvents.ofType<SettingsUiEvent.MigrateDatabase>()
-            .subscribe { showMigrationDialog(view) }
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.ImportRealmBackup>()
+            .subscribe { showImportBackupDialog(view) }
 
         viewDisposables += sharedEvents.ofType<SettingsUiEvent.Contribute>()
             .subscribe {
@@ -796,49 +797,72 @@ class SettingsFragment : Fragment(R.layout.settings) {
     }
     
     /**
-     * Show migration dialog with progress
+     * Show import backup dialog with file picker
      */
-    private fun showMigrationDialog(view: View) {
-        // Check if encrypted database is enabled
-        if (!SettingsManager.isEncryptedDatabaseEnabled()) {
-            Snackbar.make(view, R.string.enable_encrypted_db_first, Snackbar.LENGTH_LONG).show()
-            return
+    private fun showImportBackupDialog(view: View) {
+        AlertDialog.Builder(view.context)
+            .setTitle(R.string.import_backup)
+            .setMessage(R.string.import_backup_description)
+            .setPositiveButton(R.string.select_file) { _, _ ->
+                // Launch file picker to select Realm backup file
+                val intent = android.content.Intent(android.content.Intent.ACTION_OPEN_DOCUMENT).apply {
+                    addCategory(android.content.Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                    putExtra(android.content.Intent.EXTRA_MIME_TYPES, arrayOf("*/*", "application/octet-stream"))
+                }
+                backupPickerLauncher.launch(intent)
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+    
+    /**
+     * Handle the selected backup file and perform import
+     */
+    private val backupPickerLauncher = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == android.app.Activity.RESULT_OK) {
+            result.data?.data?.let { uri ->
+                performBackupImport(uri)
+            }
         }
-        
-        // Check if migration is already complete
-        if (com.shelbeely.opentransition.database.migration.RealmToRoomMigration.isMigrationComplete(requireContext())) {
-            Snackbar.make(view, R.string.migration_already_complete, Snackbar.LENGTH_LONG).show()
-            return
-        }
+    }
+    
+    /**
+     * Perform the actual backup import
+     */
+    private fun performBackupImport(uri: android.net.Uri) {
+        val view = view ?: return
         
         val progressDialog = AlertDialog.Builder(view.context)
-            .setTitle(R.string.migrate_database)
-            .setMessage(R.string.migration_in_progress)
+            .setTitle(R.string.import_backup)
+            .setMessage(R.string.import_in_progress)
             .setCancelable(false)
             .create()
         
         progressDialog.show()
         
-        // Launch migration in coroutine using viewLifecycleOwner
+        // Launch import in coroutine using viewLifecycleOwner
         viewLifecycleOwner.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
             try {
-                val result = com.shelbeely.opentransition.database.migration.RealmToRoomMigration.migrate(requireContext())
+                val result = com.shelbeely.opentransition.database.migration.RealmBackupImporter.importFromBackup(requireContext(), uri)
                 
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                     progressDialog.dismiss()
                     
                     if (result.success) {
-                        val message = getString(R.string.migration_complete, result.totalSuccess)
+                        val message = getString(R.string.import_complete, result.totalSuccess)
                         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
                     } else {
-                        val message = getString(R.string.migration_failed, result.error ?: "Unknown error")
+                        val message = getString(R.string.import_failed, result.error ?: "Unknown error")
                         Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
                     }
                 }
             } catch (e: Exception) {
                 kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                     progressDialog.dismiss()
-                    val message = getString(R.string.migration_failed, e.message ?: "Unknown error")
+                    val message = getString(R.string.import_failed, e.message ?: "Unknown error")
                     Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
                 }
             }

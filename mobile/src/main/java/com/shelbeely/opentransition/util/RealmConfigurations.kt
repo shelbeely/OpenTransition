@@ -15,5 +15,13 @@ import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.data.Photo
 import io.realm.kotlin.RealmConfiguration
 
+/**
+ * **BACKWARDS COMPATIBILITY**: Realm configuration for compatibility with the old app.
+ * 
+ * This configuration is retained to support importing backups from the forked version.
+ * The new app uses Room database with DatabaseManager.
+ * 
+ * Used by: RealmToRoomMigration, RealmBackupImporter
+ */
 val RealmConfiguration.Companion.default
     get() = create(setOf(Milestone::class, Photo::class, AudioAnalysis::class))

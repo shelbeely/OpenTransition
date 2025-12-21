@@ -20,7 +20,8 @@ object EncryptionUtil {
 
         val messageDigest = MessageDigest.getInstance("SHA-512")
         messageDigest.update(dataArray)
+        val hash = messageDigest.digest()
 
-        return Base64.encodeToString(dataArray, Base64.NO_WRAP)
+        return Base64.encodeToString(hash, Base64.NO_WRAP)
     }
 }

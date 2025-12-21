@@ -21,6 +21,17 @@ import io.realm.kotlin.types.annotations.PrimaryKey
 import java.io.File
 import java.util.UUID
 
+/**
+ * Photo data model.
+ * 
+ * **BACKWARDS COMPATIBILITY**: This class extends RealmObject for compatibility with the old app.
+ * The new app uses Room database (see PhotoEntity), but this class is retained to support:
+ * - Importing backups from the forked version
+ * - Reading legacy Realm database files
+ * - Data migration utilities (RealmToRoomMigration, RealmBackupImporter)
+ * 
+ * Do not use this class for new database operations. Use PhotoEntity with DatabaseManager instead.
+ */
 class Photo : RealmObject {
     @PrimaryKey
     var id: String = UUID.randomUUID().toString()

@@ -13,4 +13,12 @@ package com.shelbeely.opentransition.util
 import io.realm.kotlin.Realm
 import io.realm.kotlin.RealmConfiguration
 
+/**
+ * **BACKWARDS COMPATIBILITY**: Realm extension function for compatibility with the old app.
+ * 
+ * This utility is retained to support importing backups from the forked version.
+ * The new app uses Room database with DatabaseManager.
+ * 
+ * Used by: RealmToRoomMigration, RealmBackupImporter
+ */
 fun Realm.Companion.openDefault() = Realm.open(RealmConfiguration.default)
