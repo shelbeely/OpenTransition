@@ -1,0 +1,92 @@
+name: opentransition
+description: A transition tracking application for transgender people, focusing on photo tracking and milestone management.
+publish_to: 'none'
+version: 1.3.0+128
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # UI & Material Design
+  material_design_icons_flutter: ^7.0.0
+  cupertino_icons: ^1.0.6
+  
+  # State Management
+  provider: ^6.1.1
+  
+  # Database
+  sqflite: ^2.3.0
+  sqflite_sqlcipher: ^3.0.0
+  path: ^1.8.3
+  path_provider: ^2.1.1
+  
+  # Storage & Encryption
+  shared_preferences: ^2.2.2
+  flutter_secure_storage: ^9.0.0
+  encrypt: ^5.0.3
+  
+  # Authentication & Security
+  local_auth: ^2.1.8
+  biometric_storage: ^5.0.0
+  
+  # Firebase
+  firebase_core: ^2.24.2
+  firebase_auth: ^4.15.3
+  firebase_analytics: ^10.7.4
+  firebase_crashlytics: ^3.4.8
+  cloud_firestore: ^4.13.6
+  
+  # Camera & Photos
+  camera: ^0.10.5+7
+  image_picker: ^1.0.7
+  photo_manager: ^3.0.0
+  image: ^4.1.4
+  
+  # ML & Face Detection
+  google_mlkit_face_detection: ^0.10.0
+  
+  # File handling
+  file_picker: ^6.1.1
+  
+  # JSON & Serialization
+  json_annotation: ^4.8.1
+  
+  # Date & Time
+  intl: ^0.19.0
+  
+  # Utilities
+  uuid: ^4.3.3
+  rxdart: ^0.27.7
+  
+  # Platform Detection
+  universal_io: ^2.2.2
+  
+  # Ads (Google AdMob - Mobile only)
+  google_mobile_ads: ^4.0.0
+  
+  # Web-specific packages
+  url_launcher: ^6.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.7
+  json_serializable: ^6.7.1
+
+flutter:
+  uses-material-design: true
+  
+  # Assets
+  assets:
+    - assets/images/
+    - assets/icons/
+  
+  # Fonts (if needed for custom fonts)
+  # fonts:
+  #   - family: Custom
+  #     fonts:
+  #       - asset: assets/fonts/Custom-Regular.ttf
