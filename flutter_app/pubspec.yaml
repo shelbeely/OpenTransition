@@ -61,8 +61,14 @@ dependencies:
   uuid: ^4.3.3
   rxdart: ^0.27.7
   
-  # Ads (Google AdMob)
+  # Platform Detection
+  universal_io: ^2.2.2
+  
+  # Ads (Google AdMob - Mobile only)
   google_mobile_ads: ^4.0.0
+  
+  # Web-specific packages
+  url_launcher: ^6.2.2
 
 dev_dependencies:
   flutter_test:

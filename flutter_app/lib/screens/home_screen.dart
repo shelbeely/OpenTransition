@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import '../widgets/bottom_navigation.dart';
+import '../utils/platform_utils.dart';
 import 'photos_screen.dart';
 import 'milestones_screen.dart';
 import 'gallery_screen.dart';
 import 'settings_screen.dart';
 import 'camera_screen.dart';
 import 'add_edit_milestone_screen.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import '../providers/photo_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -55,17 +59,39 @@ class _HomeScreenState extends State<HomeScreen> {
       );
 
       if (photoType != null && mounted) {
-        final imagePath = await Navigator.of(context).push<String>(
-          MaterialPageRoute(
-            builder: (context) => CameraScreen(photoType: photoType),
-          ),
-        );
+        String? imagePath;
+        
+        // Use camera for mobile, image picker for web/desktop
+        if (PlatformUtils.isMobile && PlatformUtils.supportsCameraCapture) {
+          imagePath = await Navigator.of(context).push<String>(
+            MaterialPageRoute(
+              builder: (context) => CameraScreen(photoType: photoType),
+            ),
+          );
+        } else {
+          // Use image picker for web and desktop
+          final ImagePicker picker = ImagePicker();
+          final XFile? image = await picker.pickImage(
+            source: ImageSource.camera,
+            preferredCameraDevice: CameraDevice.front,
+          );
+          imagePath = image?.path;
+        }
 
         if (imagePath != null && mounted) {
-          // TODO: Save photo with provider
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Photo saved successfully')),
+          // Save photo with provider
+          final photoProvider =
+              Provider.of<PhotoProvider>(context, listen: false);
+          await photoProvider.addPhoto(
+            filePath: imagePath,
+            type: photoType,
           );
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Photo saved successfully')),
+            );
+          }
         }
       }
     } else if (_selectedIndex == 1) {

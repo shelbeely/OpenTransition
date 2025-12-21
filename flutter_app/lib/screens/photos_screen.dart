@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'dart:io';
 import '../providers/photo_provider.dart';
+import 'photo_detail_screen.dart';
 
 class PhotosScreen extends StatefulWidget {
   const PhotosScreen({super.key});
@@ -215,7 +216,12 @@ class _PhotosScreenState extends State<PhotosScreen> {
                     ],
                     onSelected: (value) async {
                       if (value == 'view') {
-                        // TODO: Navigate to photo detail
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PhotoDetailScreen(photo: photo),
+                          ),
+                        );
                       } else if (value == 'delete') {
                         final confirmed = await showDialog<bool>(
                           context: context,
@@ -246,7 +252,11 @@ class _PhotosScreenState extends State<PhotosScreen> {
                     },
                   ),
                   onTap: () {
-                    // TODO: Navigate to photo detail
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => PhotoDetailScreen(photo: photo),
+                      ),
+                    );
                   },
                 ),
               );
