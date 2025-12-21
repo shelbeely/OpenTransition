@@ -4,6 +4,8 @@ import 'photos_screen.dart';
 import 'milestones_screen.dart';
 import 'gallery_screen.dart';
 import 'settings_screen.dart';
+import 'camera_screen.dart';
+import 'add_edit_milestone_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +24,60 @@ class _HomeScreenState extends State<HomeScreen> {
     SettingsScreen(),
   ];
 
+  Future<void> _handleFloatingActionButton() async {
+    if (_selectedIndex == 0) {
+      // Take photo - show photo type selection first
+      final photoType = await showDialog<String>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Select Photo Type'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.face),
+                title: const Text('Face'),
+                onTap: () => Navigator.of(context).pop('face'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.accessibility_new),
+                title: const Text('Body'),
+                onTap: () => Navigator.of(context).pop('body'),
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo),
+                title: const Text('Custom'),
+                onTap: () => Navigator.of(context).pop('custom'),
+              ),
+            ],
+          ),
+        ),
+      );
+
+      if (photoType != null && mounted) {
+        final imagePath = await Navigator.of(context).push<String>(
+          MaterialPageRoute(
+            builder: (context) => CameraScreen(photoType: photoType),
+          ),
+        );
+
+        if (imagePath != null && mounted) {
+          // TODO: Save photo with provider
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Photo saved successfully')),
+          );
+        }
+      }
+    } else if (_selectedIndex == 1) {
+      // Add milestone
+      await Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => const AddEditMilestoneScreen(),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -36,9 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: _selectedIndex < 2
           ? FloatingActionButton.extended(
-              onPressed: () {
-                // TODO: Navigate to add photo/milestone
-              },
+              onPressed: _handleFloatingActionButton,
               icon: Icon(_selectedIndex == 0 ? Icons.camera_alt : Icons.add),
               label: Text(_selectedIndex == 0 ? 'Take Photo' : 'Add Milestone'),
             )
