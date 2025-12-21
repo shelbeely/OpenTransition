@@ -116,11 +116,13 @@ See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for more details on the datab
 
 This fork uses a different package name to allow independent deployment
 
-## 🤖 GitHub Copilot Skills
+## 🤖 AI Agent Skills
 
-This repository includes **GitHub Copilot agent skills** in the `.github/skills/` directory. These skills enhance AI-assisted development by providing specialized capabilities:
+This repository includes **AI agent skills** in the `.github/skills/` directory from both OpenAI and Anthropic. These skills enhance AI-assisted development by providing specialized capabilities that are automatically available when using GitHub Copilot or Claude with this repository.
 
-### Curated Skills
+### OpenAI Skills (from [openai/skills](https://github.com/openai/skills))
+
+**Curated Skills:**
 - **gh-address-comments** - Address PR review comments efficiently
 - **gh-fix-ci** - Debug and fix failing GitHub Actions CI/CD
 - **notion-knowledge-capture** - Capture conversations into structured Notion pages
@@ -128,15 +130,40 @@ This repository includes **GitHub Copilot agent skills** in the `.github/skills/
 - **notion-research-documentation** - Research and synthesize documentation
 - **notion-spec-to-implementation** - Turn specs into implementation plans
 
-### Experimental Skills
+**Experimental Skills:**
 - **create-plan** - Create concise plans for coding tasks
 - **linear** - Manage issues and workflows in Linear
 
-### System Skills
+**System Skills:**
 - **skill-creator** - Guide for creating new skills
 - **skill-installer** - Install skills from GitHub repositories
 
-These skills are automatically available when using GitHub Copilot with this repository. Learn more about [GitHub Copilot agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills).
+### Anthropic Skills (from [anthropics/skills](https://github.com/anthropics/skills))
+
+**Creative & Design:**
+- **algorithmic-art** - Create algorithmic art with p5.js
+- **canvas-design** - Create beautiful visual art in PNG/PDF
+- **frontend-design** - Create production-grade frontend interfaces
+- **slack-gif-creator** - Create animated GIFs for Slack
+- **theme-factory** - Style artifacts with themes
+
+**Development & Technical:**
+- **mcp-builder** - Create MCP (Model Context Protocol) servers
+- **web-artifacts-builder** - Create complex web artifacts with React
+- **webapp-testing** - Test web applications with Playwright
+
+**Document Skills:**
+- **docx** - Document creation, editing, and analysis
+- **pdf** - PDF manipulation toolkit
+- **pptx** - Presentation creation and editing
+- **xlsx** - Spreadsheet creation and analysis
+
+**Enterprise & Communication:**
+- **brand-guidelines** - Apply brand colors and typography
+- **doc-coauthoring** - Guide for co-authoring documentation
+- **internal-comms** - Write internal communications
+
+Learn more: [GitHub Copilot agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) | [Agent Skills Standard](http://agentskills.io)
 
 ## 🤝 Contributing
 
