@@ -116,6 +116,28 @@ See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for more details on the datab
 
 This fork uses a different package name to allow independent deployment
 
+## 🤖 GitHub Copilot Skills
+
+This repository includes **GitHub Copilot agent skills** in the `.github/skills/` directory. These skills enhance AI-assisted development by providing specialized capabilities:
+
+### Curated Skills
+- **gh-address-comments** - Address PR review comments efficiently
+- **gh-fix-ci** - Debug and fix failing GitHub Actions CI/CD
+- **notion-knowledge-capture** - Capture conversations into structured Notion pages
+- **notion-meeting-intelligence** - Prepare meeting materials with context
+- **notion-research-documentation** - Research and synthesize documentation
+- **notion-spec-to-implementation** - Turn specs into implementation plans
+
+### Experimental Skills
+- **create-plan** - Create concise plans for coding tasks
+- **linear** - Manage issues and workflows in Linear
+
+### System Skills
+- **skill-creator** - Guide for creating new skills
+- **skill-installer** - Install skills from GitHub repositories
+
+These skills are automatically available when using GitHub Copilot with this repository. Learn more about [GitHub Copilot agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills).
+
 ## 🤝 Contributing
 
 We welcome contributions! If you'd like to help improve OpenTransition:
