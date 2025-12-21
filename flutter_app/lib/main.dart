@@ -9,6 +9,7 @@ import 'services/photo_service.dart';
 import 'services/milestone_service.dart';
 import 'providers/photo_provider.dart';
 import 'providers/milestone_provider.dart';
+import 'providers/settings_provider.dart';
 import 'theme/app_theme.dart';
 
 void main() async {
@@ -51,6 +52,9 @@ void main() async {
         ChangeNotifierProvider<MilestoneProvider>(
           create: (_) => MilestoneProvider(milestoneService),
         ),
+        ChangeNotifierProvider<SettingsProvider>(
+          create: (_) => SettingsProvider(storageService),
+        ),
       ],
       child: const OpenTransitionApp(),
     ),
@@ -62,13 +66,17 @@ class OpenTransitionApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'OpenTransition',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: const SplashScreen(),
-      debugShowCheckedModeBanner: false,
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, child) {
+        return MaterialApp(
+          title: 'OpenTransition',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: settings.themeModeEnum,
+          home: const SplashScreen(),
+          debugShowCheckedModeBanner: false,
+        );
+      },
     );
   }
 }
