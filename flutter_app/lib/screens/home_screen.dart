@@ -5,6 +5,7 @@ import 'photos_screen.dart';
 import 'milestones_screen.dart';
 import 'gallery_screen.dart';
 import 'settings_screen.dart';
+import 'timeline_screen.dart';
 import 'camera_screen.dart';
 import 'add_edit_milestone_screen.dart';
 import 'package:image_picker/image_picker.dart';
@@ -107,6 +108,24 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: _selectedIndex == 0
+          ? AppBar(
+              title: const Text('OpenTransition'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.timeline),
+                  onPressed: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => const TimelineScreen(),
+                      ),
+                    );
+                  },
+                  tooltip: 'Timeline View',
+                ),
+              ],
+            )
+          : null,
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigation(
         selectedIndex: _selectedIndex,
