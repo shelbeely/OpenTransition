@@ -64,6 +64,143 @@ body {
     page-break-after: auto;
 }
 
+/* Decorative corner flourishes */
+.corner-flourish {
+    position: absolute;
+    width: 0.75in;
+    height: 0.75in;
+    pointer-events: none;
+}
+
+.corner-flourish.top-left {
+    top: calc(var(--bleed) + 0.15in);
+    left: calc(var(--bleed) + 0.15in);
+    border-top: 3px solid var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+    border-top-left-radius: 5px;
+}
+
+.corner-flourish.top-left::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+.corner-flourish.top-right {
+    top: calc(var(--bleed) + 0.15in);
+    right: calc(var(--bleed) + 0.15in);
+    border-top: 3px solid var(--primary-color);
+    border-right: 3px solid var(--primary-color);
+    border-top-right-radius: 5px;
+}
+
+.corner-flourish.top-right::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+.corner-flourish.bottom-left {
+    bottom: calc(var(--bleed) + 0.15in);
+    left: calc(var(--bleed) + 0.15in);
+    border-bottom: 3px solid var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+    border-bottom-left-radius: 5px;
+}
+
+.corner-flourish.bottom-left::before {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+.corner-flourish.bottom-right {
+    bottom: calc(var(--bleed) + 0.15in);
+    right: calc(var(--bleed) + 0.15in);
+    border-bottom: 3px solid var(--primary-color);
+    border-right: 3px solid var(--primary-color);
+    border-bottom-right-radius: 5px;
+}
+
+.corner-flourish.bottom-right::before {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+/* Rainbow divider - Pride flag colors */
+.rainbow-divider {
+    height: 8px;
+    background: linear-gradient(to right, 
+        #E40303 0%, #E40303 16.66%,
+        #FF8C00 16.66%, #FF8C00 33.33%,
+        #FFED00 33.33%, #FFED00 50%,
+        #008026 50%, #008026 66.66%,
+        #24408E 66.66%, #24408E 83.33%,
+        #732982 83.33%, #732982 100%
+    );
+    margin: 0.2in 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Decorative divider with accent circles */
+.decorative-divider {
+    position: relative;
+    height: 3px;
+    background: linear-gradient(to right, 
+        transparent 0%, 
+        var(--primary-color) 10%, 
+        var(--primary-color) 90%, 
+        transparent 100%
+    );
+    margin: 0.15in 0;
+}
+
+.decorative-divider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--page-background), 0 0 0 6px var(--primary-color);
+}
+
+.decorative-divider::after {
+    content: '✦';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--secondary-color);
+    font-size: 20px;
+    text-shadow: 0 0 8px var(--secondary-color);
+}
+
 /* Headers */
 h1 {
     font-size: 24pt;
@@ -71,15 +208,31 @@ h1 {
     margin-bottom: 0.3in;
     text-align: center;
     font-weight: bold;
+    text-shadow: 0 2px 4px rgba(230, 131, 34, 0.3);
 }
 
 h2 {
     font-size: 16pt;
-    color: var(--primary-dark);
+    color: var(--secondary-color);
     margin-bottom: 0.2in;
     margin-top: 0.2in;
-    border-bottom: 2px solid var(--primary-light);
-    padding-bottom: 0.05in;
+    padding-bottom: 0.1in;
+    position: relative;
+    font-weight: 600;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, 
+        var(--primary-color) 0%, 
+        var(--secondary-color) 50%, 
+        var(--primary-color) 100%
+    );
 }
 
 h3 {
@@ -87,6 +240,7 @@ h3 {
     color: var(--secondary-color);
     margin-bottom: 0.1in;
     margin-top: 0.15in;
+    font-weight: 600;
 }
 
 /* Text elements */
@@ -333,16 +487,20 @@ td {
 }
 
 .cover-title {
-    font-size: 32pt;
+    font-size: 36pt;
     color: var(--primary-color);
     margin-bottom: 0.2in;
-    font-weight: bold;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 8px rgba(230, 131, 34, 0.4), 0 0 20px rgba(230, 131, 34, 0.2);
 }
 
 .cover-subtitle {
     font-size: 18pt;
     color: var(--text-light);
     margin-bottom: 0.4in;
+    font-weight: 300;
+    letter-spacing: 1px;
 }
 
 .cover-info {
