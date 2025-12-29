@@ -41,7 +41,7 @@ body {
     font-size: 11pt;
     line-height: 1.4;
     color: var(--text-color);
-    background: var(--background);
+    background: #2A2A2A; /* Darker gray background to contrast with black pages */
     padding: 1rem;
 }
 
@@ -163,9 +163,11 @@ p {
 }
 
 .info-field {
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--primary-color);
     flex: 1;
-    min-height: 0.2in;
+    min-height: 0.25in;
+    background: #FFFFFF; /* White background for writing */
+    padding: 0.05in;
 }
 
 /* Milestone boxes - Maximum dark with white writing */
@@ -398,10 +400,10 @@ td {
     }
 }
 
-/* Screen-only styling for pure black background */
+/* Screen-only styling for gray background to contrast pages */
 @media screen {
     body {
-        background: var(--background);
+        background: #2A2A2A; /* Dark gray background for better contrast */
         min-height: 100vh;
     }
     
