@@ -8,8 +8,9 @@ This printable journal provides a tangible way to track your transition journey.
 
 **Print Options:**
 - 🏠 **Home/Office Printing**: Print on standard or custom paper
-- 🏢 **Professional Services**: Ready for VistaPrint, Printful, and print shops with 0.125" bleed
-- 📄 **DIY Booklet**: Bind yourself with staples, rings, or spiral binding
+- 🏢 **Professional Services**: Ready for VistaPrint flyers with 5.5" × 8.5" format
+- 📄 **DIY System**: Order individual page types, build custom journals
+- 🎁 **Premade Journals**: Opportunity to create and sell complete journal sets
 
 The journal includes:
 
@@ -20,22 +21,42 @@ The journal includes:
 - 💭 **Reflection pages** for documenting your emotional journey
 - 📝 **Notes pages** for free-form journaling
 
-## 🏢 Professional Printing
+## 🏢 Professional Printing with VistaPrint
 
-**NEW:** This journal is now optimized for professional printing services!
+**NEW:** This journal uses a **DIY flyer-based system** for VistaPrint!
 
-- ✅ **Bleed margins** (0.125") automatically included
-- ✅ **VistaPrint ready** - upload PDF and order booklets
-- ✅ **Print shop compatible** - works with Printful, local printers
-- ✅ **Crop marks** included for precise trimming
+### How It Works
 
-**[📖 Read the Professional Printing Guide →](PROFESSIONAL-PRINTING.md)**
+Since VistaPrint requires a **minimum of 25 copies** per page design, this system lets you:
 
-Quick professional printing steps:
-1. Generate PDF with size 5.75" × 8.75" (includes bleed)
-2. Upload to VistaPrint, Printful, or your print shop
-3. Select 5.5" × 8.5" booklet, saddle-stitch binding
-4. Order your printed journals!
+1. **Choose** which page types you want (photo tracking, milestones, calendars, etc.)
+2. **Order** 25+ copies of each page type as individual 5.5" × 8.5" flyers
+3. **Build** your own custom journal by selecting pages from each batch
+4. **Share or save** extras for future use or to gift to friends
+
+### Benefits
+
+- ✅ **Personalized** - Only order page types you'll actually use
+- ✅ **Quality** - Professional VistaPrint printing with vivid colors  
+- ✅ **Flexible** - Mix and match pages to create your perfect journal
+- ✅ **Economical** - Bulk pricing means lower cost per page
+- ✅ **Community** - Extra copies to share or create premade journal sets
+- ✅ **Size** - Compact 5.5" × 8.5" format, portable and convenient
+
+**[📖 Read the VistaPrint DIY Guide →](PROFESSIONAL-PRINTING.md)**
+
+### Quick Professional Printing Steps:
+1. Choose which page types you want (e.g., photo tracking, calendars, notes)
+2. Generate PDF for each page type with size 5.75" × 8.75" (includes bleed)
+3. Upload each to VistaPrint as 5.5" × 8.5" flyers (minimum 25 per type)
+4. Order with 100 lb matte paper + 3-hole punch option
+5. Assemble your custom journals when they arrive!
+
+### Cost Example:
+- Order 3 page types (75 flyers total): ~$15-20
+- Create 3-5 complete journals from your flyers
+- Extra pages for future use or gifting
+- Optional: **Sell premade journals** to benefit your community!
 
 ## 🖨️ How to Print
 
