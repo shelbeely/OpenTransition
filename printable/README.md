@@ -4,7 +4,14 @@ A physical, print-friendly version of the OpenTransition app that you can print 
 
 ## 📄 Overview
 
-This printable journal provides a tangible way to track your transition journey. It's designed to be printed on **5.5" x 8.5" paper** (half-letter size) and includes:
+This printable journal provides a tangible way to track your transition journey. It's designed for **5.5" x 8.5" paper** (half-letter size) with **professional printing bleed margins** included for services like VistaPrint.
+
+**Print Options:**
+- 🏠 **Home/Office Printing**: Print on standard or custom paper
+- 🏢 **Professional Services**: Ready for VistaPrint, Printful, and print shops with 0.125" bleed
+- 📄 **DIY Booklet**: Bind yourself with staples, rings, or spiral binding
+
+The journal includes:
 
 - 📸 **Photo tracking pages** for face, body, and custom areas
 - 🎯 **Milestone pages** for medical, legal, social, and personal events
@@ -12,6 +19,23 @@ This printable journal provides a tangible way to track your transition journey.
 - 📅 **Monthly calendars** for appointments and medication tracking
 - 💭 **Reflection pages** for documenting your emotional journey
 - 📝 **Notes pages** for free-form journaling
+
+## 🏢 Professional Printing
+
+**NEW:** This journal is now optimized for professional printing services!
+
+- ✅ **Bleed margins** (0.125") automatically included
+- ✅ **VistaPrint ready** - upload PDF and order booklets
+- ✅ **Print shop compatible** - works with Printful, local printers
+- ✅ **Crop marks** included for precise trimming
+
+**[📖 Read the Professional Printing Guide →](PROFESSIONAL-PRINTING.md)**
+
+Quick professional printing steps:
+1. Generate PDF with size 5.75" × 8.75" (includes bleed)
+2. Upload to VistaPrint, Printful, or your print shop
+3. Select 5.5" × 8.5" booklet, saddle-stitch binding
+4. Order your printed journals!
 
 ## 🖨️ How to Print
 

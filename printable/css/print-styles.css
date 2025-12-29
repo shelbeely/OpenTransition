@@ -1,5 +1,6 @@
 /* OpenTransition Printable Journal - Print Styles */
-/* Optimized for 5.5" x 8.5" (half-letter) paper size */
+/* Optimized for VistaPrint Custom Flyers - 5.5" x 8.5" Half-Letter Size */
+/* Half-letter paper with bleed for professional printing */
 
 :root {
     /* OpenTransition Brand Colors */
@@ -15,6 +16,7 @@
     --border-color: #D0D0D0;
     --background: #3B3B3B; /* Charcoal background */
     --page-background: #FFFFFF;
+    --bleed: 0.125in; /* Standard bleed for professional printing */
 }
 
 * {
@@ -23,9 +25,11 @@
     box-sizing: border-box;
 }
 
+/* VistaPrint Custom Flyer format - 5.5"x8.5" with bleed */
 @page {
-    size: 5.5in 8.5in;
-    margin: 0.5in 0.4in;
+    size: 5.75in 8.75in; /* 5.5"x8.5" + 0.125" bleed on all sides */
+    margin: 0;
+    marks: crop; /* Add crop marks for trimming */
 }
 
 body {
@@ -37,16 +41,18 @@ body {
     padding: 1rem;
 }
 
-/* Page structure */
+/* Page structure - VistaPrint Custom Flyer format (5.5"x8.5") */
 .page {
-    width: 5.5in;
-    height: 8.5in;
-    padding: 0.5in 0.4in;
+    width: 5.75in; /* 5.5" + 0.125" bleed on each side */
+    height: 8.75in; /* 8.5" + 0.125" bleed on each side */
+    padding: 0.625in 0.525in; /* 0.5in + 0.125in bleed margins */
     page-break-after: always;
     position: relative;
     background: var(--page-background);
     margin: 0 auto 1rem auto;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    /* Bleed area extends beyond trim line */
+    background-clip: padding-box;
 }
 
 .page:last-child {
@@ -337,7 +343,7 @@ th {
     border-left: 3px solid var(--primary-color);
 }
 
-/* Print-specific overrides */
+/* Print-specific overrides for VistaPrint custom flyers */
 @media print {
     body {
         background: white;
@@ -348,10 +354,20 @@ th {
         page-break-inside: avoid;
         box-shadow: none;
         margin: 0;
+        /* Ensure full bleed extends to page edge */
+        width: 5.75in;
+        height: 8.75in;
     }
     
     .no-print {
         display: none;
+    }
+    
+    /* Optimize for print resolution */
+    * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        color-adjust: exact;
     }
 }
 
@@ -364,5 +380,18 @@ th {
     
     .page {
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        /* Show trim line on screen for reference */
+        outline: 2px dashed rgba(230, 131, 34, 0.3);
+        outline-offset: -0.125in;
+    }
+    
+    .page::before {
+        content: 'Bleed area (will be trimmed) - 5.5" × 8.5" custom flyer format';
+        position: absolute;
+        top: 0.02in;
+        left: 0.02in;
+        font-size: 6pt;
+        color: rgba(230, 131, 34, 0.5);
+        pointer-events: none;
     }
 }
