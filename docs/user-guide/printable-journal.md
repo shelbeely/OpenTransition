@@ -243,16 +243,23 @@ Edit `printable/css/print-styles.css` and modify these color variables:
 
 ```css
 :root {
-    --primary-color: #E91E63;        /* Main pink */
-    --primary-light: #F8BBD0;        /* Light pink */
-    --primary-dark: #C2185B;         /* Dark pink */
-    --secondary-color: #9C27B0;      /* Purple */
-    --text-color: #212121;           /* Dark text */
-    --text-light: #757575;           /* Light text */
-    --border-color: #E0E0E0;         /* Borders */
-    --background: #FFFFFF;           /* Background */
+    /* OpenTransition Brand Colors */
+    --primary-color: #E68322;        /* Orange */
+    --primary-light: #FCF4ED;        /* Light cream */
+    --primary-dark: #BC5A1E;         /* Dark brown */
+    --secondary-color: #F9B21E;      /* Yellow */
+    --secondary-light: #FFF8E7;      /* Light yellow */
+    --tertiary-color: #BC5A1E;       /* Brown */
+    --tertiary-light: #FFEEDD;       /* Light peach */
+    --text-color: #3B3B3B;           /* Dark gray */
+    --text-light: #6B6B6B;           /* Medium gray */
+    --border-color: #D0D0D0;         /* Light border */
+    --background: #3B3B3B;           /* Charcoal background (screen only) */
+    --page-background: #FFFFFF;      /* White pages */
 }
 ```
+
+Note: The charcoal background (`--background`) is only visible on screen for a modern look. When printed, pages will have white backgrounds.
 
 ### Adding Custom Pages
 
