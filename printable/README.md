@@ -49,7 +49,7 @@ Since VistaPrint requires a **minimum of 25 copies** per page design, this syste
 1. Choose which page types you want (e.g., photo tracking, calendars, notes)
 2. Generate PDF for each page type with size 5.75" × 8.75" (includes bleed)
 3. Upload each to VistaPrint as 5.5" × 8.5" flyers (minimum 25 per type)
-4. Order with 100 lb matte paper + 3-hole punch option
+4. Order with 100 lb gloss cover, matte finish + 3-hole punch option
 5. Assemble your custom journals when they arrive!
 
 ### Cost Example:
