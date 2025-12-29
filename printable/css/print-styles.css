@@ -19,6 +19,7 @@
     --border-color: #444444; /* Dark borders */
     --background: #000000; /* Pure black background - darkest possible */
     --page-background: #000000; /* Pure black page background */
+    --screen-background: #2A2A2A; /* Dark gray for screen contrast */
     --structural-dark: #0A0A0A; /* Slightly lighter black for depth */
     --bleed: 0.125in; /* Standard bleed for professional printing */
 }
@@ -41,7 +42,7 @@ body {
     font-size: 11pt;
     line-height: 1.4;
     color: var(--text-color);
-    background: #2A2A2A; /* Darker gray background to contrast with black pages */
+    background: var(--screen-background); /* Dark gray background to contrast with black pages */
     padding: 1rem;
 }
 
@@ -403,7 +404,7 @@ td {
 /* Screen-only styling for gray background to contrast pages */
 @media screen {
     body {
-        background: #2A2A2A; /* Dark gray background for better contrast */
+        background: var(--screen-background); /* Dark gray background for better contrast */
         min-height: 100vh;
     }
     
