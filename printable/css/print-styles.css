@@ -1,0 +1,598 @@
+/* OpenTransition Printable Journal - Print Styles */
+/* Optimized for VistaPrint Custom Flyers - 5.5" x 8.5" Half-Letter Size */
+/* Half-letter paper with bleed for professional printing */
+
+/* Google Fonts - Montserrat */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    /* OpenTransition Brand Colors - Maximum Dark Mode */
+    --primary-color: #E68322;
+    --primary-light: #FCF4ED;
+    --primary-dark: #BC5A1E;
+    --secondary-color: #F9B21E;
+    --secondary-light: #FFF8E7;
+    --tertiary-color: #BC5A1E;
+    --tertiary-light: #FFEEDD;
+    --text-color: #FFFFFF; /* Pure white text for maximum contrast */
+    --text-light: #E0E0E0; /* Very light gray for secondary text */
+    --border-color: #444444; /* Dark borders */
+    --background: #000000; /* Pure black background - darkest possible */
+    --page-background: #000000; /* Pure black page background */
+    --screen-background: #2A2A2A; /* Dark gray for screen contrast */
+    --structural-dark: #0A0A0A; /* Slightly lighter black for depth */
+    --bleed: 0.125in; /* Standard bleed for professional printing */
+    
+    /* Pride Flag Colors for Rainbow Divider */
+    --pride-red: #E40303;
+    --pride-orange: #FF8C00;
+    --pride-yellow: #FFED00;
+    --pride-green: #008026;
+    --pride-blue: #24408E;
+    --pride-purple: #732982;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* VistaPrint Custom Flyer format - 5.5"x8.5" with bleed */
+@page {
+    size: 5.75in 8.75in; /* 5.5"x8.5" + 0.125" bleed on all sides */
+    margin: 0;
+    marks: crop; /* Add crop marks for trimming */
+}
+
+body {
+    font-family: 'Montserrat', 'Arial', 'Helvetica', sans-serif;
+    font-size: 11pt;
+    line-height: 1.4;
+    color: var(--text-color);
+    background: var(--screen-background); /* Dark gray background to contrast with black pages */
+    padding: 1rem;
+}
+
+/* Page structure - VistaPrint Custom Flyer format (5.5"x8.5") */
+.page {
+    width: 5.75in; /* 5.5" + 0.125" bleed on each side */
+    height: 8.75in; /* 8.5" + 0.125" bleed on each side */
+    padding: 0.625in 0.525in; /* 0.5in + 0.125in bleed margins */
+    page-break-after: always;
+    position: relative;
+    background: var(--page-background);
+    margin: 0 auto 1rem auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    /* Bleed area extends beyond trim line */
+    background-clip: padding-box;
+}
+
+.page:last-child {
+    page-break-after: auto;
+}
+
+/* Decorative corner flourishes */
+.corner-flourish {
+    position: absolute;
+    width: 0.75in;
+    height: 0.75in;
+    pointer-events: none;
+}
+
+.corner-flourish.top-left {
+    top: calc(var(--bleed) + 0.15in);
+    left: calc(var(--bleed) + 0.15in);
+    border-top: 3px solid var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+    border-top-left-radius: 5px;
+}
+
+.corner-flourish.top-left::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+.corner-flourish.top-right {
+    top: calc(var(--bleed) + 0.15in);
+    right: calc(var(--bleed) + 0.15in);
+    border-top: 3px solid var(--primary-color);
+    border-right: 3px solid var(--primary-color);
+    border-top-right-radius: 5px;
+}
+
+.corner-flourish.top-right::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+.corner-flourish.bottom-left {
+    bottom: calc(var(--bleed) + 0.15in);
+    left: calc(var(--bleed) + 0.15in);
+    border-bottom: 3px solid var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+    border-bottom-left-radius: 5px;
+}
+
+.corner-flourish.bottom-left::before {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+.corner-flourish.bottom-right {
+    bottom: calc(var(--bleed) + 0.15in);
+    right: calc(var(--bleed) + 0.15in);
+    border-bottom: 3px solid var(--primary-color);
+    border-right: 3px solid var(--primary-color);
+    border-bottom-right-radius: 5px;
+}
+
+.corner-flourish.bottom-right::before {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+}
+
+/* Rainbow divider - Pride flag colors */
+.rainbow-divider {
+    height: 8px;
+    background: linear-gradient(to right, 
+        var(--pride-red) 0%, var(--pride-red) 16.66%,
+        var(--pride-orange) 16.66%, var(--pride-orange) 33.33%,
+        var(--pride-yellow) 33.33%, var(--pride-yellow) 50%,
+        var(--pride-green) 50%, var(--pride-green) 66.66%,
+        var(--pride-blue) 66.66%, var(--pride-blue) 83.33%,
+        var(--pride-purple) 83.33%, var(--pride-purple) 100%
+    );
+    margin: 0.2in 0;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Decorative divider with accent circles */
+.decorative-divider {
+    position: relative;
+    height: 3px;
+    background: linear-gradient(to right, 
+        transparent 0%, 
+        var(--primary-color) 10%, 
+        var(--primary-color) 90%, 
+        transparent 100%
+    );
+    margin: 0.15in 0;
+}
+
+.decorative-divider::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--page-background), 0 0 0 6px var(--primary-color);
+}
+
+.decorative-divider::after {
+    content: '★';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--secondary-color);
+    font-size: 20px;
+    text-shadow: 0 0 8px var(--secondary-color);
+}
+
+/* Headers */
+h1 {
+    font-size: 24pt;
+    color: var(--primary-color);
+    margin-bottom: 0.3in;
+    text-align: center;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(230, 131, 34, 0.3);
+}
+
+h2 {
+    font-size: 16pt;
+    color: var(--secondary-color);
+    margin-bottom: 0.2in;
+    margin-top: 0.2in;
+    padding-bottom: 0.1in;
+    position: relative;
+    font-weight: 600;
+}
+
+h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(to right, 
+        var(--primary-color) 0%, 
+        var(--secondary-color) 50%, 
+        var(--primary-color) 100%
+    );
+}
+
+h3 {
+    font-size: 12pt;
+    color: var(--secondary-color);
+    margin-bottom: 0.1in;
+    margin-top: 0.15in;
+    font-weight: 600;
+}
+
+/* Text elements */
+p {
+    margin-bottom: 0.1in;
+    text-align: justify;
+}
+
+.subtitle {
+    font-size: 14pt;
+    color: var(--text-light);
+    text-align: center;
+    margin-bottom: 0.2in;
+}
+
+.intro-text {
+    font-size: 10pt;
+    line-height: 1.5;
+    margin-bottom: 0.15in;
+}
+
+/* Photo boxes - Maximum dark with white writing areas */
+.photo-box {
+    border: 2px solid var(--primary-color);
+    min-height: 2.5in;
+    margin-bottom: 0.2in;
+    padding: 0.15in;
+    background: var(--structural-dark); /* Very dark background */
+}
+
+.photo-placeholder {
+    border: 2px dashed var(--primary-color);
+    min-height: 2in;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF; /* White for attaching photos */
+    color: #000000; /* Black text on white */
+    font-size: 10pt;
+    margin-bottom: 0.1in;
+}
+
+.photo-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.1in;
+}
+
+.photo-label {
+    font-size: 9pt;
+    color: var(--text-light);
+    margin-right: 0.1in;
+}
+
+.photo-input {
+    border-bottom: 2px solid var(--primary-color);
+    flex: 1;
+    min-height: 0.2in;
+    background: #FFFFFF; /* White for writing */
+    padding: 0.02in;
+}
+
+/* Date and info fields */
+.info-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.1in;
+}
+
+.info-label {
+    font-weight: bold;
+    font-size: 10pt;
+    min-width: 1in;
+    color: var(--text-color);
+}
+
+.info-field {
+    border-bottom: 2px solid var(--primary-color);
+    flex: 1;
+    min-height: 0.25in;
+    background: #FFFFFF; /* White background for writing */
+    padding: 0.05in;
+}
+
+/* Milestone boxes - Maximum dark with white writing */
+.milestone-box {
+    border: 2px solid var(--primary-color);
+    border-left: 4px solid var(--primary-color);
+    padding: 0.15in;
+    margin-bottom: 0.2in;
+    background: var(--structural-dark); /* Very dark background */
+}
+
+.milestone-title {
+    font-weight: bold;
+    font-size: 11pt;
+    color: var(--primary-color);
+    margin-bottom: 0.08in;
+}
+
+.milestone-date {
+    font-size: 9pt;
+    color: var(--text-light);
+    margin-bottom: 0.1in;
+}
+
+.milestone-notes {
+    border: 1px solid var(--primary-color);
+    min-height: 0.8in;
+    background: #FFFFFF; /* White for writing */
+    padding: 0.05in;
+    color: #000000; /* Black text on white */
+}
+
+/* Lists */
+ul {
+    margin-left: 0.3in;
+    margin-bottom: 0.15in;
+}
+
+li {
+    margin-bottom: 0.05in;
+    line-height: 1.4;
+}
+
+/* Checkboxes */
+.checkbox-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 0.08in;
+}
+
+.checkbox {
+    width: 0.15in;
+    height: 0.15in;
+    border: 2px solid var(--primary-color);
+    margin-right: 0.1in;
+    flex-shrink: 0;
+    background: #FFFFFF; /* White checkbox for checking off */
+}
+
+/* Tables - Colorful headers on dark */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.2in;
+}
+
+th, td {
+    border: 1px solid var(--border-color);
+    padding: 0.08in;
+    text-align: left;
+    font-size: 9pt;
+}
+
+th {
+    background: var(--primary-color);
+    color: #FFFFFF;
+    font-weight: bold;
+}
+
+td {
+    background: #FFFFFF; /* White for writing */
+    color: #000000; /* Black text on white */
+}
+
+/* Calendar grid - Vibrant colors */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.02in;
+    margin-bottom: 0.2in;
+}
+
+.calendar-day {
+    border: 1px solid var(--primary-color);
+    min-height: 0.4in;
+    padding: 0.05in;
+    font-size: 8pt;
+    background: #FFFFFF; /* White for writing */
+    color: #000000; /* Black text on white */
+}
+
+.calendar-header {
+    background: var(--secondary-color);
+    color: #1F1F1F;
+    font-weight: bold;
+    text-align: center;
+    padding: 0.05in;
+    font-size: 9pt;
+}
+
+/* Footer */
+.page-footer {
+    position: absolute;
+    bottom: 0.3in;
+    left: 0.4in;
+    right: 0.4in;
+    text-align: center;
+    font-size: 8pt;
+    color: var(--text-light);
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.05in;
+}
+
+/* Progress tracker - Maximum dark with vibrant gradient */
+.progress-bar {
+    width: 100%;
+    height: 0.2in;
+    border: 2px solid var(--primary-color);
+    margin-bottom: 0.1in;
+    background: var(--structural-dark);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    width: 0%;
+}
+
+/* Tips box - Yellow accent on dark */
+.tip-box {
+    border: 2px solid var(--secondary-color);
+    border-radius: 0.1in;
+    padding: 0.15in;
+    margin: 0.15in 0;
+    background: rgba(249, 178, 30, 0.15);
+    color: var(--text-color);
+}
+
+.tip-icon {
+    font-weight: bold;
+    color: var(--secondary-color);
+    font-size: 11pt;
+}
+
+/* Cover page specific */
+.cover-page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.cover-title {
+    font-size: 36pt;
+    color: var(--primary-color);
+    margin-bottom: 0.2in;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 8px rgba(230, 131, 34, 0.4), 0 0 20px rgba(230, 131, 34, 0.2);
+}
+
+.cover-subtitle {
+    font-size: 18pt;
+    color: var(--text-light);
+    margin-bottom: 0.4in;
+    font-weight: 300;
+    letter-spacing: 1px;
+}
+
+.cover-info {
+    font-size: 11pt;
+    color: var(--text-color);
+    margin-bottom: 0.1in;
+}
+
+/* Decorative elements - Vibrant colors */
+.divider {
+    border-top: 3px solid var(--secondary-color);
+    margin: 0.2in 0;
+}
+
+.highlight-box {
+    background: rgba(230, 131, 34, 0.2);
+    padding: 0.1in;
+    margin: 0.1in 0;
+    border-left: 4px solid var(--primary-color);
+    color: var(--text-color);
+}
+
+/* Print-specific overrides for VistaPrint custom flyers - Maximum Dark Mode */
+@media print {
+    body {
+        background: #000000; /* Pure black background */
+        padding: 0;
+        color: #FFFFFF; /* Pure white text */
+    }
+    
+    .page {
+        page-break-inside: avoid;
+        box-shadow: none;
+        margin: 0;
+        /* Ensure full bleed extends to page edge */
+        width: 5.75in;
+        height: 8.75in;
+        background: #000000; /* Pure black page background */
+        color: #FFFFFF; /* Pure white text */
+    }
+    
+    .no-print {
+        display: none;
+    }
+    
+    /* Force maximum dark printing - Critical for VistaPrint */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    /* Ensure pure black backgrounds print */
+    .page::before {
+        display: none; /* Hide bleed indicator when printing */
+    }
+    
+    /* Disable text shadows for reliable printing */
+    h1, .cover-title, .decorative-divider::after {
+        text-shadow: none !important;
+    }
+}
+
+/* Screen-only styling for gray background to contrast pages */
+@media screen {
+    body {
+        background: var(--screen-background); /* Dark gray background for better contrast */
+        min-height: 100vh;
+    }
+    
+    .page {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+        /* Show trim line on screen for reference */
+        outline: 2px dashed rgba(230, 131, 34, 0.4);
+        outline-offset: -0.125in;
+    }
+    
+    .page::before {
+        content: 'Bleed area (will be trimmed) - 5.5" × 8.5" custom flyer format';
+        position: absolute;
+        top: 0.02in;
+        left: 0.02in;
+        font-size: 6pt;
+        color: rgba(230, 131, 34, 0.6);
+        pointer-events: none;
+    }
+}
