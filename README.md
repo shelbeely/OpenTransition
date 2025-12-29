@@ -49,6 +49,29 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 - 🔄 **Import Backups** - Import data from the original TransTracks app
 - 🎨 **Customizable** - Multiple themes and personalization options
 - ⌚ **Wear OS Companion** - Access key features from your smartwatch
+- 📖 **Printable Journal** - Physical tracking journal for 5.5" x 8.5" paper (NEW!)
+
+- 📖 **Printable Journal** - Physical tracking journal for 5.5" x 8.5" paper (NEW!)
+
+## 📖 Printable Journal
+
+Want a physical version you can hold in your hands? OpenTransition now includes a **printable journal** designed for 5.5" x 8.5" paper (half-letter size).
+
+The printable journal includes:
+- 📸 Photo tracking pages for face, body, and custom areas
+- 🎯 Milestone documentation pages (medical, legal, social, personal)
+- 📊 Progress comparison pages
+- 📅 Monthly calendars and medication trackers
+- 💭 Reflection and goal-setting pages
+- 📝 Notes pages for journaling
+
+**Get Started:**
+- 📂 Find it in the `/printable` directory
+- 🌐 Open `printable/instructions.html` for detailed print instructions
+- 📄 Read `printable/README.md` for full documentation
+- 🔗 [Documentation](https://shelbeely.github.io/OpenTransition/user-guide/printable-journal/)
+
+Perfect for creating a tangible keepsake of your journey or for situations where digital privacy is a concern.
 
 ## 🔄 Importing from TransTracks
 

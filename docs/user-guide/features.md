@@ -48,6 +48,14 @@ Record important events in your journey:
 - Custom milestone types
 - Personalized experience
 
+### 📖 Printable Journal (NEW!)
+- **Physical Tracking**: Print-friendly journal for 5.5" × 8.5" paper
+- **Comprehensive Templates**: Photo pages, milestone tracking, calendars
+- **Tangible Keepsake**: Create a physical record of your journey
+- **Privacy Option**: Alternative to digital tracking
+
+[Learn more about the printable journal →](printable-journal.md)
+
 ## Coming Soon
 
 Features planned for future releases:
