@@ -22,6 +22,14 @@
     --screen-background: #2A2A2A; /* Dark gray for screen contrast */
     --structural-dark: #0A0A0A; /* Slightly lighter black for depth */
     --bleed: 0.125in; /* Standard bleed for professional printing */
+    
+    /* Pride Flag Colors for Rainbow Divider */
+    --pride-red: #E40303;
+    --pride-orange: #FF8C00;
+    --pride-yellow: #FFED00;
+    --pride-green: #008026;
+    --pride-blue: #24408E;
+    --pride-purple: #732982;
 }
 
 * {
@@ -152,12 +160,12 @@ body {
 .rainbow-divider {
     height: 8px;
     background: linear-gradient(to right, 
-        #E40303 0%, #E40303 16.66%,
-        #FF8C00 16.66%, #FF8C00 33.33%,
-        #FFED00 33.33%, #FFED00 50%,
-        #008026 50%, #008026 66.66%,
-        #24408E 66.66%, #24408E 83.33%,
-        #732982 83.33%, #732982 100%
+        var(--pride-red) 0%, var(--pride-red) 16.66%,
+        var(--pride-orange) 16.66%, var(--pride-orange) 33.33%,
+        var(--pride-yellow) 33.33%, var(--pride-yellow) 50%,
+        var(--pride-green) 50%, var(--pride-green) 66.66%,
+        var(--pride-blue) 66.66%, var(--pride-blue) 83.33%,
+        var(--pride-purple) 83.33%, var(--pride-purple) 100%
     );
     margin: 0.2in 0;
     border-radius: 4px;
@@ -191,7 +199,7 @@ body {
 }
 
 .decorative-divider::after {
-    content: '✦';
+    content: '★';
     position: absolute;
     left: 50%;
     top: 50%;
@@ -556,6 +564,11 @@ td {
     /* Ensure pure black backgrounds print */
     .page::before {
         display: none; /* Hide bleed indicator when printing */
+    }
+    
+    /* Disable text shadows for reliable printing */
+    h1, .cover-title, .decorative-divider::after {
+        text-shadow: none !important;
     }
 }
 
