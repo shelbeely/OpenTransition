@@ -80,7 +80,7 @@ The printable journal is located in the `printable/` directory of the OpenTransi
 3. **Upload to VistaPrint**: Go to [vistaprint.com/flyers](https://www.vistaprint.com/marketing-materials/flyers)
 4. **Select size**: 5.5" × 8.5" flyers
 5. **Order 25+ each**: Minimum 25 copies per page design
-6. **Choose paper**: 100 lb gloss cover, matte finish (recommended)
+6. **Choose paper**: 100 lb matte cover, matte finish - allows writing! (recommended)
 7. **Add 3-hole punch**: For easy binding in 5.5" × 8.5" binders
 8. **Assemble journals**: Mix and match pages when they arrive!
 

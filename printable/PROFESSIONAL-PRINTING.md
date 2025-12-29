@@ -12,10 +12,10 @@ This guide explains how to create a **personalized OpenTransition Journal** usin
 - **Format**: Individual flyer pages (not a booklet)
 - **Color**: Full color (CMYK)
 - **Paper Options**: 
-  - 80 lb gloss text
-  - 100 lb gloss cover
-  - 14 pt cardstock (premium)
-- **Finishing**: Optional UV coating, matte, or uncoated
+  - 80 lb matte text
+  - 100 lb matte cover
+  - 14 pt matte cardstock (premium)
+- **Finishing**: Matte finish (recommended for journaling)
 
 ### How the DIY System Works
 **VistaPrint Requirement:** Minimum of 25 copies per page design
@@ -32,6 +32,7 @@ This guide explains how to create a **personalized OpenTransition Journal** usin
 - ✅ **Flexible:** Mix and match pages to create your perfect journal
 - ✅ **Extras:** Keep spare pages for future tracking or share with community
 - ✅ **Quality:** Professional VistaPrint printing with vivid colors
+- ✅ **Writable:** Matte finish allows writing with pen or pencil  
 - ✅ **Size:** Compact 5.5" × 8.5" - portable and convenient
 
 ## 🖨️ Step-by-Step: Order from VistaPrint
@@ -77,14 +78,13 @@ For each page design PDF:
 ### Step 4: Configure Options for Each Page Type
 
 **Paper & Finish:**
-- **Budget**: 80 lb gloss text (~$0.15-0.20/flyer)
-- **Standard**: 100 lb gloss cover (~$0.20-0.25/flyer) - **RECOMMENDED**
-- **Premium**: 14 pt cardstock (~$0.30-0.40/flyer)
+- **Budget**: 80 lb matte text (~$0.15-0.20/flyer)
+- **Standard**: 100 lb matte cover (~$0.20-0.25/flyer) - **RECOMMENDED**
+- **Premium**: 14 pt matte cardstock (~$0.30-0.40/flyer)
 
 **Finishing Options:**
-- **Matte**: Easy to write on, no glare (**RECOMMENDED** for journaling)
-- **UV Coating**: Shiny, fingerprint resistant
-- **Uncoated**: Most natural, best for writing notes
+- **Matte**: Easy to write on with pen or pencil, no glare (**RECOMMENDED** for journaling - allows writing!)
+- **Uncoated**: Most natural, also allows writing with any pen type
 
 **Additional Services:**
 - **3-Hole Punch**: Perfect for 5.5" × 8.5" 3-ring binders ($1-2 extra per set)
@@ -121,9 +121,9 @@ If you order 3 different page designs (e.g., Photo Tracking, Monthly Calendar, N
 
 | Paper Type | Cost per Flyer | Per Page Type (25) | Total (3 types = 75 flyers) |
 |-----------|----------------|-------------------|---------------------------|
-| 80 lb Gloss | $0.15 | ~$3.75 | ~$11.25 |
-| 100 lb Cover | $0.20 | ~$5.00 | ~$15.00 |
-| 14 pt Cardstock | $0.32 | ~$8.00 | ~$24.00 |
+| 80 lb Matte | $0.15 | ~$3.75 | ~$11.25 |
+| 100 lb Matte | $0.20 | ~$5.00 | ~$15.00 |
+| 14 pt Matte Cardstock | $0.32 | ~$8.00 | ~$24.00 |
 
 *Add ~$1-2 per set for 3-hole punch if desired*
 
@@ -138,9 +138,9 @@ If you order 5 different page designs (e.g., Photo Face, Photo Body, Milestones,
 
 | Paper Type | Cost per Flyer | Per Page Type (25) | Total (5 types = 125 flyers) |
 |-----------|----------------|-------------------|----------------------------|
-| 80 lb Gloss | $0.14 | ~$3.50 | ~$17.50 |
-| 100 lb Cover | $0.18 | ~$4.50 | ~$22.50 |
-| 14 pt Cardstock | $0.28 | ~$7.00 | ~$35.00 |
+| 80 lb Matte | $0.14 | ~$3.50 | ~$17.50 |
+| 100 lb Matte | $0.18 | ~$4.50 | ~$22.50 |
+| 14 pt Matte Cardstock | $0.28 | ~$7.00 | ~$35.00 |
 
 **What you get:**
 - 25 copies of each page type (125 flyers total)
@@ -225,7 +225,7 @@ Order just 2-3 page types to start:
 ```
 Page Types: Photo Tracking + Monthly Calendar + Notes
 Size: 5.5" × 8.5"
-Paper: 100 lb Gloss Cover
+Paper: 100 lb Matte Cover
 Finish: Matte
 Quantity: 25 copies per page type (75 flyers total)
 Add-ons: 3-hole punch
@@ -239,7 +239,7 @@ Order 5-7 different page types:
 Page Types: Face Photos, Body Photos, Milestones, Calendar, 
             Reflection, Notes, Resources
 Size: 5.5" × 8.5"
-Paper: 100 lb Gloss Cover
+Paper: 100 lb Matte Cover
 Finish: Matte
 Quantity: 25 copies per page type (175 flyers total)
 Add-ons: 3-hole punch, shrink wrap per set
@@ -252,7 +252,7 @@ Order popular page types with higher quantities:
 ```
 Page Types: Photo Tracking, Milestones, Calendar, Notes
 Size: 5.5" × 8.5"
-Paper: 100 lb Gloss Cover
+Paper: 100 lb Matte Cover
 Finish: Matte
 Quantity: 50 copies per page type (200 flyers total)
 Add-ons: 3-hole punch, shrink wrap per set
@@ -264,8 +264,8 @@ Result: Enough for 8-12 journals to gift or sell
 For journals you plan to give or sell:
 ```
 Size: 5.5" × 8.5"
-Paper: 14 pt Cardstock
-Finish: UV Gloss or Matte
+Paper: 14 pt Matte Cardstock
+Finish: Matte
 Quantity: 25-50 copies per page type
 Add-ons: 3-hole punch, rounded corners, shrink wrap
 Cost: ~$60-100 total
@@ -458,7 +458,7 @@ Format: VistaPrint Individual Flyers
 Size: 5.5" × 8.5" (half-letter)
 PDF with Bleed: 5.75" × 8.75"
 Minimum Order: 25 copies per page design
-Recommended Paper: 100 lb gloss cover, matte finish
+Recommended Paper: 100 lb matte cover, matte finish
 Add-ons: 3-hole punch (for binders)
 Binding: 5.5" × 8.5" junior 3-ring binder or spiral
 
