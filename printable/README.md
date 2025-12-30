@@ -61,7 +61,27 @@ Since VistaPrint requires a **minimum of 25 copies** per page design, this syste
 
 ## 🖨️ How to Print
 
-### Quick Start
+### ✨ NEW: Interactive Journal Builder
+
+**The easiest way to create your custom journal!**
+
+1. **Open** `builder.html` in your web browser
+2. **Select** which pages you want (checkboxes for each page type)
+3. **Choose quantities** for each page type
+4. **Generate PDFs**:
+   - **Home Printing**: One PDF with all selected pages
+   - **VistaPrint**: Separate PDFs for each page type (ready for 25+ quantity orders)
+5. **Print** using your browser or VistaPrint
+
+**Benefits:**
+- 🎯 **Customizable** - Only print what you need
+- 📊 **Smart** - Automatic quantity validation for VistaPrint
+- 💾 **Easy** - No command-line tools needed
+- 🔄 **Flexible** - Create different journal configurations
+
+### Traditional Method: Print Full Journal (All 30 Pages)
+
+#### Quick Start
 
 1. **Open** `index.html` in your web browser (Chrome, Firefox, Safari, or Edge)
 2. **Print** using your browser's print function (Ctrl+P or Cmd+P)

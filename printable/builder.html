@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenTransition Journal Builder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #E68322, #BC5A1E);
+            color: white;
+            padding: 2rem 3rem;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+            min-height: 600px;
+        }
+        
+        .page-selector {
+            padding: 2rem;
+            border-right: 2px solid #f0f0f0;
+            overflow-y: auto;
+            max-height: 70vh;
+        }
+        
+        .sidebar {
+            background: #fafafa;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        
+        h2 {
+            color: #E68322;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #FCF4ED;
+        }
+        
+        .page-category {
+            margin-bottom: 2rem;
+        }
+        
+        .page-category h3 {
+            color: #BC5A1E;
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .page-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            background: #fafafa;
+            transition: all 0.2s;
+        }
+        
+        .page-item:hover {
+            background: #FCF4ED;
+            transform: translateX(4px);
+        }
+        
+        .page-item input[type="checkbox"] {
+            margin-right: 1rem;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        
+        .page-item input[type="number"] {
+            width: 60px;
+            padding: 0.25rem 0.5rem;
+            margin-left: auto;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .page-item-content {
+            flex: 1;
+        }
+        
+        .page-item-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.25rem;
+        }
+        
+        .page-item-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .summary-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 2px solid #E68322;
+        }
+        
+        .summary-box h3 {
+            color: #E68322;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            color: #666;
+        }
+        
+        .summary-value {
+            font-weight: 600;
+            color: #E68322;
+        }
+        
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #E68322, #BC5A1E);
+            color: white;
+            box-shadow: 0 4px 12px rgba(230, 131, 34, 0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(230, 131, 34, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #F9B21E, #E68322);
+            color: white;
+            box-shadow: 0 4px 12px rgba(249, 178, 30, 0.3);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 178, 30, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        
+        .info-box {
+            background: #FFF8E7;
+            border-left: 4px solid #F9B21E;
+            padding: 1rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .selected-pages {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+        
+        .selected-page-item {
+            padding: 0.5rem;
+            margin-bottom: 0.25rem;
+            background: #fafafa;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .remove-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-selector {
+                border-right: none;
+                border-bottom: 2px solid #f0f0f0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌈 OpenTransition Journal Builder</h1>
+            <p>Build your custom printable journal - Select pages, choose order, generate PDFs</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="page-selector">
+                <h2>📄 Select Pages</h2>
+                
+                <div class="page-category">
+                    <h3>Essential Pages</h3>
+                    <div class="page-item">
+                        <input type="checkbox" id="cover" data-page-type="cover" data-category="essential">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Cover Page</div>
+                            <div class="page-item-desc">Journal cover with personalization</div>
+                        </div>
+                        <input type="number" min="1" max="5" value="1" class="quantity-input" data-for="cover">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="intro" data-page-type="intro" data-category="essential">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Introduction</div>
+                            <div class="page-item-desc">Welcome and purpose of the journal</div>
+                        </div>
+                        <input type="number" min="1" max="5" value="1" class="quantity-input" data-for="intro">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="instructions" data-page-type="instructions" data-category="essential">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Getting Started</div>
+                            <div class="page-item-desc">How to use this journal</div>
+                        </div>
+                        <input type="number" min="1" max="5" value="1" class="quantity-input" data-for="instructions">
+                    </div>
+                </div>
+                
+                <div class="page-category">
+                    <h3>Photo Tracking (Popular for VistaPrint)</h3>
+                    <div class="page-item">
+                        <input type="checkbox" id="photo-face" data-page-type="photo-face" data-category="photo" checked>
+                        <div class="page-item-content">
+                            <div class="page-item-title">Face Photo Tracking</div>
+                            <div class="page-item-desc">Track facial changes (5 pages in original)</div>
+                        </div>
+                        <input type="number" min="1" max="50" value="5" class="quantity-input" data-for="photo-face">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="photo-body" data-page-type="photo-body" data-category="photo" checked>
+                        <div class="page-item-content">
+                            <div class="page-item-title">Body Photo Tracking</div>
+                            <div class="page-item-desc">Document overall progress (3 pages in original)</div>
+                        </div>
+                        <input type="number" min="1" max="50" value="3" class="quantity-input" data-for="photo-body">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="photo-custom" data-page-type="photo-custom" data-category="photo">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Custom Area Tracking</div>
+                            <div class="page-item-desc">Blank templates for specific areas (3 pages)</div>
+                        </div>
+                        <input type="number" min="1" max="50" value="3" class="quantity-input" data-for="photo-custom">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="comparison" data-page-type="comparison" data-category="photo">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Progress Comparison</div>
+                            <div class="page-item-desc">Side-by-side progress views</div>
+                        </div>
+                        <input type="number" min="1" max="10" value="1" class="quantity-input" data-for="comparison">
+                    </div>
+                </div>
+                
+                <div class="page-category">
+                    <h3>Milestones</h3>
+                    <div class="page-item">
+                        <input type="checkbox" id="milestone-general" data-page-type="milestone-general" data-category="milestone" checked>
+                        <div class="page-item-content">
+                            <div class="page-item-title">General Milestones</div>
+                            <div class="page-item-desc">Track any important events</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="milestone-general">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="milestone-medical" data-page-type="milestone-medical" data-category="milestone">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Medical Milestones</div>
+                            <div class="page-item-desc">HRT, appointments, procedures</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="milestone-medical">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="milestone-legal" data-page-type="milestone-legal" data-category="milestone">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Legal Milestones</div>
+                            <div class="page-item-desc">Name change, gender marker updates</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="milestone-legal">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="milestone-social" data-page-type="milestone-social" data-category="milestone">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Social Milestones</div>
+                            <div class="page-item-desc">Coming out, first days presenting</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="milestone-social">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="milestone-personal" data-page-type="milestone-personal" data-category="milestone">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Personal Victories</div>
+                            <div class="page-item-desc">Celebrate your achievements</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="milestone-personal">
+                    </div>
+                </div>
+                
+                <div class="page-category">
+                    <h3>Organization (Great for VistaPrint - Reusable)</h3>
+                    <div class="page-item">
+                        <input type="checkbox" id="calendar" data-page-type="calendar" data-category="organization" checked>
+                        <div class="page-item-content">
+                            <div class="page-item-title">Monthly Calendar</div>
+                            <div class="page-item-desc">Blank calendar template (reusable!)</div>
+                        </div>
+                        <input type="number" min="1" max="50" value="2" class="quantity-input" data-for="calendar">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="medication" data-page-type="medication" data-category="organization">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Medication Tracker</div>
+                            <div class="page-item-desc">Track medications and dosages</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="medication">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="appointments" data-page-type="appointments" data-category="organization">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Appointment Tracker</div>
+                            <div class="page-item-desc">Log appointments and outcomes</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="appointments">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="resources" data-page-type="resources" data-category="organization">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Resources & Contacts</div>
+                            <div class="page-item-desc">Important contacts and resources</div>
+                        </div>
+                        <input type="number" min="1" max="10" value="1" class="quantity-input" data-for="resources">
+                    </div>
+                </div>
+                
+                <div class="page-category">
+                    <h3>Reflection & Notes (Perfect for VistaPrint)</h3>
+                    <div class="page-item">
+                        <input type="checkbox" id="reflection" data-page-type="reflection" data-category="reflection" checked>
+                        <div class="page-item-content">
+                            <div class="page-item-title">Monthly Reflection</div>
+                            <div class="page-item-desc">Document thoughts and feelings</div>
+                        </div>
+                        <input type="number" min="1" max="50" value="1" class="quantity-input" data-for="reflection">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="goals" data-page-type="goals" data-category="reflection">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Goals & Intentions</div>
+                            <div class="page-item-desc">Set and track personal goals</div>
+                        </div>
+                        <input type="number" min="1" max="20" value="1" class="quantity-input" data-for="goals">
+                    </div>
+                    
+                    <div class="page-item">
+                        <input type="checkbox" id="notes" data-page-type="notes" data-category="reflection" checked>
+                        <div class="page-item-content">
+                            <div class="page-item-title">Blank Notes Pages</div>
+                            <div class="page-item-desc">Free-form journaling (3 pages)</div>
+                        </div>
+                        <input type="number" min="1" max="50" value="3" class="quantity-input" data-for="notes">
+                    </div>
+                </div>
+                
+                <div class="page-category">
+                    <h3>Finishing Touches</h3>
+                    <div class="page-item">
+                        <input type="checkbox" id="back-cover" data-page-type="back-cover" data-category="finishing">
+                        <div class="page-item-content">
+                            <div class="page-item-title">Back Cover</div>
+                            <div class="page-item-desc">Closing message</div>
+                        </div>
+                        <input type="number" min="1" max="5" value="1" class="quantity-input" data-for="back-cover">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar">
+                <div class="summary-box">
+                    <h3>📊 Journal Summary</h3>
+                    <div class="summary-item">
+                        <span class="summary-label">Selected Pages:</span>
+                        <span class="summary-value" id="selected-count">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Total Pages:</span>
+                        <span class="summary-value" id="total-pages">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span class="summary-label">Page Types:</span>
+                        <span class="summary-value" id="page-types">0</span>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> For VistaPrint orders, you need 25+ copies per page type. Adjust quantities accordingly!
+                </div>
+                
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="generateHomePDF()" id="btn-home">
+                        🏠 Generate Home Printing PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateVistaPrintPDFs()" id="btn-vista">
+                        🏢 Generate VistaPrint PDFs
+                    </button>
+                    <button class="btn btn-secondary" onclick="previewJournal()" id="btn-preview">
+                        👁️ Preview Journal
+                    </button>
+                </div>
+                
+                <div class="info-box">
+                    <strong>📝 Note:</strong> PDFs will open in a new window. Use your browser's print function to save or print.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update summary when selections change
+        function updateSummary() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            const selectedCheckboxes = Array.from(checkboxes).filter(cb => cb.checked);
+            const pageTypes = new Set(selectedCheckboxes.map(cb => cb.dataset.pageType));
+            
+            let totalPages = 0;
+            selectedCheckboxes.forEach(cb => {
+                const quantityInput = document.querySelector(`input[data-for="${cb.id}"]`);
+                totalPages += parseInt(quantityInput.value) || 1;
+            });
+            
+            document.getElementById('selected-count').textContent = selectedCheckboxes.length;
+            document.getElementById('total-pages').textContent = totalPages;
+            document.getElementById('page-types').textContent = pageTypes.size;
+            
+            // Enable/disable buttons
+            const hasSelection = selectedCheckboxes.length > 0;
+            document.getElementById('btn-home').disabled = !hasSelection;
+            document.getElementById('btn-vista').disabled = !hasSelection;
+            document.getElementById('btn-preview').disabled = !hasSelection;
+        }
+        
+        // Add event listeners to all checkboxes and quantity inputs
+        document.querySelectorAll('input[type="checkbox"], input[type="number"]').forEach(input => {
+            input.addEventListener('change', updateSummary);
+        });
+        
+        // Generate PDF for home printing
+        function generateHomePDF() {
+            const selectedPages = getSelectedPages();
+            if (selectedPages.length === 0) {
+                alert('Please select at least one page type!');
+                return;
+            }
+            
+            // Build query string with selected pages
+            const params = new URLSearchParams();
+            selectedPages.forEach(page => {
+                params.append('pages', page.type);
+                params.append('qty_' + page.type, page.quantity);
+            });
+            params.append('mode', 'home');
+            
+            // Open preview in new window
+            window.open('preview.html?' + params.toString(), '_blank');
+        }
+        
+        // Generate PDFs for VistaPrint (one per page type)
+        function generateVistaPrintPDFs() {
+            const selectedPages = getSelectedPages();
+            if (selectedPages.length === 0) {
+                alert('Please select at least one page type!');
+                return;
+            }
+            
+            // Warn about 25-copy minimum
+            const needsAdjustment = selectedPages.filter(p => p.quantity < 25);
+            if (needsAdjustment.length > 0) {
+                const confirm = window.confirm(
+                    'VistaPrint requires 25+ copies per page type.\n\n' +
+                    'Some selections have less than 25 copies:\n' +
+                    needsAdjustment.map(p => `- ${p.type}: ${p.quantity} copies`).join('\n') +
+                    '\n\nContinue anyway?'
+                );
+                if (!confirm) return;
+            }
+            
+            // Generate separate PDF for each page type
+            selectedPages.forEach(page => {
+                const params = new URLSearchParams();
+                params.append('pages', page.type);
+                params.append('qty_' + page.type, page.quantity);
+                params.append('mode', 'vistaprint');
+                
+                setTimeout(() => {
+                    window.open('preview.html?' + params.toString(), '_blank');
+                }, 300); // Stagger window opens
+            });
+            
+            alert(`Opening ${selectedPages.length} separate PDFs (one per page type) for VistaPrint ordering.`);
+        }
+        
+        // Preview journal
+        function previewJournal() {
+            const selectedPages = getSelectedPages();
+            if (selectedPages.length === 0) {
+                alert('Please select at least one page type!');
+                return;
+            }
+            
+            const params = new URLSearchParams();
+            selectedPages.forEach(page => {
+                params.append('pages', page.type);
+                params.append('qty_' + page.type, page.quantity);
+            });
+            params.append('mode', 'preview');
+            
+            window.open('preview.html?' + params.toString(), '_blank');
+        }
+        
+        // Get selected pages with quantities
+        function getSelectedPages() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => {
+                const quantityInput = document.querySelector(`input[data-for="${cb.id}"]`);
+                return {
+                    type: cb.dataset.pageType,
+                    category: cb.dataset.category,
+                    quantity: parseInt(quantityInput.value) || 1
+                };
+            });
+        }
+        
+        // Initialize
+        updateSummary();
+    </script>
+</body>
+</html>

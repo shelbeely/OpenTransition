@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenTransition - Custom Journal Preview</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/print-styles.css">
+    <style>
+        body {
+            background: #3B3B3B;
+        }
+        
+        .builder-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        
+        .builder-controls h3 {
+            color: #E68322;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .builder-controls p {
+            margin-bottom: 0.75rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .builder-controls button {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-print {
+            background: linear-gradient(135deg, #E68322, #BC5A1E);
+            color: white;
+        }
+        
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 131, 34, 0.3);
+        }
+        
+        .btn-back {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-back:hover {
+            background: #e0e0e0;
+        }
+        
+        .info-text {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @media print {
+            .builder-controls {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="builder-controls">
+        <h3>📄 Journal Ready!</h3>
+        <p id="page-count"></p>
+        <button class="btn-print" onclick="window.print()">🖨️ Print / Save PDF</button>
+        <button class="btn-back" onclick="window.close()">← Back to Builder</button>
+        <div class="info-text" id="mode-info"></div>
+    </div>
+    
+    <div id="journal-content">
+        <!-- Journal pages will be inserted here -->
+    </div>
+    
+    <script>
+        // Page template mapping - maps page types to their HTML structure
+        const pageTemplates = {
+            'cover': `
+                <div class="page cover-page">
+                    <div class="corner-flourish top-left"></div>
+                    <div class="corner-flourish top-right"></div>
+                    <div class="corner-flourish bottom-left"></div>
+                    <div class="corner-flourish bottom-right"></div>
+                    <div>
+                        <h1 class="cover-title">OpenTransition</h1>
+                        <p class="cover-subtitle">Transition Tracking Journal</p>
+                        <div class="rainbow-divider"></div>
+                        <div class="info-row" style="margin-top: 0.5in;">
+                            <span class="info-label">Name:</span>
+                            <span class="info-field"></span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Started:</span>
+                            <span class="info-field"></span>
+                        </div>
+                        <div style="margin-top: 1in;">
+                            <p class="intro-text">
+                                This journal is your personal companion for documenting your transition journey.
+                                Use these pages to track photos, milestones, and celebrate your progress.
+                            </p>
+                            <p class="intro-text" style="font-style: italic; color: var(--text-light);">
+                                Your journey is beautiful, and every step forward deserves to be remembered. 🌈
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            `,
+            
+            'intro': `
+                <div class="page">
+                    <div class="corner-flourish top-left"></div>
+                    <div class="corner-flourish top-right"></div>
+                    <div class="corner-flourish bottom-left"></div>
+                    <div class="corner-flourish bottom-right"></div>
+                    <h1>Welcome to Your Journey</h1>
+                    <div class="decorative-divider"></div>
+                    <p class="intro-text">
+                        This printable journal is designed to help you document and celebrate your transition.
+                        Whether you're just starting or years into your journey, tracking your progress can be
+                        incredibly empowering and help you see how far you've come.
+                    </p>
+                    <h2>How to Use This Journal</h2>
+                    <h3>📸 Photo Tracking Pages</h3>
+                    <p class="intro-text">
+                        Use these pages to attach photos or draw sketches of your progress. Take photos regularly
+                        (weekly or monthly) in similar lighting and angles to best see changes over time.
+                    </p>
+                    <h3>🎯 Milestone Pages</h3>
+                    <p class="intro-text">
+                        Record important events, medical appointments, legal changes, and personal celebrations.
+                        These moments are part of your story and deserve to be remembered.
+                    </p>
+                    <div class="tip-box">
+                        <p class="tip-icon">💡 Pro Tips</p>
+                        <ul style="margin-top: 0.1in; margin-bottom: 0;">
+                            <li>Take photos in consistent lighting for best comparisons</li>
+                            <li>Use the same camera angle and distance each time</li>
+                            <li>Write notes about how you're feeling alongside photos</li>
+                            <li>Celebrate small victories - every change matters!</li>
+                            <li>Keep this journal in a safe, private place</li>
+                        </ul>
+                    </div>
+                    <div class="page-footer">OpenTransition Printable Journal</div>
+                </div>
+            `,
+            
+            'photo-face': `
+                <div class="page">
+                    <h1>📸 Face Photo Tracking</h1>
+                    <div class="decorative-divider"></div>
+                    <div class="photo-tracking-grid">
+                        <div class="photo-box large">
+                            <div class="photo-placeholder">Attach Photo Here</div>
+                            <div class="photo-date">Date: _____________</div>
+                        </div>
+                    </div>
+                    <div class="tracking-section">
+                        <h3>Changes Observed</h3>
+                        <div class="checkbox-grid">
+                            <div class="checkbox-item">☐ Skin texture</div>
+                            <div class="checkbox-item">☐ Facial hair</div>
+                            <div class="checkbox-item">☐ Face shape</div>
+                            <div class="checkbox-item">☐ Skin tone</div>
+                            <div class="checkbox-item">☐ Hair growth</div>
+                            <div class="checkbox-item">☐ Eye appearance</div>
+                        </div>
+                    </div>
+                    <div class="notes-section">
+                        <h3>Notes & Observations</h3>
+                        <div class="lined-area"></div>
+                    </div>
+                    <div class="page-footer">Face Photo Tracking</div>
+                </div>
+            `,
+            
+            'photo-body': `
+                <div class="page">
+                    <h1>📸 Body Photo Tracking</h1>
+                    <div class="decorative-divider"></div>
+                    <div class="photo-tracking-grid">
+                        <div class="photo-box large">
+                            <div class="photo-placeholder">Attach Photo Here</div>
+                            <div class="photo-date">Date: _____________</div>
+                        </div>
+                    </div>
+                    <div class="tracking-section">
+                        <h3>Measurements (Optional)</h3>
+                        <div class="measurement-grid">
+                            <div class="measurement-item">Chest: _______</div>
+                            <div class="measurement-item">Waist: _______</div>
+                            <div class="measurement-item">Hips: _______</div>
+                            <div class="measurement-item">Weight: _______</div>
+                        </div>
+                    </div>
+                    <div class="notes-section">
+                        <h3>Notes & Observations</h3>
+                        <div class="lined-area"></div>
+                    </div>
+                    <div class="page-footer">Body Photo Tracking</div>
+                </div>
+            `,
+            
+            'calendar': `
+                <div class="page">
+                    <h1>📅 Monthly Calendar</h1>
+                    <div class="decorative-divider"></div>
+                    <div class="calendar-header">
+                        <span class="calendar-label">Month:</span>
+                        <span class="calendar-field">_________________</span>
+                        <span class="calendar-label">Year:</span>
+                        <span class="calendar-field">_______</span>
+                    </div>
+                    <table class="calendar-table">
+                        <thead>
+                            <tr>
+                                <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                            <tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                        </tbody>
+                    </table>
+                    <div class="calendar-notes">
+                        <h3>Notes & Appointments</h3>
+                        <div class="lined-area-short"></div>
+                    </div>
+                    <div class="page-footer">Monthly Calendar</div>
+                </div>
+            `,
+            
+            'milestone-general': `
+                <div class="page">
+                    <h1>🎯 Milestones</h1>
+                    <div class="decorative-divider"></div>
+                    <div class="milestone-list">
+                        <div class="milestone-box">
+                            <div class="milestone-date">Date: _____________</div>
+                            <div class="milestone-title">Milestone: _________________________________</div>
+                            <div class="milestone-description">
+                                <p class="field-label">Description:</p>
+                                <div class="text-area"></div>
+                            </div>
+                        </div>
+                        <div class="milestone-box">
+                            <div class="milestone-date">Date: _____________</div>
+                            <div class="milestone-title">Milestone: _________________________________</div>
+                            <div class="milestone-description">
+                                <p class="field-label">Description:</p>
+                                <div class="text-area"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-footer">General Milestones</div>
+                </div>
+            `,
+            
+            'notes': `
+                <div class="page">
+                    <h1>📝 Notes</h1>
+                    <div class="decorative-divider"></div>
+                    <div class="notes-header">
+                        <span class="notes-label">Date:</span>
+                        <span class="notes-field">_________________</span>
+                    </div>
+                    <div class="lined-page">
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                        <div class="line"></div>
+                    </div>
+                    <div class="page-footer">Notes</div>
+                </div>
+            `
+        };
+        
+        // Simplified templates for other page types
+        const simpleTemplates = {
+            'instructions': { title: 'Getting Started', icon: '📖' },
+            'photo-custom': { title: 'Custom Area Tracking', icon: '📸' },
+            'comparison': { title: 'Progress Comparison', icon: '📊' },
+            'milestone-medical': { title: 'Medical Milestones', icon: '⚕️' },
+            'milestone-legal': { title: 'Legal Milestones', icon: '⚖️' },
+            'milestone-social': { title: 'Social Milestones', icon: '👥' },
+            'milestone-personal': { title: 'Personal Victories', icon: '🎉' },
+            'medication': { title: 'Medication Tracker', icon: '💊' },
+            'appointments': { title: 'Appointment Tracker', icon: '📅' },
+            'reflection': { title: 'Monthly Reflection', icon: '💭' },
+            'goals': { title: 'Goals & Intentions', icon: '🎯' },
+            'resources': { title: 'Resources & Contacts', icon: '📚' },
+            'back-cover': { title: 'Journey Continues...', icon: '🌈' }
+        };
+        
+        // Generate simple page template
+        function generateSimplePage(type) {
+            const template = simpleTemplates[type];
+            if (!template) return '';
+            
+            return `
+                <div class="page">
+                    <h1>${template.icon} ${template.title}</h1>
+                    <div class="decorative-divider"></div>
+                    <div class="content-area">
+                        <div class="lined-page">
+                            ${Array(25).fill('<div class="line"></div>').join('')}
+                        </div>
+                    </div>
+                    <div class="page-footer">${template.title}</div>
+                </div>
+            `;
+        }
+        
+        // Parse URL parameters
+        function getQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            const pages = params.getAll('pages');
+            const mode = params.get('mode') || 'preview';
+            
+            const result = [];
+            pages.forEach(pageType => {
+                const quantity = parseInt(params.get('qty_' + pageType)) || 1;
+                result.push({ type: pageType, quantity });
+            });
+            
+            return { pages: result, mode };
+        }
+        
+        // Generate journal content
+        function generateJournal() {
+            const { pages, mode } = getQueryParams();
+            const container = document.getElementById('journal-content');
+            
+            let totalPages = 0;
+            let html = '';
+            
+            pages.forEach(({ type, quantity }) => {
+                for (let i = 0; i < quantity; i++) {
+                    if (pageTemplates[type]) {
+                        html += pageTemplates[type];
+                    } else if (simpleTemplates[type]) {
+                        html += generateSimplePage(type);
+                    }
+                    totalPages++;
+                }
+            });
+            
+            container.innerHTML = html;
+            
+            // Update info
+            document.getElementById('page-count').textContent = `${totalPages} pages ready to print`;
+            
+            let modeText = '';
+            if (mode === 'home') {
+                modeText = '🏠 Home Printing Mode: Print all pages together at 5.5" × 8.5"';
+            } else if (mode === 'vistaprint') {
+                const pageType = pages[0]?.type || 'Unknown';
+                const qty = pages[0]?.quantity || 0;
+                modeText = `🏢 VistaPrint Mode: ${pageType} (${qty} copies)\nOrder as 5.5" × 8.5" matte flyers`;
+            } else {
+                modeText = '👁️ Preview Mode: Review your selection before printing';
+            }
+            document.getElementById('mode-info').textContent = modeText;
+        }
+        
+        // Initialize
+        generateJournal();
+    </script>
+</body>
+</html>
