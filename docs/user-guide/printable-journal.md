@@ -12,6 +12,7 @@ The printable journal is designed for **5.5" × 8.5" paper** (half-letter size) 
     - Creating a tangible keepsake
     - Situations where digital privacy is a concern
     - Gift giving to support friends on their journey
+    - **Creating premade journal sets to sell or share**
 
 ## What's Included
 
@@ -48,7 +49,44 @@ The printable journal is located in the `printable/` directory of the OpenTransi
 2. **Clone the Repository**: If you have the app source code, find it in the `printable/` folder
 3. **Download Individual Files**: Download `index.html` and the `css/` folder
 
-## How to Print
+## Professional Printing with VistaPrint
+
+!!! success "DIY Flyer System for Custom Journals"
+    The journal now uses a **DIY flyer-based approach** for professional printing!
+    
+    **How it works:**
+    
+    1. **Choose** which page types you want (photo tracking, milestones, calendars, notes)
+    2. **Order** 25+ copies of each page type as 5.5" × 8.5" flyers from VistaPrint
+    3. **Build** custom journals by selecting pages from each batch
+    4. **Share or sell** extras as premade journal sets
+    
+    **Why this system?**
+    
+    VistaPrint requires a minimum of **25 copies per page design** - but this becomes an opportunity! You can:
+    
+    - Create multiple journals from one order
+    - Only order the page types you actually need
+    - Gift journals to friends in the community
+    - **Create premade journal sets to sell** as a benefit to your community
+    - Keep extras for future tracking needs
+    
+    **Cost example:** Order 3 page types (75 flyers) for ~$15-20, create 3-5 complete journals
+
+### Quick VistaPrint Steps
+
+1. **Choose page types**: Decide which pages you want (e.g., 3 photo tracking pages, 1 calendar, 1 notes page)
+2. **Generate PDFs**: Create separate PDF for each page type at 5.75" × 8.75" (with bleed)
+3. **Upload to VistaPrint**: Go to [vistaprint.com/flyers](https://www.vistaprint.com/marketing-materials/flyers)
+4. **Select size**: 5.5" × 8.5" flyers
+5. **Order 25+ each**: Minimum 25 copies per page design
+6. **Choose paper**: 100 lb matte cover, matte finish - allows writing! (recommended)
+7. **Add 3-hole punch**: For easy binding in 5.5" × 8.5" binders
+8. **Assemble journals**: Mix and match pages when they arrive!
+
+**[📖 Full VistaPrint DIY Guide](../printable/PROFESSIONAL-PRINTING.md)**
+
+## Home/Office Printing
 
 ### Quick Instructions
 

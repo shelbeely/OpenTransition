@@ -2,6 +2,9 @@
 
 # OpenTransition Printable Journal - PDF Generator
 # This script generates a PDF from the HTML journal using a headless browser
+#
+# NOTE: For custom journals with page selection, use the new Journal Builder:
+#       Open builder.html in your browser for an interactive experience!
 
 set -e
 
@@ -9,6 +12,10 @@ echo "==================================="
 echo "OpenTransition Printable Journal"
 echo "PDF Generator"
 echo "==================================="
+echo ""
+echo "💡 TIP: Use builder.html for custom journals!"
+echo "   Select specific pages, adjust quantities,"
+echo "   and generate PDFs for home or VistaPrint."
 echo ""
 
 # Check if we're in the printable directory
