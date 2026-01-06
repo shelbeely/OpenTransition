@@ -185,8 +185,13 @@ We welcome contributions! If you'd like to help improve OpenTransition:
 
 We are grateful to everyone who has contributed to OpenTransition! Here are our code contributors:
 
-- copilot-swe-agent[bot]: 4 commits (80.0%)
-- Shelbee Johnson: 1 commits (20.0%)
+- Cassie Wilson: 223 commits (47.2%)
+- copilot-swe-agent[bot]: 172 commits (36.4%)
+- TransTracks: 39 commits (8.3%)
+- dependabot[bot]: 28 commits (5.9%)
+- shelbeely: 6 commits (1.3%)
+- Shelbee Johnson: 3 commits (0.6%)
+- codefactor-io: 1 commit (0.2%)
 
 View all contributors on [GitHub](https://github.com/shelbeely/OpenTransition/graphs/contributors).
 
