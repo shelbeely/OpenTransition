@@ -359,4 +359,15 @@
     <string name="import_complete">Import completed successfully!\n%1$d items imported</string>
     <string name="import_failed">Import failed: %1$s</string>
     <string name="select_file">Select File</string>
+    
+    <!-- Shortcuts -->
+    <string name="shortcut_take_photo_short">Take Photo</string>
+    <string name="shortcut_take_photo_long">Take a new photo</string>
+    <string name="shortcut_view_gallery_short">Gallery</string>
+    <string name="shortcut_view_gallery_long">View photo gallery</string>
+    <string name="shortcut_view_milestones_short">Milestones</string>
+    <string name="shortcut_view_milestones_long">View milestones</string>
+    <string name="shortcut_record_audio_short">Record Audio</string>
+    <string name="shortcut_record_audio_long">Record audio sample</string>
+    <string name="shortcut_disabled_message">This shortcut is currently disabled</string>
 </resources>

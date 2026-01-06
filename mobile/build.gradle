@@ -196,6 +196,13 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.7.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3'
+
+    // AppSearch for in-app content indexing
+    def appsearch_version = "1.1.0-alpha05"
+    implementation "androidx.appsearch:appsearch:$appsearch_version"
+    implementation "androidx.appsearch:appsearch-local-storage:$appsearch_version"
+    ksp "androidx.appsearch:appsearch-compiler:$appsearch_version"
 
     testImplementation 'junit:junit:4.13.2'
 

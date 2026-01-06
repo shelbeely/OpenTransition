@@ -293,6 +293,13 @@ class MainActivity : AppCompatActivity() {
     )
 
     private fun processIntent(intent: Intent) {
+        // Handle shortcuts
+        val shortcutAction = intent.getStringExtra("shortcut_action")
+        if (shortcutAction != null) {
+            handleShortcutAction(shortcutAction, intent)
+            return
+        }
+        
         if (intent.action != Intent.ACTION_VIEW) return
 
         val fileUri: Uri? = intent.data
@@ -310,6 +317,72 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton(android.R.string.yes) { _, _ -> processImport(fileUri) }
                 .setNegativeButton(android.R.string.no, null)
                 .show()
+        }
+    }
+    
+    private fun handleShortcutAction(action: String, intent: Intent) {
+        val navController = findNavController(R.id.nav_host_fragment)
+        
+        // For simplicity, navigate to home and use intent extras to indicate what to show
+        // The home fragment can handle displaying the appropriate content
+        when (action) {
+            "take_photo" -> {
+                // Navigate to camera
+                try {
+                    navController.navigate(R.id.action_global_camera)
+                } catch (e: Exception) {
+                    // Fall back to home if navigation fails
+                    navController.navigate(R.id.homeFragment)
+                }
+            }
+            "view_gallery" -> {
+                // Navigate to gallery
+                try {
+                    navController.navigate(R.id.galleryFragment)
+                } catch (e: Exception) {
+                    navController.navigate(R.id.homeFragment)
+                }
+            }
+            "view_milestones" -> {
+                // Navigate to milestones
+                try {
+                    navController.navigate(R.id.milestonesFragment)
+                } catch (e: Exception) {
+                    navController.navigate(R.id.homeFragment)
+                }
+            }
+            "record_audio" -> {
+                // Navigate to audio recording
+                try {
+                    navController.navigate(R.id.recordAudioFragment)
+                } catch (e: Exception) {
+                    navController.navigate(R.id.homeFragment)
+                }
+            }
+            "view_photo" -> {
+                val photoId = intent.getStringExtra("photo_id")
+                if (photoId != null) {
+                    try {
+                        navController.navigate(R.id.singlePhotoFragment)
+                    } catch (e: Exception) {
+                        navController.navigate(R.id.homeFragment)
+                    }
+                }
+            }
+            "view_milestone" -> {
+                val milestoneId = intent.getStringExtra("milestone_id")
+                if (milestoneId != null) {
+                    try {
+                        navController.navigate(R.id.addEditMilestoneFragment)
+                    } catch (e: Exception) {
+                        navController.navigate(R.id.homeFragment)
+                    }
+                }
+            }
+            else -> {
+                // Default to home
+                navController.navigate(R.id.homeFragment)
+            }
         }
     }
 

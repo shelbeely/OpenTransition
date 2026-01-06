@@ -95,6 +95,8 @@ nav:
       - Lock & Security: features/lock-security.md
       - Settings & Sync: features/settings-sync.md
       - Import & Export: features/import-export.md
+      - AppSearch Integration: features/app-search.md
+      - App Shortcuts: features/shortcuts.md
     - Development:
       - Code Style: development/code-style.md
       - Testing: development/testing.md

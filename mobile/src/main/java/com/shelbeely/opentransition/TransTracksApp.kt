@@ -25,6 +25,9 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentInformation.ConsentStatus
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class TransTracksApp : Application() {
     val domainManager = DomainManager()
@@ -50,6 +53,19 @@ class TransTracksApp : Application() {
         //Clearing these, as we don't want to maintain this state across launches
         PrefUtil.setSelectPhotoFirstVisible("")
         PrefUtil.clearAllAlbumFirstVisiblePrefs()
+        
+        // Initialize AppSearch for content indexing
+        initializeAppSearch()
+    }
+    
+    private fun initializeAppSearch() {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                com.shelbeely.opentransition.appsearch.AppSearchManager.getInstance(this@TransTracksApp).initialize()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     companion object {
