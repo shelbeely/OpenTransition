@@ -78,6 +78,7 @@ class DomainManager {
 **`TransTracksApp`**: Application singleton
 
 - Initializes MobileAds
+- Initializes AppSearch for system-wide content search
 - Manages DomainManager
 - Handles app version updates
 - Manages Firebase settings synchronization
@@ -88,6 +89,12 @@ class TransTracksApp : Application() {
     val adConsentStatus = BehaviorSubject.createDefault(ConsentStatus.UNKNOWN)
     val firebaseSettingUtil: FirebaseSettingUtil by lazy(LazyThreadSafetyMode.NONE) {
         FirebaseSettingUtil()
+    }
+    
+    override fun onCreate() {
+        super.onCreate()
+        // Initialize AppSearch for system-wide search
+        AppSearchManager.getInstance(this)
     }
 }
 ```
@@ -101,6 +108,7 @@ class TransTracksApp : Application() {
 - Handles Firebase Auth
 - Manages screen lock/security
 - Processes backup imports
+- Handles app shortcuts activation
 
 ### Navigation
 
@@ -157,9 +165,18 @@ com.shelbeely.opentransition/
 │   ├── lock/                      # Lock screen
 │   └── widget/                    # Custom widgets
 │
+├── appsearch/                      # AppSearch integration
+│   ├── AppSearchManager.kt        # Search session manager
+│   ├── PhotoDocument.kt           # Photo search document
+│   └── MilestoneDocument.kt       # Milestone search document
+│
+├── shortcuts/                      # App Shortcuts
+│   └── ShortcutManagerUtil.kt     # Shortcut management
+│
 ├── util/                           # Utility classes
 │   ├── FileUtil.kt                # File operations
 │   ├── RxSchedulers.kt            # RxJava schedulers
+│   ├── SearchIndexingUtil.kt      # Content indexing utility
 │   └── settings/                  # Settings utilities
 │       ├── SettingsManager.kt     # Settings management
 │       ├── Theme.kt               # Theme definitions

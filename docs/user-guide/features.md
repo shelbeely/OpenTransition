@@ -27,6 +27,23 @@ Record important events in your journey:
 - Filter by type and date
 - See your progress over time
 
+### 🔍 System Search
+- Find your photos and milestones from Android's system search
+- Search by photo type (face, body, audio)
+- Search by milestone titles and descriptions
+- Access content quickly from device search
+
+[Learn more about AppSearch →](../features/app-search.md)
+
+### ⚡ Quick Access Shortcuts
+- Long-press app icon for quick actions
+- Take photos instantly
+- Jump to gallery or milestones
+- Recent photos and milestones shortcuts
+- Add shortcuts to your home screen
+
+[Learn more about shortcuts →](../features/shortcuts.md)
+
 ### 🔒 Privacy & Security
 - **App Lock**: PIN or pattern protection
 - **Train Mode**: Disguised app icon

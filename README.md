@@ -42,6 +42,8 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 - 📸 **Photo Tracking** - Document your transition with organized photos (face, body, custom areas)
 - 🎯 **Milestone Management** - Record and celebrate important events
 - 🖼️ **Gallery View** - Browse and compare your progress photos
+- 🔍 **System Search** - Find photos and milestones from Android's system search
+- ⚡ **App Shortcuts** - Quick access to features from launcher (long-press app icon)
 - 🔒 **Privacy First** - App lock, disguised mode, and local storage
 - 🔐 **Optional Encryption** - Encrypt your database with SQLCipher (optional)
 - 🎭 **Decoy Vault** - Create a separate vault with different passcode for added security

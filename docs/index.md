@@ -22,6 +22,12 @@ Record and celebrate important milestones in your transition journey. Track date
 ### 🖼️ Gallery View
 Browse your transition photos in an organized gallery. Filter by date, body type, and milestones to find exactly what you're looking for.
 
+### 🔍 System Search
+Find your photos and milestones from Android's system search. Content is indexed for quick access across your device.
+
+### ⚡ Quick Access Shortcuts
+Long-press the app icon for instant access to key features. Recent photos and milestones appear as dynamic shortcuts.
+
 ### 🔒 Privacy & Security
 - App lock with PIN or pattern
 - Disguised app icon (train mode)
@@ -42,11 +48,12 @@ Browse your transition photos in an organized gallery. Filter by date, body type
 
 - **Language**: Kotlin
 - **UI Framework**: Android SDK with Material Design
-- **Database**: Realm Kotlin
+- **Database**: Room (with Realm for legacy imports)
 - **Architecture**: MVVM with Domain layer
 - **Navigation**: Android Navigation Component
 - **Reactive Programming**: RxJava 3
 - **Cloud Services**: Firebase (Auth, Firestore, Analytics, Crashlytics)
+- **Search**: AndroidX AppSearch for system-wide content indexing
 - **Build System**: Gradle
 
 ## Quick Links
