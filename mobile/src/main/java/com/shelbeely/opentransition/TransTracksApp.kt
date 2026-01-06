@@ -25,6 +25,9 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentInformation.ConsentStatus
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class TransTracksApp : Application() {
     val domainManager = DomainManager()
@@ -56,7 +59,7 @@ class TransTracksApp : Application() {
     }
     
     private fun initializeAppSearch() {
-        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.IO).launch {
             try {
                 com.shelbeely.opentransition.appsearch.AppSearchManager.getInstance(this@TransTracksApp).initialize()
             } catch (e: Exception) {

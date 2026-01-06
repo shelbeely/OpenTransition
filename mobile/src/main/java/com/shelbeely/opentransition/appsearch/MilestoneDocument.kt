@@ -39,10 +39,10 @@ data class MilestoneDocument(
     @LongProperty
     val epochDay: Long,
     
-    @StringProperty(indexingType = StringProperty.INDEXING_TYPE_PREFIXES)
+    @StringProperty
     val title: String,
     
-    @StringProperty(indexingType = StringProperty.INDEXING_TYPE_PREFIXES)
+    @StringProperty
     val description: String
 ) {
     companion object {

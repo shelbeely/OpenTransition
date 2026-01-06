@@ -42,7 +42,7 @@ data class PhotoDocument(
     @StringProperty
     val type: String,
     
-    @StringProperty(indexingType = StringProperty.INDEXING_TYPE_PREFIXES)
+    @StringProperty
     val typeName: String,
     
     @StringProperty

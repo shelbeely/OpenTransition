@@ -108,12 +108,12 @@ class AppSearchManager private constructor(private val context: Context) {
                 .setResultCountPerPage(20)
                 .build()
             
-            val searchResults = session.search(query, searchSpec).await()
+            val searchResults = session.search(query, searchSpec)
             val results = mutableListOf<SearchResult>()
             
-            while (searchResults.hasNext()) {
-                val result = searchResults.next().await()
-                val document = result.genericDocument
+            val nextPage = searchResults.nextPageAsync.await()
+            for (searchResult in nextPage) {
+                val document = searchResult.genericDocument
                 
                 when (document.namespace) {
                     PhotoDocument.NAMESPACE -> {

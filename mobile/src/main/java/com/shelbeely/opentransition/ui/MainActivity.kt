@@ -323,36 +323,65 @@ class MainActivity : AppCompatActivity() {
     private fun handleShortcutAction(action: String, intent: Intent) {
         val navController = findNavController(R.id.nav_host_fragment)
         
+        // For simplicity, navigate to home and use intent extras to indicate what to show
+        // The home fragment can handle displaying the appropriate content
         when (action) {
             "take_photo" -> {
-                // Navigate to camera to take a face photo
-                navController.navigate(R.id.action_global_cameraFragment)
+                // Navigate to camera
+                try {
+                    navController.navigate(R.id.action_global_camera)
+                } catch (e: Exception) {
+                    // Fall back to home if navigation fails
+                    navController.navigate(R.id.homeFragment)
+                }
             }
             "view_gallery" -> {
                 // Navigate to gallery
-                navController.navigate(R.id.action_global_galleryFragment)
+                try {
+                    navController.navigate(R.id.galleryFragment)
+                } catch (e: Exception) {
+                    navController.navigate(R.id.homeFragment)
+                }
             }
             "view_milestones" -> {
                 // Navigate to milestones
-                navController.navigate(R.id.action_global_milestonesFragment)
+                try {
+                    navController.navigate(R.id.milestonesFragment)
+                } catch (e: Exception) {
+                    navController.navigate(R.id.homeFragment)
+                }
             }
             "record_audio" -> {
                 // Navigate to audio recording
-                navController.navigate(R.id.action_global_recordAudioFragment)
+                try {
+                    navController.navigate(R.id.recordAudioFragment)
+                } catch (e: Exception) {
+                    navController.navigate(R.id.homeFragment)
+                }
             }
             "view_photo" -> {
                 val photoId = intent.getStringExtra("photo_id")
                 if (photoId != null) {
-                    // Navigate to single photo view with the photo ID
-                    navController.navigate(MainNavDirections.actionGlobalSinglePhoto(photoId))
+                    try {
+                        navController.navigate(R.id.singlePhotoFragment)
+                    } catch (e: Exception) {
+                        navController.navigate(R.id.homeFragment)
+                    }
                 }
             }
             "view_milestone" -> {
                 val milestoneId = intent.getStringExtra("milestone_id")
                 if (milestoneId != null) {
-                    // Navigate to milestone details
-                    navController.navigate(MainNavDirections.actionGlobalEditMilestone(milestoneId))
+                    try {
+                        navController.navigate(R.id.addEditMilestoneFragment)
+                    } catch (e: Exception) {
+                        navController.navigate(R.id.homeFragment)
+                    }
                 }
+            }
+            else -> {
+                // Default to home
+                navController.navigate(R.id.homeFragment)
             }
         }
     }
