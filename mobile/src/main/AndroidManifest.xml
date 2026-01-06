@@ -57,6 +57,11 @@
             <intent-filter>
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+                
             <!--
                  Capture content by MIME type, which is how Gmail broadcasts
                  attachment open requests.  pathPattern and file extensions

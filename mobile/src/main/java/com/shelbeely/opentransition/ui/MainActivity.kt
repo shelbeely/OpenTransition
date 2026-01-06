@@ -293,6 +293,13 @@ class MainActivity : AppCompatActivity() {
     )
 
     private fun processIntent(intent: Intent) {
+        // Handle shortcuts
+        val shortcutAction = intent.getStringExtra("shortcut_action")
+        if (shortcutAction != null) {
+            handleShortcutAction(shortcutAction, intent)
+            return
+        }
+        
         if (intent.action != Intent.ACTION_VIEW) return
 
         val fileUri: Uri? = intent.data
@@ -310,6 +317,43 @@ class MainActivity : AppCompatActivity() {
                 .setPositiveButton(android.R.string.yes) { _, _ -> processImport(fileUri) }
                 .setNegativeButton(android.R.string.no, null)
                 .show()
+        }
+    }
+    
+    private fun handleShortcutAction(action: String, intent: Intent) {
+        val navController = findNavController(R.id.nav_host_fragment)
+        
+        when (action) {
+            "take_photo" -> {
+                // Navigate to camera to take a face photo
+                navController.navigate(R.id.action_global_cameraFragment)
+            }
+            "view_gallery" -> {
+                // Navigate to gallery
+                navController.navigate(R.id.action_global_galleryFragment)
+            }
+            "view_milestones" -> {
+                // Navigate to milestones
+                navController.navigate(R.id.action_global_milestonesFragment)
+            }
+            "record_audio" -> {
+                // Navigate to audio recording
+                navController.navigate(R.id.action_global_recordAudioFragment)
+            }
+            "view_photo" -> {
+                val photoId = intent.getStringExtra("photo_id")
+                if (photoId != null) {
+                    // Navigate to single photo view with the photo ID
+                    navController.navigate(MainNavDirections.actionGlobalSinglePhoto(photoId))
+                }
+            }
+            "view_milestone" -> {
+                val milestoneId = intent.getStringExtra("milestone_id")
+                if (milestoneId != null) {
+                    // Navigate to milestone details
+                    navController.navigate(MainNavDirections.actionGlobalEditMilestone(milestoneId))
+                }
+            }
         }
     }
 

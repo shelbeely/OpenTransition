@@ -50,6 +50,19 @@ class TransTracksApp : Application() {
         //Clearing these, as we don't want to maintain this state across launches
         PrefUtil.setSelectPhotoFirstVisible("")
         PrefUtil.clearAllAlbumFirstVisiblePrefs()
+        
+        // Initialize AppSearch for content indexing
+        initializeAppSearch()
+    }
+    
+    private fun initializeAppSearch() {
+        kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            try {
+                com.shelbeely.opentransition.appsearch.AppSearchManager.getInstance(this@TransTracksApp).initialize()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 
     companion object {

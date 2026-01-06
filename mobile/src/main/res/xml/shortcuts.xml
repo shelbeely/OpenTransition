@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright © 2025 TransTracks. All rights reserved.
+  ~
+  ~ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="take_photo"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_camera"
+        android:shortcutShortLabel="@string/shortcut_take_photo_short"
+        android:shortcutLongLabel="@string/shortcut_take_photo_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.shelbeely.opentransition"
+            android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
+            <extra android:name="shortcut_action" android:value="take_photo" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="view_gallery"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_gallery"
+        android:shortcutShortLabel="@string/shortcut_view_gallery_short"
+        android:shortcutLongLabel="@string/shortcut_view_gallery_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.shelbeely.opentransition"
+            android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
+            <extra android:name="shortcut_action" android:value="view_gallery" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="view_milestones"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_milestones"
+        android:shortcutShortLabel="@string/shortcut_view_milestones_short"
+        android:shortcutLongLabel="@string/shortcut_view_milestones_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.shelbeely.opentransition"
+            android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
+            <extra android:name="shortcut_action" android:value="view_milestones" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="record_audio"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_audio"
+        android:shortcutShortLabel="@string/shortcut_record_audio_short"
+        android:shortcutLongLabel="@string/shortcut_record_audio_long"
+        android:shortcutDisabledMessage="@string/shortcut_disabled_message">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.shelbeely.opentransition"
+            android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
+            <extra android:name="shortcut_action" android:value="record_audio" />
+        </intent>
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>
