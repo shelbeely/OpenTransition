@@ -23,7 +23,6 @@
             android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
             <extra android:name="shortcut_action" android:value="take_photo" />
         </intent>
-        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
     <shortcut
@@ -39,7 +38,6 @@
             android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
             <extra android:name="shortcut_action" android:value="view_gallery" />
         </intent>
-        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
     <shortcut
@@ -55,7 +53,6 @@
             android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
             <extra android:name="shortcut_action" android:value="view_milestones" />
         </intent>
-        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 
     <shortcut
@@ -71,6 +68,5 @@
             android:targetClass="com.shelbeely.opentransition.ui.MainActivity">
             <extra android:name="shortcut_action" android:value="record_audio" />
         </intent>
-        <categories android:name="android.shortcut.conversation" />
     </shortcut>
 </shortcuts>
