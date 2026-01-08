@@ -100,6 +100,7 @@ nav:
       - Testing: development/testing.md
       - Debugging: development/debugging.md
       - Dependencies: development/dependencies.md
+      - Material Design Components: development/material-design-components.md
     - Contributing:
       - Guidelines: contributing/guidelines.md
       - Pull Requests: contributing/pull-requests.md
