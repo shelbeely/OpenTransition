@@ -100,6 +100,15 @@ See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for more details on the datab
 
 **Full setup instructions:** [Development Setup Guide](https://shelbeely.github.io/OpenTransition/getting-started/development-setup/)
 
+## 🎨 Customization & Branding
+
+Want to rebrand this app with your own logo and images? We've got you covered!
+
+- 📋 **[IMAGE_ASSETS_TO_REPLACE.md](IMAGE_ASSETS_TO_REPLACE.md)** - Complete list of all 9 image files to replace
+- 📖 **[LOGO_REPLACEMENT_GUIDE.md](LOGO_REPLACEMENT_GUIDE.md)** - Step-by-step guide for replacing logos and icons
+
+These guides will help you replace all logos, app icons, splash screens, and other image assets with your own branding.
+
 ## 📦 Package Information
 
 ### Mobile App

@@ -18,6 +18,14 @@ mkdocs serve
 
 The documentation is organized into several main sections:
 
+### 🎨 Customization Guides (For Rebranding)
+Located in the root directory
+
+- **IMAGE_ASSETS_TO_REPLACE.md** - Complete checklist of all image files that need replacing
+- **LOGO_REPLACEMENT_GUIDE.md** - Step-by-step instructions for replacing logos, icons, and branding
+
+**Audience**: Developers who want to rebrand/customize the app with their own visual identity
+
 ### 🎯 User Guide (For End Users)
 Located in `docs/user-guide/`
 
