@@ -61,7 +61,7 @@ jobs:
       # Create a default medium_phone virtual device that the agent can deploy
       # to and interact with during the session.
       - name: Create Android emulator
-        run: android emulator create
+        run: android emulator create --profile=medium_phone
 
       # Start the emulator in the background before Copilot begins work so it
       # is immediately available. We wait for a full boot before proceeding.
