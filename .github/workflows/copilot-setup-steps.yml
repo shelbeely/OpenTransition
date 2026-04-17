@@ -1,19 +1,29 @@
-name: Copilot Debug Build
+name: "Copilot Setup Steps"
 
+# Run automatically when this file changes (for easy validation), and allow
+# manual runs from the Actions tab.
 on:
   workflow_dispatch:
   push:
-    branches:
-      - 'copilot/**'
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
+  pull_request:
+    paths:
+      - .github/workflows/copilot-setup-steps.yml
 
 jobs:
-  debug:
+  # Job MUST be named `copilot-setup-steps` to be picked up by Copilot cloud agent.
+  copilot-setup-steps:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
+      # JDK 17 is required by AGP 8+ and matches the rest of the CI pipeline.
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -21,30 +31,30 @@ jobs:
           java-version: 17
           cache: gradle
 
+      # Install Android SDK command-line tools so the agent can run avdmanager,
+      # sdkmanager, etc. without guesswork.
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      # Gradle requires local.properties to locate the Android SDK.
       - name: Generate local.properties
-        run: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
+      # Stub secrets so the build can run without real credentials.
+      # Real secrets are injected from the `copilot` environment when available.
       - name: Prepare secrets.properties
         env:
           SECRETS_PROPERTIES_B64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
-        run: |
-          if [ -z "$SECRETS_PROPERTIES_B64" ]; then
-            echo "Using example secrets.properties for testing"
-            cp secrets.properties.example secrets.properties
-          else
-            bash .github/ci-scripts/prepare-secrets.sh
-          fi
+        run: bash .github/ci-scripts/prepare-secrets.sh
 
+      # Stub google-services.json with safe dummy values so Firebase plugins
+      # don't fail the configuration phase.
       - name: Prepare google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
-            echo "Creating dummy google-services.json for testing"
+          if [ -z "${GOOGLE_SERVICES_JSON:-}" ]; then
+            echo "Creating dummy google-services.json for agent environment"
             mkdir -p mobile
             cat > mobile/google-services.json << 'EOF'
           {
@@ -85,12 +95,7 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew --stacktrace :mobile:assembleDebug
-
-      - name: Upload Debug APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: opentransition-debug-${{ github.sha }}
-          path: mobile/build/outputs/apk/debug/mobile-debug.apk
-          retention-days: 7
+      # Pre-warm the Gradle dependency cache so the agent's first real build
+      # resolves no dependencies from the network.
+      - name: Pre-warm Gradle dependency cache
+        run: ./gradlew :mobile:assembleDebug --dry-run
