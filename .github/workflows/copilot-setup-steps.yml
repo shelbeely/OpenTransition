@@ -67,10 +67,208 @@ jobs:
       - name: Init Android CLI for agent
         run: android init
 
-      # Create a default medium_phone virtual device that the agent can deploy
-      # to and interact with during the session.
-      - name: Create Android emulator
-        run: android emulator create --profile=medium_phone
+      # Install the google_apis (non-PlayStore) system image for API 35.
+      # The google_apis tag is critical: unlike google_apis_playstore it ships a
+      # userdebug build where `adb root` works and ADB key-auth is auto-accepted
+      # from the host key embedded at AVD creation time.  Without this, every
+      # headless session blocks on a "confirm RSA key" dialog that can never
+      # be tapped.
+      - name: Install google_apis system image
+        run: |
+          sdkmanager --install "system-images;android-35;google_apis;x86_64" \
+            "emulator" "platform-tools" "platforms;android-35"
+
+      # Create the AVD explicitly with avdmanager so we can pin the system-image
+      # tag to google_apis (the android-cli `emulator create` defaults to
+      # google_apis_playstore which breaks headless ADB auth).
+      - name: Create Android emulator (google_apis)
+        run: |
+          echo "no" | avdmanager create avd \
+            --name medium_phone \
+            --package "system-images;android-35;google_apis;x86_64" \
+            --device "medium_phone" \
+            --force
+
+      # YES — we need to start the emulator here in setup.
+      #
+      # Reason: the google_apis adbd auto-authorises the host ADB key only on
+      # the FIRST connection after a fresh boot.  If we never boot during setup
+      # the agent session always starts against an unauthorised device and every
+      # `adb shell` call fails with "device unauthorized".
+      #
+      # What this step does:
+      #  1. Starts a virtual framebuffer (Xvfb) so the emulator Qt window can
+      #     initialise without a physical display.
+      #  2. Boots the emulator headlessly and waits up to 5 minutes for
+      #     sys.boot_completed=1.
+      #  3. Runs `adb root` to confirm unrestricted access works.
+      #  4. Pushes sample JPEG images and an AAC audio clip so the agent can
+      #     immediately add and test photo/audio entries without network access.
+      #  5. Saves a snapshot named "agent_ready" — subsequent `android emulator
+      #     start medium_phone` calls in agent sessions restore from this
+      #     snapshot in under 30 seconds (vs 3-5 min cold boot).
+      #  6. Shuts the emulator down gracefully.
+      - name: Boot emulator, seed test media, save snapshot
+        timeout-minutes: 15
+        run: |
+          set -euo pipefail
+
+          # ── 1. Virtual framebuffer ──────────────────────────────────────────
+          Xvfb :99 -screen 0 1280x800x24 &
+          export DISPLAY=:99
+
+          # ── 2. Boot emulator ────────────────────────────────────────────────
+          $ANDROID_SDK_ROOT/emulator/emulator \
+            -avd medium_phone \
+            -no-snapshot-load \
+            -no-window \
+            -gpu swiftshader_indirect \
+            -noaudio \
+            -no-boot-anim \
+            -accel on \
+            -qemu -m 2048 \
+            > /tmp/emulator-setup.log 2>&1 &
+          EMU_PID=$!
+          echo "Emulator PID: $EMU_PID"
+
+          # Wait for the device to appear on ADB
+          adb wait-for-device
+
+          # Poll until Android has finished booting (up to 5 minutes)
+          echo "Waiting for Android to fully boot..."
+          for i in $(seq 1 60); do
+            BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            echo "  Boot check $i/60: sys.boot_completed=$BOOTED"
+            if [ "$BOOTED" = "1" ]; then
+              echo "Android fully booted."
+              break
+            fi
+            sleep 5
+          done
+
+          if [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" != "1" ]; then
+            echo "ERROR: Emulator did not boot in time"
+            cat /tmp/emulator-setup.log | tail -40
+            exit 1
+          fi
+
+          # ── 3. Verify unrestricted ADB access ───────────────────────────────
+          adb root
+          sleep 2
+          adb shell id
+
+          # ── 4. Push sample images and audio ─────────────────────────────────
+          # Create a set of minimal but valid JPEG images using Python's
+          # built-in struct module (no external tools needed).
+          python3 - <<'PYEOF'
+          import struct, os
+
+          # Minimal valid 1×1 JPEG (white pixel)
+          JPEG = bytes([
+            0xFF,0xD8,0xFF,0xE0,0x00,0x10,0x4A,0x46,0x49,0x46,0x00,0x01,
+            0x01,0x00,0x00,0x01,0x00,0x01,0x00,0x00,0xFF,0xDB,0x00,0x43,
+            0x00,0x08,0x06,0x06,0x07,0x06,0x05,0x08,0x07,0x07,0x07,0x09,
+            0x09,0x08,0x0A,0x0C,0x14,0x0D,0x0C,0x0B,0x0B,0x0C,0x19,0x12,
+            0x13,0x0F,0x14,0x1D,0x1A,0x1F,0x1E,0x1D,0x1A,0x1C,0x1C,0x20,
+            0x24,0x2E,0x27,0x20,0x22,0x2C,0x23,0x1C,0x1C,0x28,0x37,0x29,
+            0x2C,0x30,0x31,0x34,0x34,0x34,0x1F,0x27,0x39,0x3D,0x38,0x32,
+            0x3C,0x2E,0x33,0x34,0x32,0xFF,0xC0,0x00,0x0B,0x08,0x00,0x01,
+            0x00,0x01,0x01,0x01,0x11,0x00,0xFF,0xC4,0x00,0x1F,0x00,0x00,
+            0x01,0x05,0x01,0x01,0x01,0x01,0x01,0x01,0x00,0x00,0x00,0x00,
+            0x00,0x00,0x00,0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
+            0x09,0x0A,0x0B,0xFF,0xC4,0x00,0xB5,0x10,0x00,0x02,0x01,0x03,
+            0x03,0x02,0x04,0x03,0x05,0x05,0x04,0x04,0x00,0x00,0x01,0x7D,
+            0x01,0x02,0x03,0x00,0x04,0x11,0x05,0x12,0x21,0x31,0x41,0x06,
+            0x13,0x51,0x61,0x07,0x22,0x71,0x14,0x32,0x81,0x91,0xA1,0x08,
+            0x23,0x42,0xB1,0xC1,0x15,0x52,0xD1,0xF0,0x24,0x33,0x62,0x72,
+            0x82,0x09,0x0A,0x16,0x17,0x18,0x19,0x1A,0x25,0x26,0x27,0x28,
+            0x29,0x2A,0x34,0x35,0x36,0x37,0x38,0x39,0x3A,0x43,0x44,0x45,
+            0x46,0x47,0x48,0x49,0x4A,0x53,0x54,0x55,0x56,0x57,0x58,0x59,
+            0x5A,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6A,0x73,0x74,0x75,
+            0x76,0x77,0x78,0x79,0x7A,0x83,0x84,0x85,0x86,0x87,0x88,0x89,
+            0x8A,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9A,0xA2,0xA3,0xA4,
+            0xA5,0xA6,0xA7,0xA8,0xA9,0xAA,0xB2,0xB3,0xB4,0xB5,0xB6,0xB7,
+            0xB8,0xB9,0xBA,0xC2,0xC3,0xC4,0xC5,0xC6,0xC7,0xC8,0xC9,0xCA,
+            0xD2,0xD3,0xD4,0xD5,0xD6,0xD7,0xD8,0xD9,0xDA,0xE1,0xE2,0xE3,
+            0xE4,0xE5,0xE6,0xE7,0xE8,0xE9,0xEA,0xF1,0xF2,0xF3,0xF4,0xF5,
+            0xF6,0xF7,0xF8,0xF9,0xFA,0xFF,0xDA,0x00,0x08,0x01,0x01,0x00,
+            0x00,0x3F,0x00,0xFB,0xD2,0x8A,0x28,0x03,0xFF,0xD9
+          ])
+
+          os.makedirs('/tmp/test-media', exist_ok=True)
+          for name in ['photo_day1.jpg', 'photo_day2.jpg', 'photo_day3.jpg']:
+              with open(f'/tmp/test-media/{name}', 'wb') as f:
+                  f.write(JPEG)
+          print("Created 3 sample JPEG files")
+          PYEOF
+
+          # Create a minimal valid AAC/ADTS audio file (1 silent frame)
+          python3 - <<'PYEOF'
+          # ADTS header for AAC-LC, 44100 Hz, 1 channel, 1 frame of silence
+          # Sync word (12b=FFF) | ID(1b=0) | layer(2b=00) | prot_abs(1b=1)
+          # profile(2b=01=LC) | sfreq_idx(4b=4=44100) | priv(1b=0) | ch(3b=1)
+          # orig(1b=0) | home(1b=0) | copy_id(1b=0) | copy_start(1b=0)
+          # frame_len(13b) | buffer_full(11b=7FF) | num_raw(2b=0)
+          import struct, os
+
+          SILENT_FRAME = bytes([0x21, 0x10, 0x04, 0x60, 0x20, 0x02,
+                                0x00, 0x20, 0x00, 0x00])
+          frame_len = 7 + len(SILENT_FRAME)  # 7-byte header + data
+          # Pack ADTS header (56 bits = 7 bytes)
+          h = (0xFFF << 44 | 0 << 43 | 0 << 41 | 1 << 40 |
+               1 << 38 | 4 << 34 | 0 << 33 | 1 << 30 |
+               0 << 29 | 0 << 28 | 0 << 27 | 0 << 26 |
+               frame_len << 13 | 0x7FF << 2 | 0)
+          header = h.to_bytes(7, 'big')
+          with open('/tmp/test-media/audio_note.aac', 'wb') as f:
+              f.write(header + SILENT_FRAME)
+          print("Created sample AAC audio file")
+          PYEOF
+
+          # Push images into the emulator's DCIM folder and scan them into
+          # MediaStore so they appear in gallery pickers
+          adb shell mkdir -p /sdcard/DCIM/OpenTransition
+          for IMG in photo_day1.jpg photo_day2.jpg photo_day3.jpg; do
+            adb push /tmp/test-media/$IMG /sdcard/DCIM/OpenTransition/$IMG
+          done
+
+          # Push audio into the emulator's Music folder
+          adb shell mkdir -p /sdcard/Music/OpenTransition
+          adb push /tmp/test-media/audio_note.aac \
+            /sdcard/Music/OpenTransition/audio_note.aac
+
+          # Trigger a MediaStore rescan so the files appear in pickers
+          adb shell am broadcast \
+            -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
+            -d file:///sdcard/DCIM/OpenTransition/photo_day1.jpg \
+            --receiver-include-background || true
+          adb shell content call \
+            --uri content://media \
+            --method scan_volume \
+            --arg external || true
+
+          echo "Test media pushed to emulator"
+          adb shell ls /sdcard/DCIM/OpenTransition/
+          adb shell ls /sdcard/Music/OpenTransition/
+
+          # ── 5. Save snapshot ─────────────────────────────────────────────────
+          # The snapshot captures the booted + media-seeded state so the agent
+          # can restore to it in seconds rather than waiting for a cold boot.
+          AUTH_TOKEN=$(cat ~/.emulator_console_auth_token 2>/dev/null || echo "")
+          if [ -n "$AUTH_TOKEN" ]; then
+            {
+              echo "auth $AUTH_TOKEN"
+              sleep 1
+              echo "avd snapshot save agent_ready"
+              sleep 5
+            } | nc -q 8 localhost 5554 || true
+            echo "Snapshot 'agent_ready' saved."
+          fi
+
+          # ── 6. Graceful shutdown ─────────────────────────────────────────────
+          adb emu kill || true
+          sleep 5
+          echo "Emulator shutdown complete."
 
       # Gradle requires local.properties to locate the Android SDK.
       - name: Generate local.properties
