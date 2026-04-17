@@ -149,7 +149,7 @@ The existing `CameraHandler` (using Intent-based camera) remains in place but is
 ## Code Organization
 
 ```
-app/src/main/java/com/shelbeely/opentransition/
+mobile/src/main/java/com/shelbeely/opentransition/
 ├── background/
 │   ├── CameraXHandler.kt           # CameraX camera manager
 │   ├── FaceDetectionAnalyzer.kt    # ML Kit face detection
@@ -165,7 +165,7 @@ app/src/main/java/com/shelbeely/opentransition/
 
 ## Dependencies
 
-Added to `app/build.gradle`:
+Added to `mobile/build.gradle`:
 
 ```gradle
 // CameraX for modern camera implementation
