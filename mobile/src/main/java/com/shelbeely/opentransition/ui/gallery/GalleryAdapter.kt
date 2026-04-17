@@ -17,10 +17,13 @@ import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
 import com.shelbeely.opentransition.util.RxSchedulers
 import com.shelbeely.opentransition.util.getString
@@ -92,8 +95,17 @@ class GalleryAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             TYPE_TITLE -> {
-                val view = LayoutInflater.from(parent.context).inflate(R.layout.gallery_adapter_title_item, parent, false)
-                TitleViewHolder(view)
+                val composeView = ComposeView(parent.context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    // Pool-aware disposal strategy for RecyclerView items
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+                TitleViewHolder(composeView)
             }
             TYPE_PHOTO -> {
                 if (type == Photo.TYPE_AUDIO) {
@@ -231,11 +243,14 @@ class GalleryAdapter(
 
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class TitleViewHolder(itemView: View) : BaseViewHolder(itemView) {
-        private val title: TextView by bindView(R.id.gallery_adapter_item_title)
-
+    class TitleViewHolder(private val composeView: ComposeView) : BaseViewHolder(composeView) {
         fun bind(item: GalleryAdapterItem) {
-            title.text = LocalDate.ofEpochDay(item.epochDay!!).toFullDateString(itemView.context)
+            val title = LocalDate.ofEpochDay(item.epochDay!!).toFullDateString(composeView.context)
+            composeView.setContent {
+                OpenTransitionTheme {
+                    GalleryDateTitleItem(title = title)
+                }
+            }
         }
     }
 
@@ -423,7 +438,7 @@ class GalleryAdapter(
 
     @Suppress("MayBeConstant")
     companion object {
-        private val TYPE_TITLE = R.layout.gallery_adapter_title_item
-        private val TYPE_PHOTO = R.layout.gallery_adapter_item
+        private val TYPE_TITLE = 0
+        private val TYPE_PHOTO = 1
     }
 }

@@ -78,12 +78,15 @@ Always add `--stacktrace` when diagnosing build failures.
 ### 2. Apply official Android Skills (SKILL.md pattern)
 
 When working on complex or fast-moving areas, consult the relevant Android Skill.
-Skills ship in `.github/skills/android/` and can also be installed via `android skills add`:
-- **Navigation 3 setup** — use `android skills add navigation3`
-- **Edge-to-edge / insets** — use `android skills add edge-to-edge`
-- **AGP 8/9 migration** — use `android skills add agp-migration`
-- **XML → Compose migration** — use `android skills add compose-migration`
-- **R8 / ProGuard config** — use `android skills add r8`
+Skills ship in `.github/skills/android/` and `skills/` (installed), or install via `android skills add`:
+- **Navigation 3 setup** — use `android skills add --skill=navigation-3`
+- **Edge-to-edge / insets** — use `android skills add --skill=edge-to-edge`
+- **AGP 9 migration** — use `android skills add --skill=agp-9-upgrade`
+- **XML → Compose migration** — use `android skills add --skill=migrate-xml-views-to-jetpack-compose`
+- **R8 / ProGuard config** — use `android skills add --skill=r8-analyzer`
+- **Play Billing upgrade** — use `android skills add --skill=play-billing-library-version-upgrade`
+
+To install all skills at once: `android skills add --all --project=<repo-root>`
 
 ### 3. Dependency management
 
@@ -94,8 +97,8 @@ Skills ship in `.github/skills/android/` and can also be installed via `android 
 
 ### 4. Architecture patterns in this project
 
-- **UI layer**: XML Views + ViewBinding (not Compose — do not introduce Compose without
-  explicit instruction).
+- **UI layer**: Migrating from XML Views + ViewBinding → Jetpack Compose (incremental;
+  use `ComposeView`/`AndroidView` interop during transition).
 - **Reactive layer**: RxJava 3 + RxRelay + RxBinding.
 - **Local persistence**: Realm Kotlin SDK (`:shared` module) + Room + SQLCipher (`:mobile`).
 - **Navigation**: Jetpack Navigation with SafeArgs.
@@ -138,7 +141,6 @@ Skills ship in `.github/skills/android/` and can also be installed via `android 
 ## What NOT to do
 
 - Do not commit `secrets.properties`, `local.properties`, or `google-services.json` with real values.
-- Do not introduce Jetpack Compose without explicit instruction — the app uses XML Views.
 - Do not change `minSdkVersion` below 21 or `targetSdkVersion` above 36 without discussion.
 - Do not remove or weaken existing ProGuard/R8 rules.
 - Do not push directly to `production` or `main` branches.
