@@ -28,9 +28,8 @@ jobs:
   capture-screenshots:
     runs-on: ubuntu-latest
     timeout-minutes: 60
-
     name: Screenshots - medium_phone
-    
+
     steps:
     - name: 🚚 Checkout
       uses: actions/checkout@v4
@@ -67,7 +66,6 @@ jobs:
         GOOGLE_SERVICES_JSON_64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
       run: |
         if [ -z "$GOOGLE_SERVICES_JSON_64" ]; then
-          # Create a dummy google-services.json for builds
           mkdir -p mobile
           cat > ./mobile/google-services.json << 'EOF'
         {
@@ -131,193 +129,183 @@ jobs:
         set -euo pipefail
         APP="com.shelbeely.opentransition"
         SHOTS="screenshots"
-        DUMP="/sdcard/ui_dump.xml"
-        LOCAL="/tmp/ui_dump.xml"
         mkdir -p "$SHOTS"
 
-        # ── helpers ──────────────────────────────────────────────────────────
+        # ── Android CLI helpers ───────────────────────────────────────────────
+        #
+        # `android layout` returns a flat JSON array; each element has:
+        #   .text          — visible label
+        #   .contentDesc   — accessibility description
+        #   .center        — "[x,y]" centre of the bounding box  ← we use this
+        #   .interactions  — ["clickable","scrollable", …]
+        #
+        # `android screen capture -o FILE` writes a PNG screenshot.
+        # `android run --apks=APK --activity=ACTIVITY` installs + launches.
 
-        dump_ui() {
-          adb shell uiautomator dump "$DUMP" >/dev/null 2>&1 || true
-          adb pull "$DUMP" "$LOCAL" >/dev/null 2>&1 || true
+        # Return the centre coords ("x y") for the first element matching a
+        # given field=value, or the empty string when nothing matches.
+        center_of() {
+          local field="$1" value="$2"
+          android layout 2>/dev/null \
+            | jq -r --arg v "$value" \
+                '.[] | select(.'"$field"' == $v) | .center' \
+            | head -1 \
+            | tr -d '[]' | tr ',' ' '
         }
 
-        # find_center <attr> <value>  →  "cx cy" or empty
-        find_center() {
-          dump_ui
-          python3 - "$1" "$2" <<'PY'
-        import sys, re, xml.etree.ElementTree as ET
-        attr, val = sys.argv[1], sys.argv[2].lower()
-        try:
-            for node in ET.parse('/tmp/ui_dump.xml').iter('node'):
-                if node.get(attr, '').lower() == val:
-                    nums = re.findall(r'\d+', node.get('bounds', ''))
-                    if len(nums) == 4:
-                        print((int(nums[0])+int(nums[2]))//2,
-                              (int(nums[1])+int(nums[3]))//2)
-                        sys.exit(0)
-        except Exception:
-            pass
-        PY
+        # Tap an element by its visible text label.
+        tap_text() {
+          local c; c=$(center_of text "$1")
+          if [ -n "$c" ]; then adb shell input tap $c; return 0; fi
+          echo "⚠ text='$1' not found"; return 1
         }
 
-        tap_text() { c=$(find_center text "$1"); [ -n "$c" ] && adb shell input tap $c && return 0; echo "⚠ text='$1' not found"; return 1; }
-        tap_desc() { c=$(find_center content-desc "$1"); [ -n "$c" ] && adb shell input tap $c && return 0; echo "⚠ desc='$1' not found"; return 1; }
-        back()       { adb shell input keyevent KEYCODE_BACK; sleep 1; }
-        shot()       { sleep 2; adb exec-out screencap -p > "$SHOTS/$1.png"; echo "✅ $1"; }
-        swipe_up()   { adb shell input swipe 540 1500 540 400 600; sleep 1; }
-        swipe_down() { adb shell input swipe 540 400 540 1500 600; sleep 1; }
-        rotate_landscape() { adb shell settings put system user_rotation 1; sleep 4; }
-        rotate_portrait()  { adb shell settings put system user_rotation 0; sleep 4; }
+        # Tap an element by its accessibility content-description.
+        tap_desc() {
+          local c; c=$(center_of contentDesc "$1")
+          if [ -n "$c" ]; then adb shell input tap $c; return 0; fi
+          echo "⚠ desc='$1' not found"; return 1
+        }
 
-        # ── install & grant permissions ───────────────────────────────────────
-        adb install -r mobile/build/outputs/apk/debug/mobile-debug.apk
+        # Scroll the first scrollable element up (reveal lower content).
+        scroll_up() {
+          local c
+          c=$(android layout 2>/dev/null \
+                | jq -r '[.[] | select(.interactions | index("scrollable"))] | first | .center' \
+                | tr -d '[]' | tr ',' ' ')
+          [ -n "$c" ] && adb shell input swipe $c $(echo "$c" | awk '{print $1, $2-900}') 600
+          sleep 1
+        }
+
+        # Scroll the first scrollable element down (return to top).
+        scroll_down() {
+          local c
+          c=$(android layout 2>/dev/null \
+                | jq -r '[.[] | select(.interactions | index("scrollable"))] | first | .center' \
+                | tr -d '[]' | tr ',' ' ')
+          [ -n "$c" ] && adb shell input swipe $c $(echo "$c" | awk '{print $1, $2+900}') 600
+          sleep 1
+        }
+
+        back()              { adb shell input keyevent KEYCODE_BACK; sleep 1; }
+        shot()              { sleep 2; android screen capture -o "$SHOTS/$1.png"; echo "✅ $1"; }
+        rotate_landscape()  { adb shell settings put system user_rotation 1; sleep 4; }
+        rotate_portrait()   { adb shell settings put system user_rotation 0; sleep 4; }
+
+        # ── Install, grant permissions, launch ────────────────────────────────
+        android run \
+          --apks=mobile/build/outputs/apk/debug/mobile-debug.apk \
+          --activity=com.shelbeely.opentransition.ui.MainActivity
         adb shell pm grant "$APP" android.permission.READ_EXTERNAL_STORAGE  || true
         adb shell pm grant "$APP" android.permission.WRITE_EXTERNAL_STORAGE || true
         adb shell pm grant "$APP" android.permission.RECORD_AUDIO           || true
         adb shell pm grant "$APP" android.permission.CAMERA                 || true
+        sleep 5
 
-        # ── 1. Launch ─────────────────────────────────────────────────────────
-        adb shell am start -n "$APP/.ui.MainActivity"
-        sleep 6
-
-        # 01 — whatever appears first (welcome dialog on fresh install)
+        # ── Group 1 · First launch & Home ─────────────────────────────────────
+        # 01 — whatever appears first (welcome dialog on a fresh install)
         shot "01_launch_screen"
 
-        # Dismiss welcome dialog if present
-        tap_text "Looks Good" 2>/dev/null || true; sleep 2
+        tap_text "Looks Good"  2>/dev/null || true; sleep 2   # dismiss welcome
+        tap_text "Risk It"     2>/dev/null || true; sleep 2   # dismiss account warning
 
-        # Dismiss account-warning dialog if present
-        tap_text "Risk It" 2>/dev/null || true; sleep 2
-
-        # 02 — clean Home screen
         shot "02_home"
 
-        # 03 — Previous day
         tap_desc "Previous record" || true; sleep 1
         shot "03_home_previous_day"
 
-        # 04 — Next day (back to today)
         tap_desc "Next record" || true; sleep 1
         shot "04_home_next_day"
 
-        # 05 — Photo source popup (Take Photo button on Home)
-        tap_desc "Take Photo"
-        sleep 1
+        # 05 — Take Photo source popup (Camera / Gallery)
+        tap_desc "Take Photo"; sleep 1
         shot "05_home_photo_source_menu"
         back  # dismiss popup
 
-        # ── 2. Settings ───────────────────────────────────────────────────────
+        # ── Group 2 · Settings ────────────────────────────────────────────────
         tap_desc "Edit Settings"; sleep 3
         shot "06_settings_top"
 
-        swipe_up; shot "07_settings_middle"
-        swipe_up; shot "08_settings_bottom"
+        scroll_up; shot "07_settings_middle"
+        scroll_up; shot "08_settings_bottom"
 
-        # scroll back to top so labels are reachable
-        swipe_down; swipe_down; sleep 1
+        scroll_down; scroll_down; sleep 1   # back to top
 
-        # 09 — Theme picker dialog
-        tap_text "Theme:"; sleep 1
-        shot "09_settings_theme_dialog"
-        back
-
-        # 10 — Lock Mode picker
-        tap_text "Lock Mode:"; sleep 1
-        shot "10_settings_lock_mode_dialog"
-        back
-
-        # 11 — Start Date picker
-        tap_text "Start Date:"; sleep 1
-        shot "11_settings_start_date_picker"
-        back
-
-        # 12 — Lock Delay picker
-        tap_text "Lock Delay:"; sleep 1
-        shot "12_settings_lock_delay_dialog"
-        back
+        tap_text "Theme:";      sleep 1; shot "09_settings_theme_dialog";      back
+        tap_text "Lock Mode:";  sleep 1; shot "10_settings_lock_mode_dialog";  back
+        tap_text "Start Date:"; sleep 1; shot "11_settings_start_date_picker"; back
+        tap_text "Lock Delay:"; sleep 1; shot "12_settings_lock_delay_dialog"; back
 
         back  # back to Home
 
-        # ── 3. Milestones ─────────────────────────────────────────────────────
+        # ── Group 3 · Milestones ──────────────────────────────────────────────
         tap_desc "Milestones"; sleep 3
         shot "13_milestones_empty"
 
-        # 14 — Add Milestone form
         tap_desc "Add"; sleep 2
         shot "14_add_milestone_form"
 
-        # 15 — Date picker inside Add Milestone
         tap_text "Date"; sleep 1
         shot "15_add_milestone_date_picker"
-        back  # dismiss date picker
+        back   # dismiss date picker
+        back   # back to Milestones
+        back   # back to Home
 
-        back  # back to Milestones
-        back  # back to Home
-
-        # ── 4. Face Gallery ───────────────────────────────────────────────────
+        # ── Group 4 · Face Gallery ────────────────────────────────────────────
         tap_text "Face Gallery"; sleep 3
         shot "16_face_gallery_empty"
 
-        # 17 — Photo source popup
+        # 17 — photo source popup (Camera / Gallery)
         tap_desc "Add"; sleep 1
         shot "17_face_gallery_source_menu"
 
-        # 18 — Camera (choose Camera from popup)
+        # 18 — Camera
         tap_text "Camera"; sleep 4
         shot "18_camera"
 
-        # 19 — Camera with overlay
         tap_desc "Toggle overlay"; sleep 1
         shot "19_camera_overlay_on"
 
         back; sleep 2  # back to Face Gallery
 
-        # 20 — Selection action-mode (tap Share in toolbar)
+        # 20 — multi-select action mode (tap Share in toolbar)
         tap_text "Share"; sleep 1
         shot "20_face_gallery_selection_mode"
-        back  # end action mode
+        back   # end action mode
+        back   # back to Home
 
-        back  # back to Home
-
-        # ── 5. Body Gallery ───────────────────────────────────────────────────
+        # ── Group 5 · Body Gallery ────────────────────────────────────────────
         tap_text "Body Gallery"; sleep 3
         shot "21_body_gallery_empty"
 
-        # 22 — Source popup
         tap_desc "Add"; sleep 1
         shot "22_body_gallery_source_menu"
-        back  # dismiss popup
+        back   # dismiss popup
+        back   # back to Home
 
-        back  # back to Home
-
-        # ── 6. Audio Gallery ──────────────────────────────────────────────────
+        # ── Group 6 · Audio Gallery & Record Audio ────────────────────────────
         tap_text "Audio Gallery"; sleep 3
         shot "23_audio_gallery_empty"
 
-        # Audio gallery Add goes directly to Record Audio (no popup)
+        # Audio Add goes directly to Record Audio (no source popup)
         tap_desc "Add"; sleep 3
         shot "24_record_audio_idle"
 
-        # 25 — Start recording
         tap_desc "Record audio"; sleep 2
         shot "25_record_audio_recording"
 
-        # 26 — Waveform building while recording
         sleep 4
         shot "26_record_audio_waveform"
 
-        # 27 — Stop recording
-        tap_desc "Record audio"; sleep 2
+        tap_desc "Record audio"; sleep 2   # stop
         shot "27_record_audio_stopped"
 
-        back  # cancel (no save), back to Audio Gallery
-        sleep 1
-        back  # back to Home
+        back; sleep 1   # cancel (no save) → Audio Gallery
+        back            # back to Home
 
-        # ── 7. Camera from Home ───────────────────────────────────────────────
+        # ── Group 7 · Camera from Home ────────────────────────────────────────
         tap_desc "Take Photo"; sleep 1
-        tap_text "Camera"; sleep 4
+        tap_text "Camera";     sleep 4
         shot "28_camera_from_home"
 
         tap_desc "Toggle overlay"; sleep 1
@@ -325,236 +313,236 @@ jobs:
 
         back; sleep 2  # back to Home
 
-        # ── 8. Landscape rotation ─────────────────────────────────────────────
+        # ── Group 8 · Landscape rotation ─────────────────────────────────────
         rotate_landscape
         shot "30_home_landscape"
 
-        tap_desc "Edit Settings"; sleep 3
-        shot "31_settings_landscape"
-        back; sleep 2
-
-        tap_desc "Milestones"; sleep 3
-        shot "32_milestones_landscape"
-        back; sleep 2
-
-        tap_text "Face Gallery"; sleep 3
-        shot "33_gallery_landscape"
-        back; sleep 2
+        tap_desc "Edit Settings"; sleep 3; shot "31_settings_landscape"; back; sleep 2
+        tap_desc "Milestones";    sleep 3; shot "32_milestones_landscape"; back; sleep 2
+        tap_text "Face Gallery";  sleep 3; shot "33_gallery_landscape"; back; sleep 2
 
         tap_text "Audio Gallery"; sleep 3
-        tap_desc "Add"; sleep 3
-        shot "34_record_audio_landscape"
-        back; sleep 1  # cancel
-        back; sleep 2  # back to Home
+        tap_desc "Add";           sleep 3; shot "34_record_audio_landscape"
+        back; sleep 1   # cancel
+        back; sleep 2   # back to Home
 
         rotate_portrait
         shot "35_home_portrait_restored"
 
-        # ── 9. Back-stack integrity ────────────────────────────────────────────
-        tap_desc "Edit Settings"; sleep 3
-        back; sleep 2
-        shot "36_home_after_settings"
-
-        tap_desc "Milestones"; sleep 3
-        back; sleep 2
-        shot "37_home_after_milestones"
-
-        tap_text "Face Gallery"; sleep 3
-        back; sleep 2
-        shot "38_home_after_face_gallery"
-
-        tap_text "Body Gallery"; sleep 3
-        back; sleep 2
-        shot "39_home_after_body_gallery"
-
-        tap_text "Audio Gallery"; sleep 3
-        back; sleep 2
-        shot "40_home_after_audio_gallery"
+        # ── Group 9 · Back-stack integrity ────────────────────────────────────
+        tap_desc "Edit Settings"; sleep 3; back; sleep 2; shot "36_home_after_settings"
+        tap_desc "Milestones";    sleep 3; back; sleep 2; shot "37_home_after_milestones"
+        tap_text "Face Gallery";  sleep 3; back; sleep 2; shot "38_home_after_face_gallery"
+        tap_text "Body Gallery";  sleep 3; back; sleep 2; shot "39_home_after_body_gallery"
+        tap_text "Audio Gallery"; sleep 3; back; sleep 2; shot "40_home_after_audio_gallery"
 
         echo ""
-        echo "📸 Screenshot capture complete! $(ls "$SHOTS"/*.png | wc -l) PNGs captured."
+        echo "📸 Done — $(ls "$SHOTS"/*.png | wc -l) screenshots captured."
 
     - name: 🛑 Stop Android Emulator
       if: always()
       run: |
         SERIAL=$(adb devices | grep emulator | awk '{print $1}' | head -1)
-        if [ -n "$SERIAL" ]; then
-          android emulator stop "$SERIAL"
-        fi
+        [ -n "$SERIAL" ] && android emulator stop "$SERIAL" || true
 
-    - name: 📊 Generate Screenshot Report
+    - name: 📝 Regenerate screenshots/README.md
       if: always()
       run: |
-        # Create an HTML report
-        cat > screenshots/index.html << 'EOF'
+        SHOTS="screenshots"
+        DATE=$(date -u '+%Y-%m-%d')
+        {
+          echo "# OpenTransition — UI Screenshots"
+          echo ""
+          echo "> 🤖 **Auto-generated** by CI on \`$DATE\` from a \`medium_phone\` emulator (API 36, debug build)."
+          echo "> Re-runs on every push to \`main\` that touches UI source files."
+          echo ""
+          echo "---"
+          echo ""
+          echo "## All screenshots"
+          echo ""
+          echo "| # | Screenshot | Screen / State |"
+          echo "|---|:---:|---|"
+          for f in $(ls "$SHOTS"/*.png 2>/dev/null | sort); do
+            name=$(basename "$f" .png)
+            num=$(echo "$name" | grep -oE '^[0-9]+')
+            label=$(echo "$name" | sed 's/^[0-9]*_//' | tr '_' ' ' | \
+                      sed 's/\b\(.\)/\u\1/g')
+            echo "| $num | ![$label]($name.png) | **$label** |"
+          done
+        } > "$SHOTS/README.md"
+        echo "📝 screenshots/README.md regenerated."
+
+    - name: 📊 Regenerate HTML report
+      if: always()
+      run: |
+        SHOTS="screenshots"
+        DATE=$(date -u '+%Y-%m-%d %H:%M UTC')
+        {
+          cat << 'HTMLEOF'
         <!DOCTYPE html>
-        <html>
+        <html lang="en">
         <head>
-            <title>UI Screenshots - medium_phone</title>
-            <style>
-                body {
-                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-                    max-width: 1400px;
-                    margin: 0 auto;
-                    padding: 20px;
-                    background: #0d1117;
-                    color: #c9d1d9;
-                }
-                h1 {
-                    color: #58a6ff;
-                    border-bottom: 1px solid #21262d;
-                    padding-bottom: 10px;
-                }
-                .android-version {
-                    background: #1f6feb;
-                    color: white;
-                    padding: 6px 12px;
-                    border-radius: 6px;
-                    font-size: 14px;
-                    font-weight: bold;
-                    display: inline-block;
-                    margin-bottom: 20px;
-                }
-                .screenshot-section {
-                    margin: 30px 0;
-                    padding: 20px;
-                    background: #161b22;
-                    border-radius: 8px;
-                    border: 1px solid #30363d;
-                }
-                .screenshot-section h2 {
-                    color: #58a6ff;
-                    margin-top: 0;
-                }
-                .screenshot-section img {
-                    max-width: 100%;
-                    height: auto;
-                    border: 2px solid #30363d;
-                    border-radius: 8px;
-                    margin-top: 10px;
-                    background: white;
-                }
-                .description {
-                    color: #8b949e;
-                    margin: 10px 0;
-                }
-                .new-badge {
-                    background: #238636;
-                    color: white;
-                    padding: 4px 8px;
-                    border-radius: 4px;
-                    font-size: 12px;
-                    font-weight: bold;
-                    margin-left: 10px;
-                }
-            </style>
+          <meta charset="UTF-8">
+          <title>OpenTransition — UI Screenshots</title>
+          <style>
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+                   max-width: 1200px; margin: 0 auto; padding: 20px;
+                   background: #0d1117; color: #c9d1d9; }
+            h1 { color: #58a6ff; border-bottom: 1px solid #21262d; padding-bottom: 10px; }
+            .meta { color: #8b949e; margin-bottom: 30px; }
+            .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+            .card { background: #161b22; border: 1px solid #30363d; border-radius: 8px;
+                    overflow: hidden; }
+            .card img { width: 100%; display: block; background: white; }
+            .card .label { padding: 10px 14px; font-size: 13px; color: #8b949e; }
+            .card .label strong { display: block; color: #c9d1d9; margin-bottom: 4px; font-size: 14px; }
+          </style>
         </head>
         <body>
-            <h1>🎵 Audio Gallery Feature - UI Screenshots</h1>
-            <div class="android-version">📱 medium_phone</div>
-            <p>Screenshots captured from PR automated testing</p>
-            
-            <div class="screenshot-section">
-                <h2>1. Home Screen with Audio Gallery <span class="new-badge">NEW</span></h2>
-                <p class="description">Shows the new Audio Gallery button added to the home screen below Body Gallery</p>
-                <img src="01_home_screen.png" alt="Home Screen">
-            </div>
-            
-            <div class="screenshot-section">
-                <h2>2. Audio Gallery (Empty State)</h2>
-                <p class="description">Audio Gallery screen when no recordings exist yet</p>
-                <img src="02_audio_gallery_empty.png" alt="Audio Gallery Empty">
-            </div>
-            
-            <div class="screenshot-section">
-                <h2>3. Record Audio Screen <span class="new-badge">NEW</span></h2>
-                <p class="description">Recording interface accessible from Audio Gallery</p>
-                <img src="03_record_audio_screen.png" alt="Record Audio Screen">
-            </div>
-            
-            <div class="screenshot-section">
-                <h2>4. Face Gallery (Reference)</h2>
-                <p class="description">Existing gallery pattern for comparison - Audio Gallery follows same design language</p>
-                <img src="04_face_gallery_reference.png" alt="Face Gallery Reference">
-            </div>
-            
-            <div class="screenshot-section">
-                <h2>5. Home Screen (Final)</h2>
-                <p class="description">Final state showing all gallery options</p>
-                <img src="05_home_screen_final.png" alt="Home Screen Final">
-            </div>
-            
-            <hr style="border-color: #30363d; margin: 40px 0;">
-            <p style="color: #8b949e; text-align: center;">
-                <strong>Note:</strong> With actual audio recordings, the Audio Gallery would show items with waveforms, 
-                play/pause buttons, pitch data, and formant information as described in the PR.
-            </p>
-        </body>
-        </html>
-        EOF
-        echo "📊 Screenshot report generated for medium_phone"
+          <h1>📸 OpenTransition — UI Screenshots</h1>
+        HTMLEOF
+          echo "  <p class=\"meta\">📱 <strong>medium_phone</strong> emulator · API 36 · debug build · captured $DATE</p>"
+          echo "  <div class=\"grid\">"
+          for f in $(ls "$SHOTS"/*.png 2>/dev/null | sort); do
+            name=$(basename "$f" .png)
+            label=$(echo "$name" | sed 's/^[0-9]*_//' | tr '_' ' ' | \
+                      sed 's/\b\(.\)/\u\1/g')
+            echo "    <div class=\"card\">"
+            echo "      <img src=\"$name.png\" alt=\"$label\" loading=\"lazy\">"
+            echo "      <div class=\"label\"><strong>$label</strong>$name.png</div>"
+            echo "    </div>"
+          done
+          echo "  </div>"
+          echo "</body></html>"
+        } > "$SHOTS/index.html"
+        echo "📊 HTML report regenerated."
 
-    - name: 📤 Upload Screenshots
+    - name: 🔄 Update README.md screenshots section
+      if: always()
+      run: |
+        SHOTS="screenshots"
+        DATE=$(date -u '+%Y-%m-%d')
+
+        # Build the replacement block (everything between the markers, inclusive).
+        NEW_BLOCK="<!-- SCREENSHOTS-START -->
+        > 🤖 **Auto-generated** — refreshed by CI on \`$DATE\`.  Captured on a \`medium_phone\` emulator (API 36, debug build).
+
+        | | | |
+        |:---:|:---:|:---:|"
+
+        # Pick six representative shots for the README preview grid.
+        declare -A PICKS=(
+          ["02_home.png"]="Home"
+          ["06_settings_top.png"]="Settings"
+          ["13_milestones_empty.png"]="Milestones"
+          ["16_face_gallery_empty.png"]="Face Gallery"
+          ["23_audio_gallery_empty.png"]="Audio Gallery"
+          ["24_record_audio_idle.png"]="Record Audio"
+        )
+        KEYS=("02_home.png" "06_settings_top.png" "13_milestones_empty.png"
+              "16_face_gallery_empty.png" "23_audio_gallery_empty.png" "24_record_audio_idle.png")
+
+        ROW_IMGS="" ROW_LABELS=""
+        for i in "${!KEYS[@]}"; do
+          f="${KEYS[$i]}"
+          lbl="${PICKS[$f]}"
+          ROW_IMGS="$ROW_IMGS| ![$lbl](screenshots/$f) "
+          ROW_LABELS="$ROW_LABELS| **$lbl** "
+          if (( (i+1) % 3 == 0 )); then
+            NEW_BLOCK="$NEW_BLOCK
+        $ROW_IMGS|
+        $ROW_LABELS|"
+            ROW_IMGS="" ROW_LABELS=""
+          fi
+        done
+
+        NEW_BLOCK="$NEW_BLOCK
+
+        [📂 View all $(ls "$SHOTS"/*.png 2>/dev/null | wc -l) screenshots →](screenshots/README.md)
+        <!-- SCREENSHOTS-END -->"
+
+        # Inject into README.md — replace existing block or insert after ## ✨ Key Features.
+        if grep -q "<!-- SCREENSHOTS-START -->" README.md; then
+          python3 - <<'PY'
+        import re, pathlib
+        txt = pathlib.Path("README.md").read_text()
+        import os
+        block = os.environ.get("NEW_BLOCK", "")
+        txt = re.sub(
+            r"<!-- SCREENSHOTS-START -->.*?<!-- SCREENSHOTS-END -->",
+            block, txt, flags=re.DOTALL)
+        pathlib.Path("README.md").write_text(txt)
+        PY
+        else
+          python3 - <<'PY'
+        import re, pathlib, os
+        txt = pathlib.Path("README.md").read_text()
+        block = os.environ.get("NEW_BLOCK", "")
+        section = "\n## 📸 Screenshots\n\n" + block + "\n"
+        # Insert after the Key Features section heading
+        txt = re.sub(r"(## ✨ Key Features\b)", section + r"\n\1", txt)
+        pathlib.Path("README.md").write_text(txt)
+        PY
+        fi
+        echo "📝 README.md screenshots section updated."
+      env:
+        NEW_BLOCK: |
+          <!-- SCREENSHOTS-START -->
+          Placeholder — replaced at runtime by the step above.
+          <!-- SCREENSHOTS-END -->
+
+    - name: 💾 Commit screenshots back to repo
+      if: github.event_name != 'pull_request'
+      run: |
+        git config user.name  "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add screenshots/ README.md
+        git diff --cached --quiet \
+          || git commit -m "chore(screenshots): auto-update UI screenshots [skip ci]"
+        git push origin HEAD:${{ github.ref_name }}
+
+    - name: 📤 Upload Screenshots artifact
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: ui-screenshots-pr${{ github.event.pull_request.number }}
+        name: ui-screenshots-${{ github.run_number }}
         path: screenshots/
         retention-days: 30
 
-    - name: 💬 Comment on PR with Screenshots
+    - name: 💬 Comment on PR with screenshot list
       if: always() && github.event_name == 'pull_request'
       uses: actions/github-script@v7
       with:
         script: |
           const fs = require('fs');
-          const path = require('path');
-          
-          const screenshotDir = 'screenshots';
-          const files = fs.readdirSync(screenshotDir)
+          const files = fs.readdirSync('screenshots')
             .filter(f => f.endsWith('.png'))
             .sort();
-          
-          const androidVersion = 'medium_phone';
-          const apiLevel = 'medium_phone';
-          const profile = 'medium_phone';
-          
-          let comment = `### 📸 Screenshots - medium_phone\n\n`;
-          comment += `**Device:** medium_phone\n\n`;
-          
-          comment += `**Screenshots captured:**\n`;
-          files.forEach(file => {
-            const name = file.replace('.png', '').replace(/^\d+_/, '').replace(/_/g, ' ');
-            comment += `- ✅ ${name}\n`;
+
+          let body = `## 📸 UI Screenshots — medium_phone\n\n`;
+          body += `**${files.length} screenshots captured** on this PR.\n\n`;
+          body += `**Screens covered:**\n`;
+          files.forEach(f => {
+            const label = f.replace('.png','').replace(/^\d+_/,'').replace(/_/g,' ');
+            body += `- ✅ ${label}\n`;
           });
-          
-          comment += `\n**Total:** ${files.length} screenshots\n\n`;
-          comment += `📦 Download artifact: \`ui-screenshots-pr${{ github.event.pull_request.number }}\`\n`;
-          
-          // Find existing comment
+          body += `\n📦 Artifact: \`ui-screenshots-${{ github.run_number }}\`\n`;
+
           const { data: comments } = await github.rest.issues.listComments({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
+            owner: context.repo.owner, repo: context.repo.repo,
             issue_number: context.issue.number,
           });
-          
-          const botComment = comments.find(comment => 
-            comment.user.type === 'Bot' && 
-            comment.body.includes('## 📸 UI Screenshots')
-          );
-          
-          if (botComment) {
+          const existing = comments.find(c =>
+            c.user.type === 'Bot' && c.body.includes('## 📸 UI Screenshots'));
+
+          if (existing) {
             await github.rest.issues.updateComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              comment_id: botComment.id,
-              body: `## 📸 UI Screenshots\n\nAutomated screenshots captured from this PR.\n\n${comment}`
+              owner: context.repo.owner, repo: context.repo.repo,
+              comment_id: existing.id, body,
             });
           } else {
             await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `## 📸 UI Screenshots\n\nAutomated screenshots captured from this PR.\n\n${comment}`
+              owner: context.repo.owner, repo: context.repo.repo,
+              issue_number: context.issue.number, body,
             });
           }
