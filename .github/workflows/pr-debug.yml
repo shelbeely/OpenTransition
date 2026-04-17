@@ -51,6 +51,40 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew --stacktrace :mobile:assembleDebug
 
+      - name: 🔧 Enable KVM for Android Emulator
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: 📱 Create Android Emulator
+        run: android emulator create --profile=medium_phone
+
+      - name: 🚀 Start Android Emulator
+        run: |
+          android emulator start medium_phone &
+          adb wait-for-device
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+          echo "Emulator booted successfully"
+
+      - name: 🧪 Run Instrumented Tests
+        run: ./gradlew --stacktrace :mobile:connectedDebugAndroidTest
+
+      - name: 🛑 Stop Android Emulator
+        if: always()
+        run: |
+          SERIAL=$(adb devices | grep emulator | awk '{print $1}' | head -1)
+          if [ -n "$SERIAL" ]; then
+            android emulator stop "$SERIAL"
+          fi
+
+      - name: 📊 Upload Instrumented Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: instrumented-test-results-pr${{ github.event.pull_request.number }}
+          path: mobile/build/outputs/androidTest-results/
+
       - name: Upload Debug APK artifact
         uses: actions/upload-artifact@v4
         with:
