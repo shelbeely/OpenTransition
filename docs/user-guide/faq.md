@@ -48,7 +48,7 @@ The app lock offers multiple security options:
 
 - **Password Lock**: Uses industry-standard hashing to securely store your password. Your actual password is never stored—only a hashed version is saved, making it very difficult for anyone to access your data without your code.
 
-- **Biometric Lock** (NEW): Uses your device's fingerprint or face recognition for quick and secure access. This option:
+- **Biometric Lock**: Uses your device's fingerprint or face recognition for quick and secure access. This option:
   - Uses Android's BiometricPrompt API with BIOMETRIC_STRONG security
   - Still requires a backup password for recovery
   - Only works if your device supports biometric authentication
@@ -315,6 +315,42 @@ There are many ways to help:
 ### Is there a community forum or Discord?
 
 Currently, the main community space is GitHub. A Discord or forum may be created in the future based on community interest.
+
+## Migrating from TransTracks
+
+### I used TransTracks — can I import my data?
+
+**Yes!** TransTracks was retired from the Google Play Store in 2025. OpenTransition is the recommended successor and is fully compatible with the `.ttbackup` backup format that TransTracks exports.
+
+**If TransTracks is still installed on your phone:**
+
+1. Open TransTracks
+2. Go to **Settings → Export**
+3. Save the `.ttbackup` file somewhere safe (Google Drive, Files app, email, etc.)
+4. Install OpenTransition
+5. Tap the `.ttbackup` file, or open OpenTransition → **Settings → Import Backup**
+6. Confirm the import
+
+**If you already uninstalled TransTracks:**
+
+Apps removed from the Play Store are still available for reinstall to people who previously installed them. Open the Play Store, go to **Manage apps and device → Manage → Not installed**, find TransTracks, and tap Install. Android auto-backup usually restores your data.
+
+### What does a `.ttbackup` file contain?
+
+Everything. The `.ttbackup` file is a ZIP archive (you can rename it to `.zip` to open it on a computer) containing:
+- All your photos, body photos, and audio recordings
+- All milestones with dates and descriptions
+- App settings (theme, preferences)
+
+### Does importing overwrite my existing OpenTransition data?
+
+The import process merges data when possible. You will be shown a confirmation prompt before import proceeds. If you have existing data in OpenTransition, review the prompt carefully.
+
+### What happened to TransTracks?
+
+The TransTracks team retired the app from the Play Store and archived their source repository at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android). The code is preserved for reference and data recovery only. OpenTransition continues as the active, maintained successor.
+
+---
 
 ## Safety & Support Resources
 
