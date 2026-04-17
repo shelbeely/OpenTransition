@@ -42,6 +42,15 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      - name: Install Android CLI
+        run: |
+          curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/android -o android
+          chmod +x android
+          sudo mv android /usr/local/bin/android
+
+      - name: Init Android CLI
+        run: android init
+
       - name: Generate local.properties
         run: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties

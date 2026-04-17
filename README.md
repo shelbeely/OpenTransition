@@ -37,6 +37,21 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 - 🧪 [Development Guide](https://shelbeely.github.io/OpenTransition/development/code-style/) - Coding standards and practices
 - 🤝 [Contributing](https://shelbeely.github.io/OpenTransition/contributing/guidelines/) - How to contribute to the project
 
+## 📸 Screenshots
+
+<!-- SCREENSHOTS-START -->
+> 🤖 **Auto-generated** — refreshed by CI on every push to `main`.  Captured on a `medium_phone` emulator (API 36, debug build).
+
+| | | |
+|:---:|:---:|:---:|
+| ![Home](screenshots/02_home.png) | ![Settings](screenshots/06_settings_top.png) | ![Milestones](screenshots/13_milestones_empty.png) |
+| **Home** | **Settings** | **Milestones** |
+| ![Face Gallery](screenshots/16_face_gallery_empty.png) | ![Audio Gallery](screenshots/23_audio_gallery_empty.png) | ![Record Audio](screenshots/24_record_audio_idle.png) |
+| **Face Gallery** | **Audio Gallery** | **Record Audio** |
+
+[📂 View all 40 screenshots →](screenshots/README.md)
+<!-- SCREENSHOTS-END -->
+
 ## ✨ Key Features
 
 - 📸 **Photo Tracking** - Document your transition with organized photos (face, body, custom areas)
