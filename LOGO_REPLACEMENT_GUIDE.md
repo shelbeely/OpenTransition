@@ -13,8 +13,8 @@ The OpenTransition app uses Android's adaptive icon system along with various ic
 The primary app launcher icons are located in:
 
 ```
-app/src/main/ic_launcher-playstore.png      (512x512 PNG for Play Store)
-app/src/main/ic_launcher-web.png            (512x512 PNG for web)
+mobile/src/main/ic_launcher-playstore.png      (512x512 PNG for Play Store)
+mobile/src/main/ic_launcher-web.png            (512x512 PNG for web)
 ```
 
 ### 2. Adaptive Icon Components
@@ -22,36 +22,36 @@ app/src/main/ic_launcher-web.png            (512x512 PNG for web)
 Android adaptive icons consist of separate foreground and background layers:
 
 **Foreground Images:**
-- `app/src/main/res/mipmap-mdpi/ic_launcher_foreground.png` (108x108 dp)
-- `app/src/main/res/mipmap-hdpi/ic_launcher_foreground.png` (162x162 dp)
-- `app/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png` (216x216 dp)
-- `app/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png` (324x324 dp)
-- `app/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` (432x432 dp)
+- `mobile/src/main/res/mipmap-mdpi/ic_launcher_foreground.png` (108x108 dp)
+- `mobile/src/main/res/mipmap-hdpi/ic_launcher_foreground.png` (162x162 dp)
+- `mobile/src/main/res/mipmap-xhdpi/ic_launcher_foreground.png` (216x216 dp)
+- `mobile/src/main/res/mipmap-xxhdpi/ic_launcher_foreground.png` (324x324 dp)
+- `mobile/src/main/res/mipmap-xxxhdpi/ic_launcher_foreground.png` (432x432 dp)
 
 **Monochrome Images (for themed icons on Android 13+):**
-- `app/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png` (108x108 dp)
-- `app/src/main/res/mipmap-hdpi/ic_launcher_monochrome.png` (162x162 dp)
-- `app/src/main/res/mipmap-xhdpi/ic_launcher_monochrome.png` (216x216 dp)
-- `app/src/main/res/mipmap-xxhdpi/ic_launcher_monochrome.png` (324x324 dp)
-- `app/src/main/res/mipmap-xxxhdpi/ic_launcher_monochrome.png` (432x432 dp)
+- `mobile/src/main/res/mipmap-mdpi/ic_launcher_monochrome.png` (108x108 dp)
+- `mobile/src/main/res/mipmap-hdpi/ic_launcher_monochrome.png` (162x162 dp)
+- `mobile/src/main/res/mipmap-xhdpi/ic_launcher_monochrome.png` (216x216 dp)
+- `mobile/src/main/res/mipmap-xxhdpi/ic_launcher_monochrome.png` (324x324 dp)
+- `mobile/src/main/res/mipmap-xxxhdpi/ic_launcher_monochrome.png` (432x432 dp)
 
 **Vector/XML Definitions:**
-- `app/src/main/res/drawable/ic_launcher_foreground.xml`
-- `app/src/main/res/drawable/ic_launcher_background.xml`
+- `mobile/src/main/res/drawable/ic_launcher_foreground.xml`
+- `mobile/src/main/res/drawable/ic_launcher_background.xml`
 
 ### 3. Adaptive Icon Configuration Files
 
 These XML files define how the adaptive icons are composed:
 
 ```
-app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
+mobile/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+mobile/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 ```
 
 ### 4. Play Store Graphics
 
 ```
-app/src/main/res/playstore/ic_playstore_512.png (512x512 PNG)
+mobile/src/main/res/playstore/ic_playstore_512.png (512x512 PNG)
 ```
 
 ### 5. Train Variant Icons (if applicable)
@@ -59,11 +59,11 @@ app/src/main/res/playstore/ic_playstore_512.png (512x512 PNG)
 The app may have alternate "train" variant icons:
 
 ```
-app/src/main/ic_launcher_train-web.png
-app/src/main/res/mipmap-anydpi-v26/ic_launcher_train.xml
-app/src/main/res/mipmap-anydpi-v26/ic_launcher_train_round.xml
-app/src/main/res/drawable/ic_launcher_train_background.xml
-app/src/main/res/drawable/ic_launcher_train_foreground.xml
+mobile/src/main/ic_launcher_train-web.png
+mobile/src/main/res/mipmap-anydpi-v26/ic_launcher_train.xml
+mobile/src/main/res/mipmap-anydpi-v26/ic_launcher_train_round.xml
+mobile/src/main/res/drawable/ic_launcher_train_background.xml
+mobile/src/main/res/drawable/ic_launcher_train_foreground.xml
 ```
 
 ## Step-by-Step Replacement Process
@@ -82,7 +82,7 @@ Before replacing icons, prepare the following:
 You can use Android Studio's Image Asset Studio to generate all required sizes:
 
 1. Open Android Studio
-2. Right-click on `app/src/main/res` folder
+2. Right-click on `mobile/src/main/res` folder
 3. Select **New > Image Asset**
 4. Choose "Launcher Icons (Adaptive and Legacy)"
 5. Configure your foreground and background layers
@@ -150,21 +150,21 @@ Test your new icon on:
 Beyond launcher icons, you may also want to update:
 
 ### Splash Screen / Welcome Screen
-- Check `app/src/main/res/layout/welcome.xml`
+- Check `mobile/src/main/res/layout/welcome.xml`
 - Update any logo ImageViews or branding elements
 
 ### In-App Logos
-- Search for logo references in layout files: `grep -r "logo" app/src/main/res/layout/`
+- Search for logo references in layout files: `grep -r "logo" mobile/src/main/res/layout/`
 - Update drawable resources as needed
 
 ### App Name
-- Update in `app/src/main/res/values/strings.xml`:
+- Update in `mobile/src/main/res/values/strings.xml`:
   ```xml
   <string name="app_name">Your App Name</string>
   ```
 
 ### Theme Colors
-- Update brand colors in `app/src/main/res/values/colors.xml`:
+- Update brand colors in `mobile/src/main/res/values/colors.xml`:
   ```xml
   <color name="colorPrimary">#YourColor</color>
   <color name="colorPrimaryDark">#YourColor</color>

@@ -2,7 +2,7 @@
 
 OpenTransition is a transition tracking application made specifically for transgender people, focusing on photo tracking and milestone management. It helps you document your journey privately and securely.
 
-This is a customized fork of the original TransTracks application, rebranded and repackaged for independent deployment.
+OpenTransition began as a fork of the original **TransTracks** application. TransTracks was [retired from the Google Play Store in 2025](https://github.com/TransTracks/TransTracks-Android) and its repository is now archived and read-only. OpenTransition is the active successor — the recommended way to continue tracking your transition journey. If you were a TransTracks user, see [Importing from TransTracks](#-importing-from-transtracks) below.
 
 ## 📱 Multi-Platform Support
 
@@ -40,43 +40,54 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 ## ✨ Key Features
 
 - 📸 **Photo Tracking** - Document your transition with organized photos (face, body, custom areas)
+- 📸 **Face-Detection Camera** - CameraX-powered camera with ML Kit face detection for perfectly framed face photos
 - 🎯 **Milestone Management** - Record and celebrate important events
 - 🖼️ **Gallery View** - Browse and compare your progress photos
-- 🔒 **Privacy First** - App lock, disguised mode, and local storage
+- 🎙️ **Audio Tracking** - Record voice samples and track vocal changes with pitch/formant analysis
+- 🔒 **Privacy First** - App lock (PIN, pattern, or biometric), disguised mode, and local storage
 - 🔐 **Optional Encryption** - Encrypt your database with SQLCipher (optional)
 - 🎭 **Decoy Vault** - Create a separate vault with different passcode for added security
 - 💾 **Data Control** - Export, backup, and sync on your terms
-- 🔄 **Import Backups** - Import data from the original TransTracks app
+- 🔄 **Import Backups** - Import `.ttbackup` data from the original TransTracks app
 - 🎨 **Customizable** - Multiple themes and personalization options
-- ⌚ **Wear OS Companion** - Access key features from your smartwatch
+- ⌚ **Wear OS Companion** - Trigger photo capture and view milestones from your smartwatch
 
 ## 🔄 Importing from TransTracks
 
-OpenTransition maintains **backwards compatibility** with TransTracks. You can easily import your existing data:
+**TransTracks was retired from the Google Play Store in 2025.** If you were a TransTracks user, OpenTransition is the recommended way to continue your journey. It is fully compatible with the `.ttbackup` backup format that TransTracks produces.
 
-### Import Process
+### How to get your data out of TransTracks
 
-1. **Export from TransTracks**: In TransTracks, go to Settings → Export Data
-2. **Save the backup file**: This creates a `.realm` backup file
-3. **Import to OpenTransition**: 
-   - Open OpenTransition
-   - Go to Settings
-   - Tap "Import Backup"
-   - Select your `.realm` backup file
-   - Wait for import to complete
+If you still have TransTracks installed on your phone:
+
+1. Open TransTracks
+2. Go to **Settings → Export**
+3. The app will bundle everything into a `.ttbackup` file and open the Android share sheet
+4. Save it somewhere safe (Google Drive, email, Files app, etc.)
+
+The `.ttbackup` file is a standard ZIP archive with a custom extension — you can rename it to `.zip` to inspect its contents on a computer.
+
+If you have already uninstalled TransTracks but used the same Google account, you may still be able to reinstall it from the Play Store under **Manage apps and device → Manage → Not installed**. Android auto-backup usually restores the data.
+
+### Importing into OpenTransition
+
+1. Locate your `.ttbackup` file
+2. Tap it to open it with OpenTransition (or go to Settings → Import Backup)
+3. Confirm the import
+4. Wait for the import to complete — all photos, milestones, and metadata are preserved
 
 ### Technical Details
 
-OpenTransition uses **Room database** (modern Android database) instead of Realm. However, we maintain full backwards compatibility with TransTracks:
+OpenTransition uses **Room database** instead of the Realm database used by the original TransTracks. Backwards-compatible import utilities handle the conversion automatically:
 
-- **Realm data models preserved**: Used only for importing TransTracks backups
-- **Migration utilities included**: Automatic conversion from Realm to Room format
-- **No data loss**: All photos, milestones, and audio analyses are preserved
-- **One-time process**: After import, everything runs on the new Room database
+- **Realm data models preserved** — used only for reading TransTracks backups
+- **Automatic conversion** from Realm to Room format during import
+- **No data loss** — all photos, milestones, and audio analyses are preserved
+- **One-time process** — after import, everything runs on the Room database
 
-All Realm-related code is marked with `BACKWARDS COMPATIBILITY` comments and is maintained solely for importing data from TransTracks.
+All Realm-related code is marked with `BACKWARDS COMPATIBILITY` comments.
 
-See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for more details on the database architecture.
+See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for details on the database architecture and optional SQLCipher encryption.
 
 ## 🚀 Quick Start for Development
 
@@ -116,55 +127,6 @@ See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for more details on the datab
 
 This fork uses a different package name to allow independent deployment
 
-## 🤖 AI Agent Skills
-
-This repository includes **AI agent skills** in the `.github/skills/` directory from both OpenAI and Anthropic. These skills enhance AI-assisted development by providing specialized capabilities that are automatically available when using GitHub Copilot or Claude with this repository.
-
-### OpenAI Skills (from [openai/skills](https://github.com/openai/skills))
-
-**Curated Skills:**
-- **gh-address-comments** - Address PR review comments efficiently
-- **gh-fix-ci** - Debug and fix failing GitHub Actions CI/CD
-- **notion-knowledge-capture** - Capture conversations into structured Notion pages
-- **notion-meeting-intelligence** - Prepare meeting materials with context
-- **notion-research-documentation** - Research and synthesize documentation
-- **notion-spec-to-implementation** - Turn specs into implementation plans
-
-**Experimental Skills:**
-- **create-plan** - Create concise plans for coding tasks
-- **linear** - Manage issues and workflows in Linear
-
-**System Skills:**
-- **skill-creator** - Guide for creating new skills
-- **skill-installer** - Install skills from GitHub repositories
-
-### Anthropic Skills (from [anthropics/skills](https://github.com/anthropics/skills))
-
-**Creative & Design:**
-- **algorithmic-art** - Create algorithmic art with p5.js
-- **canvas-design** - Create beautiful visual art in PNG/PDF
-- **frontend-design** - Create production-grade frontend interfaces
-- **slack-gif-creator** - Create animated GIFs for Slack
-- **theme-factory** - Style artifacts with themes
-
-**Development & Technical:**
-- **mcp-builder** - Create MCP (Model Context Protocol) servers
-- **web-artifacts-builder** - Create complex web artifacts with React
-- **webapp-testing** - Test web applications with Playwright
-
-**Document Skills:**
-- **docx** - Document creation, editing, and analysis
-- **pdf** - PDF manipulation toolkit
-- **pptx** - Presentation creation and editing
-- **xlsx** - Spreadsheet creation and analysis
-
-**Enterprise & Communication:**
-- **brand-guidelines** - Apply brand colors and typography
-- **doc-coauthoring** - Guide for co-authoring documentation
-- **internal-comms** - Write internal communications
-
-Learn more: [GitHub Copilot agent skills](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) | [Agent Skills Standard](http://agentskills.io)
-
 ## 🤝 Contributing
 
 We welcome contributions! If you'd like to help improve OpenTransition:
@@ -183,17 +145,9 @@ We welcome contributions! If you'd like to help improve OpenTransition:
 
 ## 👥 Contributors
 
-We are grateful to everyone who has contributed to OpenTransition! Here are our code contributors:
+We are grateful to everyone who has contributed to OpenTransition!
 
-- Cassie Wilson: 223 commits (47.2%)
-- copilot-swe-agent[bot]: 172 commits (36.4%)
-- TransTracks: 39 commits (8.3%)
-- dependabot[bot]: 28 commits (5.9%)
-- shelbeely: 6 commits (1.3%)
-- Shelbee Johnson: 3 commits (0.6%)
-- codefactor-io: 1 commit (0.2%)
-
-View all contributors on [GitHub](https://github.com/shelbeely/OpenTransition/graphs/contributors).
+View the full, up-to-date list on [GitHub contributors](https://github.com/shelbeely/OpenTransition/graphs/contributors).
 
 ## License
 
@@ -219,6 +173,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Credits
 
-OpenTransition is based on the original **TransTracks** application. We are deeply grateful to the TransTracks developers and contributors for creating this valuable tool for the transgender community. Their work provided the foundation that makes OpenTransition possible.
+OpenTransition is based on the original **TransTracks** application. TransTracks was retired from the Google Play Store in 2025; its source code is archived at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android). We are deeply grateful to the TransTracks developers and contributors for creating this valuable tool for the transgender community. Their work provided the foundation that makes OpenTransition possible.
 
 [Full Credits & Attribution →](https://shelbeely.github.io/OpenTransition/credits/)

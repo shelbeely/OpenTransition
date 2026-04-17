@@ -129,11 +129,11 @@ OpenTransition supports importing backups from TransTracks. The app maintains ba
 ### How to Import
 
 1. **In TransTracks**: Export your data (Settings → Export)
-2. **Save the backup file**: A `.realm` file will be created
+2. **Save the backup file**: A `.ttbackup` file will be created and offered via the Android share sheet
 3. **In OpenTransition**: 
    - Go to Settings
    - Tap "Import Backup"
-   - Select your `.realm` backup file
+   - Select your `.ttbackup` backup file
    - Wait for the import to complete
 
 ### What Gets Imported
