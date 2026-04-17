@@ -19,21 +19,8 @@ jobs:
   capture-screenshots:
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    strategy:
-      matrix:
-        include:
-          - api-level: 29
-            target: default
-            arch: x86_64
-            profile: pixel_3a
-            android-version: "Android 10"
-          - api-level: 31
-            target: google_apis
-            arch: x86_64
-            profile: pixel_5
-            android-version: "Android 12"
-    
-    name: Screenshots - ${{ matrix.android-version }} (API ${{ matrix.api-level }})
+
+    name: Screenshots - medium_phone
     
     steps:
     - name: 🚚 Checkout PR
@@ -118,76 +105,79 @@ jobs:
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
 
-    - name: 📱 Run Screenshot Tests on ${{ matrix.android-version }}
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        target: ${{ matrix.target }}
-        arch: ${{ matrix.arch }}
-        profile: ${{ matrix.profile }}
-        disable-animations: true
-        disk-size: 2048M
-        heap-size: 512M
-        ram-size: 4096M
-        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
-        script: |
-          # Wait for emulator to be ready
-          adb wait-for-device
-          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
-          
-          # Install APK
-          adb install -r mobile/build/outputs/apk/debug/mobile-debug.apk
-          
-          # Create screenshots directory
-          mkdir -p screenshots
-          
-          # Grant necessary permissions
-          adb shell pm grant com.shelbeely.opentransition android.permission.READ_EXTERNAL_STORAGE || true
-          adb shell pm grant com.shelbeely.opentransition android.permission.WRITE_EXTERNAL_STORAGE || true
-          adb shell pm grant com.shelbeely.opentransition android.permission.RECORD_AUDIO || true
-          
-          # Launch app
-          adb shell am start -n com.shelbeely.opentransition/.ui.MainActivity
-          sleep 5
-          
-          # Capture home screen
-          adb exec-out screencap -p > screenshots/01_home_screen.png
-          echo "✅ Captured: Home screen"
-          
-          # Navigate to Audio Gallery (tap on audio gallery button)
-          # Coordinates may need adjustment based on actual layout
-          adb shell input tap 540 1800
-          sleep 3
-          adb exec-out screencap -p > screenshots/02_audio_gallery_empty.png
-          echo "✅ Captured: Audio Gallery (empty state)"
-          
-          # Add recording button
-          adb shell input tap 980 200
-          sleep 2
-          adb exec-out screencap -p > screenshots/03_record_audio_screen.png
-          echo "✅ Captured: Record Audio screen"
-          
-          # Go back to home
-          adb shell input keyevent KEYCODE_BACK
-          sleep 1
-          adb shell input keyevent KEYCODE_BACK
-          sleep 2
-          
-          # Navigate to Face Gallery to show existing gallery pattern
-          adb shell input tap 540 1200
-          sleep 3
-          adb exec-out screencap -p > screenshots/04_face_gallery_reference.png
-          echo "✅ Captured: Face Gallery (reference)"
-          
-          # Go back
-          adb shell input keyevent KEYCODE_BACK
-          sleep 2
-          
-          # Final home screen
-          adb exec-out screencap -p > screenshots/05_home_screen_final.png
-          echo "✅ Captured: Final home screen"
-          
-          echo "📸 Screenshot capture complete!"
+    - name: 📱 Create Android Emulator
+      run: android emulator create --profile=medium_phone
+
+    - name: 🚀 Start Android Emulator
+      run: |
+        android emulator start medium_phone &
+        adb wait-for-device
+        adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+        echo "Emulator booted successfully"
+
+    - name: 📸 Capture Screenshots
+      run: |
+        # Install APK
+        adb install -r mobile/build/outputs/apk/debug/mobile-debug.apk
+
+        # Create screenshots directory
+        mkdir -p screenshots
+
+        # Grant necessary permissions
+        adb shell pm grant com.shelbeely.opentransition android.permission.READ_EXTERNAL_STORAGE || true
+        adb shell pm grant com.shelbeely.opentransition android.permission.WRITE_EXTERNAL_STORAGE || true
+        adb shell pm grant com.shelbeely.opentransition android.permission.RECORD_AUDIO || true
+
+        # Launch app
+        adb shell am start -n com.shelbeely.opentransition/.ui.MainActivity
+        sleep 5
+
+        # Capture home screen
+        adb exec-out screencap -p > screenshots/01_home_screen.png
+        echo "✅ Captured: Home screen"
+
+        # Navigate to Audio Gallery (tap on audio gallery button)
+        # Coordinates may need adjustment based on actual layout
+        adb shell input tap 540 1800
+        sleep 3
+        adb exec-out screencap -p > screenshots/02_audio_gallery_empty.png
+        echo "✅ Captured: Audio Gallery (empty state)"
+
+        # Add recording button
+        adb shell input tap 980 200
+        sleep 2
+        adb exec-out screencap -p > screenshots/03_record_audio_screen.png
+        echo "✅ Captured: Record Audio screen"
+
+        # Go back to home
+        adb shell input keyevent KEYCODE_BACK
+        sleep 1
+        adb shell input keyevent KEYCODE_BACK
+        sleep 2
+
+        # Navigate to Face Gallery to show existing gallery pattern
+        adb shell input tap 540 1200
+        sleep 3
+        adb exec-out screencap -p > screenshots/04_face_gallery_reference.png
+        echo "✅ Captured: Face Gallery (reference)"
+
+        # Go back
+        adb shell input keyevent KEYCODE_BACK
+        sleep 2
+
+        # Final home screen
+        adb exec-out screencap -p > screenshots/05_home_screen_final.png
+        echo "✅ Captured: Final home screen"
+
+        echo "📸 Screenshot capture complete!"
+
+    - name: 🛑 Stop Android Emulator
+      if: always()
+      run: |
+        SERIAL=$(adb devices | grep emulator | awk '{print $1}' | head -1)
+        if [ -n "$SERIAL" ]; then
+          android emulator stop "$SERIAL"
+        fi
 
     - name: 📊 Generate Screenshot Report
       if: always()
@@ -197,7 +187,7 @@ jobs:
         <!DOCTYPE html>
         <html>
         <head>
-            <title>UI Screenshots - ${{ matrix.android-version }}</title>
+            <title>UI Screenshots - medium_phone</title>
             <style>
                 body {
                     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
@@ -258,7 +248,7 @@ jobs:
         </head>
         <body>
             <h1>🎵 Audio Gallery Feature - UI Screenshots</h1>
-            <div class="android-version">📱 ${{ matrix.android-version }} (API ${{ matrix.api-level }}) - ${{ matrix.profile }}</div>
+            <div class="android-version">📱 medium_phone</div>
             <p>Screenshots captured from PR automated testing</p>
             
             <div class="screenshot-section">
@@ -299,13 +289,13 @@ jobs:
         </body>
         </html>
         EOF
-        echo "📊 Screenshot report generated for ${{ matrix.android-version }}"
+        echo "📊 Screenshot report generated for medium_phone"
 
     - name: 📤 Upload Screenshots
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: ui-screenshots-api${{ matrix.api-level }}-${{ github.event.pull_request.number }}
+        name: ui-screenshots-pr${{ github.event.pull_request.number }}
         path: screenshots/
         retention-days: 30
 
@@ -322,12 +312,12 @@ jobs:
             .filter(f => f.endsWith('.png'))
             .sort();
           
-          const androidVersion = '${{ matrix.android-version }}';
-          const apiLevel = '${{ matrix.api-level }}';
-          const profile = '${{ matrix.profile }}';
+          const androidVersion = 'medium_phone';
+          const apiLevel = 'medium_phone';
+          const profile = 'medium_phone';
           
-          let comment = `### 📸 Screenshots - ${androidVersion} (API ${apiLevel})\n\n`;
-          comment += `**Device:** ${profile}\n\n`;
+          let comment = `### 📸 Screenshots - medium_phone\n\n`;
+          comment += `**Device:** medium_phone\n\n`;
           
           comment += `**Screenshots captured:**\n`;
           files.forEach(file => {
@@ -336,7 +326,7 @@ jobs:
           });
           
           comment += `\n**Total:** ${files.length} screenshots\n\n`;
-          comment += `📦 Download artifact: \`ui-screenshots-api${apiLevel}-${{ github.event.pull_request.number }}\`\n`;
+          comment += `📦 Download artifact: \`ui-screenshots-pr${{ github.event.pull_request.number }}\`\n`;
           
           // Find existing comment
           const { data: comments } = await github.rest.issues.listComments({
@@ -347,31 +337,21 @@ jobs:
           
           const botComment = comments.find(comment => 
             comment.user.type === 'Bot' && 
-            comment.body.includes('## 📸 UI Screenshots - Multi-Version')
+            comment.body.includes('## 📸 UI Screenshots')
           );
           
           if (botComment) {
-            // Update existing comment by appending this version's info
-            let updatedBody = botComment.body;
-            if (!updatedBody.includes(`API ${apiLevel}`)) {
-              updatedBody += `\n\n---\n\n${comment}`;
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: updatedBody
-              });
-            }
+            await github.rest.issues.updateComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              comment_id: botComment.id,
+              body: `## 📸 UI Screenshots\n\nAutomated screenshots captured from this PR.\n\n${comment}`
+            });
           } else {
-            // Create new comment with header
-            const header = `## 📸 UI Screenshots - Multi-Version\n\n`;
-            const intro = `Automated screenshots captured from this PR on multiple Android versions for compatibility testing.\n\n`;
-            const fullComment = header + intro + comment;
-            
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: fullComment
+              body: `## 📸 UI Screenshots\n\nAutomated screenshots captured from this PR.\n\n${comment}`
             });
           }
