@@ -44,6 +44,15 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # libpulse0 is required by the QEMU binary bundled with the Android
+      # emulator. Without it the emulator process dies immediately on startup
+      # with "error while loading shared libraries: libpulse.so.0".
+      # libxcb-cursor0 is required by Qt ≥6.5 to load the xcb platform plugin.
+      # Xvfb provides a virtual framebuffer so the emulator can initialise its
+      # Qt window even in a headless CI environment.
+      - name: Install emulator system dependencies
+        run: sudo apt-get install -y libpulse0 libxcb-cursor0 xvfb
+
       # Android CLI is a single binary that gives agents a clean interface for
       # SDK management, project creation, and emulator control.
       # Download URL: https://developer.android.com/tools/agents/android-cli/archive
@@ -62,6 +71,33 @@ jobs:
       # to and interact with during the session.
       - name: Create Android emulator
         run: android emulator create --profile=medium_phone
+
+      # Start a virtual framebuffer so the emulator's Qt window can initialise
+      # in this headless environment, then boot the emulator in no-window mode
+      # and wait until Android has fully started (sys.boot_completed=1).
+      - name: Start Android emulator
+        run: |
+          Xvfb :99 -screen 0 1280x800x24 &
+          export DISPLAY=:99
+          echo "crashreport.consent=1" >> ~/.android/default.ini
+          /usr/local/lib/android/sdk/emulator/emulator \
+            @medium_phone \
+            -no-window \
+            -no-audio \
+            -no-boot-anim \
+            -crash-report-mode disabled \
+            -gpu swangle \
+            &
+          adb wait-for-device
+          for i in $(seq 1 60); do
+            BOOTED=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+            echo "Boot check $i/60: sys.boot_completed=$BOOTED"
+            if [ "$BOOTED" = "1" ]; then
+              echo "Emulator fully booted"
+              break
+            fi
+            sleep 5
+          done
 
       # Gradle requires local.properties to locate the Android SDK.
       - name: Generate local.properties
