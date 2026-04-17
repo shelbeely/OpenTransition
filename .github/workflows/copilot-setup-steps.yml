@@ -63,17 +63,6 @@ jobs:
       - name: Create Android emulator
         run: android emulator create --profile=medium_phone
 
-      # Start the emulator in the background before Copilot begins work so it
-      # is immediately available. We wait for a full boot before proceeding.
-      - name: Start Android emulator
-        run: |
-          nohup android emulator start medium_phone > /tmp/emulator.log 2>&1 &
-          echo "Waiting for emulator to come online..."
-          adb wait-for-device
-          echo "Waiting for boot to complete..."
-          timeout 300 bash -c 'until adb shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; do sleep 3; done'
-          echo "Emulator is ready"
-
       # Gradle requires local.properties to locate the Android SDK.
       - name: Generate local.properties
         run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
