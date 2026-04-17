@@ -82,23 +82,23 @@ The `GalleryAdapter` includes:
 ## Key Files
 
 ### Layouts
-- `app/src/main/res/layout/record_audio.xml` - Audio recording screen
-- `app/src/main/res/layout/home_adapter_audio_item.xml` - Home view audio item
-- `app/src/main/res/layout/gallery_adapter_audio_item.xml` - Gallery view audio card
-- `app/src/main/res/layout/audio_comparison.xml` - Audio comparison view
+- `mobile/src/main/res/layout/record_audio.xml` - Audio recording screen
+- `mobile/src/main/res/layout/home_adapter_audio_item.xml` - Home view audio item
+- `mobile/src/main/res/layout/gallery_adapter_audio_item.xml` - Gallery view audio card
+- `mobile/src/main/res/layout/audio_comparison.xml` - Audio comparison view
 
 ### Kotlin Files
-- `app/src/main/java/com/shelbeely/opentransition/ui/recordaudio/RecordAudioFragment.kt` - Recording logic
-- `app/src/main/java/com/shelbeely/opentransition/ui/home/HomeGalleryAdapter.kt` - Home audio display
-- `app/src/main/java/com/shelbeely/opentransition/ui/gallery/GalleryAdapter.kt` - Gallery audio display
-- `app/src/main/java/com/shelbeely/opentransition/util/AudioPlayerManager.kt` - Playback management
-- `app/src/main/java/com/shelbeely/opentransition/util/AudioAnalysisUtil.kt` - Audio analysis
-- `app/src/main/java/com/shelbeely/opentransition/util/AudioRecorderUtil.kt` - Recording utilities
+- `mobile/src/main/java/com/shelbeely/opentransition/ui/recordaudio/RecordAudioFragment.kt` - Recording logic
+- `mobile/src/main/java/com/shelbeely/opentransition/ui/home/HomeGalleryAdapter.kt` - Home audio display
+- `mobile/src/main/java/com/shelbeely/opentransition/ui/gallery/GalleryAdapter.kt` - Gallery audio display
+- `mobile/src/main/java/com/shelbeely/opentransition/util/AudioPlayerManager.kt` - Playback management
+- `mobile/src/main/java/com/shelbeely/opentransition/util/AudioAnalysisUtil.kt` - Audio analysis
+- `mobile/src/main/java/com/shelbeely/opentransition/util/AudioRecorderUtil.kt` - Recording utilities
 
 ### Widgets
-- `app/src/main/java/com/shelbeely/opentransition/ui/widget/WaveformView.kt` - Waveform display
-- `app/src/main/java/com/shelbeely/opentransition/ui/widget/PitchProgressionView.kt` - Pitch visualization
-- `app/src/main/java/com/shelbeely/opentransition/ui/widget/FormantChartView.kt` - Formant visualization
+- `mobile/src/main/java/com/shelbeely/opentransition/ui/widget/WaveformView.kt` - Waveform display
+- `mobile/src/main/java/com/shelbeely/opentransition/ui/widget/PitchProgressionView.kt` - Pitch visualization
+- `mobile/src/main/java/com/shelbeely/opentransition/ui/widget/FormantChartView.kt` - Formant visualization
 
 ## User Experience Improvements
 

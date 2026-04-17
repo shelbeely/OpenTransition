@@ -6,15 +6,21 @@ Welcome to the official documentation for **OpenTransition** - a transition trac
 
 ## What is OpenTransition?
 
-OpenTransition is a customized fork of the original **TransTracks** application, rebranded and repackaged for independent deployment. It helps transgender individuals track their transition journey through photos and milestones, providing a private and secure way to document changes over time.
+OpenTransition is the active successor to the original **TransTracks** application. TransTracks was retired from the Google Play Store in 2025 and its repository is now archived. OpenTransition continues to develop independently, providing a private and secure way for transgender individuals to document their transition journey through photos, audio recordings, and milestones. If you are a former TransTracks user, see [Import & Export](features/import-export.md) for migration instructions.
 
-!!! info "Built on TransTracks"
-    OpenTransition is based on the excellent work of the original TransTracks developers. We're grateful for their contribution to the transgender community. [Learn more about credits and attribution →](credits.md)
+!!! info "Built on TransTracks (now retired)"
+    OpenTransition originated from the excellent work of the original TransTracks developers. TransTracks was retired from the Play Store in 2025; OpenTransition is the recommended continuation. [Learn more about credits and attribution →](credits.md)
 
 ## Key Features
 
 ### 📸 Photo Tracking
 Track your transition with photos organized by different body types (face, body, custom areas). Compare photos side-by-side to see your progress over time.
+
+### 📸 Face-Detection Camera
+CameraX-powered camera with ML Kit face detection automatically guides you to frame your face consistently for better before/after comparisons.
+
+### 🎙️ Audio Tracking
+Record voice samples and track vocal changes over time with automatic pitch (F0) and formant (F1/F2) analysis. Visualize your voice journey with waveforms and progression charts.
 
 ### 🎯 Milestone Management
 Record and celebrate important milestones in your transition journey. Track dates, add descriptions, and associate photos with specific achievements.
@@ -23,10 +29,15 @@ Record and celebrate important milestones in your transition journey. Track date
 Browse your transition photos in an organized gallery. Filter by date, body type, and milestones to find exactly what you're looking for.
 
 ### 🔒 Privacy & Security
-- App lock with PIN or pattern
+- App lock with PIN, pattern, or biometric (fingerprint/face)
 - Disguised app icon (train mode)
 - Secure local storage
+- Optional SQLCipher database encryption
+- Decoy vault (separate vault with different passcode)
 - Optional cloud sync with Firebase
+
+### ⌚ Wear OS Companion
+Trigger photo capture and view recent milestones directly from your Android smartwatch via the Wearable Data Layer API.
 
 ### 🎨 Customization
 - Multiple theme options (Pink, Blue, Purple, Green)
@@ -34,20 +45,34 @@ Browse your transition photos in an organized gallery. Filter by date, body type
 - Custom milestone types
 
 ### 💾 Data Management
-- Import/Export your data
+- Import/Export your data (`.ttbackup` format)
 - Firebase cloud backup
-- Local Realm database
+- Room + SQLCipher local database (optional encrypted)
 
 ## Technology Stack
 
 - **Language**: Kotlin
-- **UI Framework**: Android SDK with Material Design
-- **Database**: Realm Kotlin
-- **Architecture**: MVVM with Domain layer
-- **Navigation**: Android Navigation Component
-- **Reactive Programming**: RxJava 3
+- **UI Framework**: Android SDK with Material Design (XML Views + ViewBinding)
+- **Primary Database**: Room + SQLCipher (optional encryption via Android Keystore)
+- **Legacy Import**: Realm Kotlin (backwards compatibility for importing TransTracks backups only)
+- **Architecture**: MVVM with Domain layer, RxJava 3 reactive streams
+- **Navigation**: Android Navigation Component (SafeArgs)
+- **Reactive Programming**: RxJava 3 + RxRelay + RxBinding
+- **Camera**: CameraX + ML Kit face detection
+- **Authentication**: Biometric (BiometricPrompt BIOMETRIC_STRONG) + Firebase Auth
 - **Cloud Services**: Firebase (Auth, Firestore, Analytics, Crashlytics)
-- **Build System**: Gradle
+- **Wear OS**: Wearable Data Layer API
+- **Build System**: Gradle (monorepo: `:mobile`, `:wear`, `:shared`)
+
+## Project Structure
+
+This is a **monorepo** containing three modules:
+
+| Module | Description |
+|--------|-------------|
+| `:mobile` | Main Android phone/tablet app (`com.shelbeely.opentransition`) |
+| `:wear` | Wear OS companion app (`com.shelbeely.opentransition.wear`) |
+| `:shared` | Common data models and Wearable Data Layer constants |
 
 ## Quick Links
 
@@ -55,6 +80,7 @@ Browse your transition photos in an organized gallery. Filter by date, body type
 - [Architecture Overview](architecture/overview.md) - Understand the app structure
 - [Contributing Guidelines](contributing/guidelines.md) - Learn how to contribute
 - [Features Documentation](features/photo-tracking.md) - Explore all features in detail
+- [Import from TransTracks](features/import-export.md) - Migrate your TransTracks data
 
 ## Community & Support
 

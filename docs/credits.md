@@ -2,10 +2,10 @@
 
 ## Original Work
 
-OpenTransition is a fork of **TransTracks**, which was originally created and maintained by the TransTracks development team.
+OpenTransition is based on **TransTracks**, which was originally created and maintained by the TransTracks development team. **TransTracks was retired from the Google Play Store in 2025** and its source repository is now archived at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android). OpenTransition is the active continuation of this work.
 
 **Original Copyright**: © 2018 - 2021 TransTracks  
-**Original Repository**: The original TransTracks application  
+**Original Repository**: [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android) (archived, read-only)  
 **License**: GNU General Public License v3.0
 
 ## What Changed in the Fork
@@ -16,10 +16,11 @@ OpenTransition maintains the core functionality and design philosophy of TransTr
 - Independent maintenance and development
 - Community-driven improvements and features
 - Separate deployment on app stores
+- Expanded features: audio tracking, biometric auth, optional encrypted database, decoy vault, CameraX face-detection camera, Wear OS companion
 
 ## Acknowledgments
 
-We are deeply grateful to the original TransTracks developers and contributors who created this valuable tool for the transgender community. Their work provided the foundation that makes OpenTransition possible.
+We are deeply grateful to the original TransTracks developers and contributors who created this valuable tool for the transgender community. Their work provided the foundation that makes OpenTransition possible. Though TransTracks is no longer active, its legacy lives on in OpenTransition.
 
 ### Original TransTracks Features
 
@@ -29,10 +30,14 @@ All core features in OpenTransition originated from TransTracks:
 - Milestone management and tracking
 - Gallery and photo comparison views
 - Privacy features (app lock, train mode)
-- Data import/export functionality
+- Data import/export functionality (`.ttbackup` format)
 - Firebase integration for cloud backup
 - Theme customization
 - And many more features
+
+## Migrating from TransTracks
+
+If you are a former TransTracks user, your data can be migrated to OpenTransition using the `.ttbackup` export file from TransTracks. See [Import & Export](features/import-export.md) for instructions.
 
 ## Current Development
 
@@ -69,7 +74,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## Community Support
 
-Both TransTracks and OpenTransition exist to serve the transgender community. If you find this app helpful, consider:
+OpenTransition exists to serve the transgender community. If you find this app helpful, consider:
 
 - Contributing code or documentation improvements
 - Reporting bugs to help improve the app

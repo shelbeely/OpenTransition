@@ -112,29 +112,42 @@ Uses **Android Navigation Component**:
 
 ### Database
 
-**Realm Kotlin**: Local persistence
+**Primary: Room + SQLCipher** (modern Android database, replaces Realm)
 
-- Object-oriented database
-- Reactive queries
-- Easy migration
-- Excellent performance
+- SQLite-backed via Room DAO/Entity pattern
+- Optional SQLCipher full-database encryption (AES-256)
+- Encryption keys stored in Android Keystore
+- Decoy vault: separate encrypted database for coercion protection
+- `AppDatabase.kt` — Room database with optional SQLCipher support
+
+**Legacy compatibility: Realm Kotlin** (import-only)
+
+- Realm data models kept solely for importing TransTracks `.ttbackup` backups
+- All Realm code is marked with `BACKWARDS COMPATIBILITY` comments
+- `RealmBackupImporter.kt` handles migration to Room
 
 ### Cloud Services
 
 **Firebase Integration**:
 - **Authentication**: User accounts with email/Google sign-in
 - **Firestore**: Cloud data sync
-- **Crashlytics**: Crash reporting
+- **Crashlytics**: Crash reporting (release builds only)
 - **Analytics**: Usage tracking (opt-in)
 
 ## Package Structure
 
 ```
-com.shelbeely.opentransition/
-├── data/                           # Data models and providers
-│   ├── Photo.kt                   # Photo data model
-│   ├── Milestone.kt               # Milestone data model
+mobile/src/main/java/com/shelbeely/opentransition/
+├── data/                           # Realm data models (import backwards compat)
+│   ├── Photo.kt                   # Photo data model (Realm, import only)
+│   ├── Milestone.kt               # Milestone data model (Realm, import only)
 │   └── TransTracksFileProvider.kt # Content provider
+│
+├── database/                       # Room database layer
+│   ├── AppDatabase.kt             # Room database with optional SQLCipher
+│   ├── DatabaseManager.kt         # Real/decoy vault switching
+│   ├── KeystoreManager.kt         # Android Keystore key management
+│   └── dao/                       # Data Access Objects
 │
 ├── domain/                         # Business logic layer
 │   ├── DomainManager.kt           # Domain instances manager
@@ -154,12 +167,17 @@ com.shelbeely.opentransition/
 │   ├── assignphoto/               # Photo assignment
 │   ├── editphoto/                 # Photo editing
 │   ├── singlephoto/               # Single photo view
+│   ├── recordaudio/               # Audio recording
 │   ├── lock/                      # Lock screen
-│   └── widget/                    # Custom widgets
+│   └── widget/                    # Custom widgets (WaveformView, etc.)
+│
+├── camera/                         # CameraX + ML Kit face detection
 │
 ├── util/                           # Utility classes
 │   ├── FileUtil.kt                # File operations
 │   ├── RxSchedulers.kt            # RxJava schedulers
+│   ├── AudioPlayerManager.kt      # Audio playback
+│   ├── AudioAnalysisUtil.kt       # Pitch/formant analysis
 │   └── settings/                  # Settings utilities
 │       ├── SettingsManager.kt     # Settings management
 │       ├── Theme.kt               # Theme definitions
@@ -170,7 +188,9 @@ com.shelbeely.opentransition/
 │   ├── CameraHandler.kt           # Camera operations
 │   └── StoragePermissionHandler.kt # Permission handling
 │
-└── TransTracksApp.kt              # Application class
+├── wear/                           # Wearable Data Layer integration
+│
+└── TransTracksApp.kt              # Application class (singleton)
 ```
 
 ## Data Flow
@@ -179,8 +199,8 @@ com.shelbeely.opentransition/
 
 1. **User Interaction** → Fragment receives input
 2. **Fragment** → Calls Domain method
-3. **Domain** → Updates Realm database
-4. **Realm** → Notifies observers via RxJava
+3. **Domain** → Updates Room database
+4. **Room** → Notifies observers via RxJava / Flow
 5. **Domain** → Emits state updates
 6. **Fragment** → Updates UI
 
@@ -202,10 +222,9 @@ val args: AssignPhotosFragmentArgs by navArgs()
 // 4. Domain processes the request
 assignPhotosDomain.addPhotos(photoUris, type, date)
 
-// 5. Domain writes to Realm
-realm.write {
-    copyToRealm(Photo(...), UpdatePolicy.ALL)
-}
+// 5. Domain writes to Room via DAO
+val db = DatabaseManager.getDatabase(context)
+db.photoDao().insert(Photo(...))
 
 // 6. UI observes changes and updates
 assignPhotosDomain.state
@@ -282,19 +301,23 @@ class HomeDomain {
 
 ### App Lock System
 
-Three lock types:
+Four lock types:
 - **Off**: No lock
 - **Normal**: Standard app icon, PIN/pattern lock
 - **Trains**: Disguised app icon, PIN/pattern lock
+- **Biometric**: Fingerprint, face, or iris scan via `BiometricPrompt` (BIOMETRIC_STRONG)
 
 Lock implementation:
 - Hashed PIN/pattern storage
 - Configurable auto-lock delay
 - Secure flag prevents screenshots when locked
+- Biometric requires a backup passcode
 
 ### Data Security
 
-- **Local storage**: Realm encrypted database (optional)
+- **Local storage**: Room database with optional SQLCipher AES-256 encryption
+- **Key storage**: Android Keystore (hardware-backed when available)
+- **Decoy vault**: Separate encrypted database accessible with a different passcode
 - **Password hashing**: Salted hash for PIN/pattern
 - **Secure flag**: Prevents screenshots in sensitive screens
 - **Firebase Auth**: Industry-standard authentication
@@ -323,14 +346,14 @@ Lock implementation:
 
 ### Unit Tests
 
-Location: `app/src/test/`
+Location: `mobile/src/test/`
 - Domain logic tests
 - Utility function tests
 - ViewModel tests
 
 ### Instrumentation Tests
 
-Location: `app/src/androidTest/`
+Location: `mobile/src/androidTest/`
 - UI tests
 - Database tests
 - Integration tests

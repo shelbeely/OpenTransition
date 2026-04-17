@@ -90,10 +90,10 @@ OpenTransition uses Firebase for authentication, cloud storage, analytics, and c
 ### Download Configuration File
 
 1. Download the `google-services.json` file
-2. Place it in the `app/` directory of your project:
+2. Place it in the `mobile/` directory of your project:
    ```
    OpenTransition/
-   └── app/
+   └── mobile/
        └── google-services.json  ← Place it here
    ```
 
@@ -183,7 +183,7 @@ Once the project is opened:
 3. Resolve any errors that appear
 
 !!! note "Common Sync Issues"
-    - **Missing google-services.json**: Ensure the file is in `app/` directory
+    - **Missing google-services.json**: Ensure the file is in `mobile/` directory
     - **Missing secrets.properties**: Ensure you copied and configured it
     - **SDK not found**: Install the required SDK version (36) in SDK Manager
 
@@ -234,7 +234,7 @@ If everything is configured correctly:
 
 ### Build Fails with "google-services.json missing"
 
-**Solution**: Ensure `google-services.json` is in the `app/` directory.
+**Solution**: Ensure `google-services.json` is in the `mobile/` directory.
 
 ### Build Fails with "secrets.properties not found"
 
@@ -286,6 +286,6 @@ For development, the project uses a debug keystore located at `keys/debug-keysto
 
 ### ProGuard Configuration
 
-The release build uses ProGuard for code obfuscation and optimization. The rules are defined in `app/proguard-rules.pro`.
+The release build uses ProGuard for code obfuscation and optimization. The rules are defined in `mobile/proguard-rules.pro`.
 
 For development, ProGuard is disabled in debug builds for faster build times.
