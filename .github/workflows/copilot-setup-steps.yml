@@ -72,46 +72,6 @@ jobs:
       - name: Create Android emulator
         run: android emulator create --profile=medium_phone
 
-      # Start a virtual framebuffer so the emulator's Qt window can initialise
-      # in this headless environment, then boot the emulator in no-window mode
-      # and wait until Android has fully started (sys.boot_completed=1).
-      # `adb wait-for-device` is wrapped with `timeout` to prevent it from
-      # hanging indefinitely if the emulator never becomes reachable.
-      - name: Start Android emulator
-        run: |
-          Xvfb :99 -screen 0 1280x800x24 &
-          export DISPLAY=:99
-          echo "crashreport.consent=1" >> ~/.android/default.ini
-          /usr/local/lib/android/sdk/emulator/emulator \
-            @medium_phone \
-            -no-window \
-            -no-audio \
-            -no-boot-anim \
-            -crash-report-mode disabled \
-            -gpu swangle \
-            &
-          echo "Waiting for emulator device (timeout 120s)..."
-          timeout 120 adb wait-for-device || {
-            echo "ERROR: adb wait-for-device timed out after 120s"
-            exit 1
-          }
-          echo "Device online; waiting for boot to complete (timeout 300s)..."
-          BOOTED=0
-          for i in $(seq 1 60); do
-            BOOT_VAL=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
-            echo "Boot check $i/60: sys.boot_completed=$BOOT_VAL"
-            if [ "$BOOT_VAL" = "1" ]; then
-              BOOTED=1
-              echo "Emulator fully booted"
-              break
-            fi
-            sleep 5
-          done
-          if [ "$BOOTED" != "1" ]; then
-            echo "ERROR: Emulator did not finish booting within 300s"
-            exit 1
-          fi
-
       # Gradle requires local.properties to locate the Android SDK.
       - name: Generate local.properties
         run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
