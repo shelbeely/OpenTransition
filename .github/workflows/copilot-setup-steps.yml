@@ -36,6 +36,44 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
+      # KVM acceleration is required for the Android emulator to run at usable
+      # speed on GitHub-hosted ubuntu runners.
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Android CLI is a single binary that gives agents a clean interface for
+      # SDK management, project creation, and emulator control.
+      # Download URL: https://developer.android.com/tools/agents/android-cli/archive
+      - name: Install Android CLI
+        run: |
+          curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/android -o android
+          chmod +x android
+          sudo mv android /usr/local/bin/android
+
+      # Installs the android-cli skill into the agent context so Copilot
+      # understands all available CLI commands and their best practices.
+      - name: Init Android CLI for agent
+        run: android init
+
+      # Create a default medium_phone virtual device that the agent can deploy
+      # to and interact with during the session.
+      - name: Create Android emulator
+        run: android emulator create
+
+      # Start the emulator in the background before Copilot begins work so it
+      # is immediately available. We wait for a full boot before proceeding.
+      - name: Start Android emulator
+        run: |
+          nohup android emulator start medium_phone > /tmp/emulator.log 2>&1 &
+          echo "Waiting for emulator to come online..."
+          adb wait-for-device
+          echo "Waiting for boot to complete..."
+          timeout 300 bash -c 'until adb shell getprop sys.boot_completed 2>/dev/null | grep -q "1"; do sleep 3; done'
+          echo "Emulator is ready"
+
       # Gradle requires local.properties to locate the Android SDK.
       - name: Generate local.properties
         run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties

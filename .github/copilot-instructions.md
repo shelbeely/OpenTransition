@@ -28,6 +28,8 @@ Before you start any build:
 2. `secrets.properties` is stubbed from `secrets.properties.example`.
 3. `mobile/google-services.json` contains dummy values safe for debug builds.
 4. Gradle wrapper is executable (`chmod +x ./gradlew`).
+5. **Android CLI** is installed at `/usr/local/bin/android` and initialised (`android init`).
+6. **Android emulator** (`medium_phone`) is created and fully booted — use `adb devices` to confirm it is listed.
 
 If any of these are missing, re-run the setup steps or execute:
 ```bash
@@ -51,6 +53,12 @@ chmod +x ./gradlew
 | Mobile lint only | `./gradlew :mobile:lintDebug` |
 | Clean | `./gradlew clean` |
 | Check dependencies | `./gradlew :mobile:dependencies` |
+| Install & run on emulator | `android run` |
+| List connected devices | `adb devices` |
+| Check emulator status | `android emulator list` |
+| Search Android docs | `android docs search '<query>'` |
+| Fetch a docs page | `android docs fetch kb://<path>` |
+| Install an Android skill | `android skills add <skill-name>` |
 
 Always add `--stacktrace` when diagnosing build failures.
 
@@ -60,20 +68,22 @@ Always add `--stacktrace` when diagnosing build failures.
 
 ### 1. Grounding in official knowledge
 
-- Fetch the latest Android developer docs via `android docs` CLI semantics before
-  answering questions about APIs, Jetpack libraries, or AGP migrations.
+- Use `android docs search '<query>'` and `android docs fetch kb://<path>` to pull
+  the latest Android developer guidance directly into context before answering
+  questions about APIs, Jetpack libraries, or AGP migrations.
 - Prefer the official [Android Developers blog](https://android-developers.googleblog.com),
   [d.android.com](https://developer.android.com), and Kotlin/Firebase docs over pre-trained
   knowledge for anything released after 2024.
 
 ### 2. Apply official Android Skills (SKILL.md pattern)
 
-When working on complex or fast-moving areas, consult the relevant Android Skill:
-- **Navigation 3 setup** — use `android skills navigation3`
-- **Edge-to-edge / insets** — use `android skills edge-to-edge`
-- **AGP 8/9 migration** — use `android skills agp-migration`
-- **XML → Compose migration** — use `android skills compose-migration`
-- **R8 / ProGuard config** — use `android skills r8`
+When working on complex or fast-moving areas, consult the relevant Android Skill.
+Skills ship in `.github/skills/android/` and can also be installed via `android skills add`:
+- **Navigation 3 setup** — use `android skills add navigation3`
+- **Edge-to-edge / insets** — use `android skills add edge-to-edge`
+- **AGP 8/9 migration** — use `android skills add agp-migration`
+- **XML → Compose migration** — use `android skills add compose-migration`
+- **R8 / ProGuard config** — use `android skills add r8`
 
 ### 3. Dependency management
 
