@@ -34,21 +34,30 @@ OpenTransition has two build variants:
 ### Using Gradle Command Line
 
 ```bash
-# Build debug APK
+# Build mobile debug APK
+./gradlew :mobile:assembleDebug
+
+# Build Wear OS debug APK
+./gradlew :wear:assembleDebug
+
+# Build all modules
 ./gradlew assembleDebug
 
-# Output location
-ls -lh app/build/outputs/apk/debug/app-debug.apk
+# Output location (mobile)
+ls -lh mobile/build/outputs/apk/debug/mobile-debug.apk
 ```
 
 ### Install Debug APK
 
 ```bash
-# Install on connected device/emulator
-./gradlew installDebug
+# Install mobile app on connected device/emulator
+./gradlew :mobile:installDebug
+
+# Install Wear OS app (requires paired Wear OS device)
+./gradlew :wear:installDebug
 
 # Or use adb directly
-adb install app/build/outputs/apk/debug/app-debug.apk
+adb install mobile/build/outputs/apk/debug/mobile-debug.apk
 ```
 
 ## Building Release Version
@@ -95,7 +104,7 @@ Follow the prompts to set passwords and enter your information.
     export KEY_ALIAS="your_key_alias"
     export KEY_PASS="your_key_password"
     
-    ./gradlew assembleRelease
+    ./gradlew :mobile:assembleRelease
     ```
 
 === "Windows (PowerShell)"
@@ -104,10 +113,10 @@ Follow the prompts to set passwords and enter your information.
     $env:KEY_ALIAS="your_key_alias"
     $env:KEY_PASS="your_key_password"
     
-    .\gradlew.bat assembleRelease
+    .\gradlew.bat :mobile:assembleRelease
     ```
 
-The signed APK will be at: `app/build/outputs/apk/release/app-release.apk`
+The signed APK will be at: `mobile/build/outputs/apk/release/mobile-release.apk`
 
 ### Build Android App Bundle (AAB)
 
@@ -120,10 +129,10 @@ export KEY_ALIAS="your_key_alias"
 export KEY_PASS="your_key_password"
 
 # Build bundle
-./gradlew bundleRelease
+./gradlew :mobile:bundleRelease
 ```
 
-The AAB will be at: `app/build/outputs/bundle/release/app-release.aab`
+The AAB will be at: `mobile/build/outputs/bundle/release/mobile-release.aab`
 
 ## Running on Device/Emulator
 
@@ -137,7 +146,7 @@ The AAB will be at: `app/build/outputs/bundle/release/app-release.aab`
    ```
 4. Run from Android Studio or use:
    ```bash
-   ./gradlew installDebug
+   ./gradlew :mobile:installDebug
    ```
 
 ### Run on Emulator
@@ -146,18 +155,18 @@ The AAB will be at: `app/build/outputs/bundle/release/app-release.aab`
 2. Wait for emulator to boot
 3. Run from Android Studio or use:
    ```bash
-   ./gradlew installDebug
+   ./gradlew :mobile:installDebug
    ```
 
 ### Run Specific Build Variant
 
 ```bash
 # Install and run debug
-./gradlew installDebug
+./gradlew :mobile:installDebug
 adb shell am start -n com.shelbeely.opentransition/.ui.MainActivity
 
 # Install and run release (requires keystore)
-./gradlew installRelease
+./gradlew :mobile:installRelease
 adb shell am start -n com.shelbeely.opentransition/.ui.MainActivity
 ```
 
@@ -166,34 +175,34 @@ adb shell am start -n com.shelbeely.opentransition/.ui.MainActivity
 ### Run Unit Tests
 
 ```bash
-# Run all unit tests
+# Run all mobile unit tests
+./gradlew :mobile:testDebugUnitTest
+
+# Run all module tests
 ./gradlew test
 
-# Run tests for specific variant
-./gradlew testDebugUnitTest
-
 # View test report
-open app/build/reports/tests/testDebugUnitTest/index.html
+open mobile/build/reports/tests/testDebugUnitTest/index.html
 ```
 
 ### Run Instrumentation Tests
 
 ```bash
 # Run on connected device/emulator
-./gradlew connectedAndroidTest
+./gradlew :mobile:connectedAndroidTest
 
 # View test report
-open app/build/reports/androidTests/connected/index.html
+open mobile/build/reports/androidTests/connected/index.html
 ```
 
 ### Run Lint Checks
 
 ```bash
-# Run lint analysis
-./gradlew lint
+# Run mobile lint analysis
+./gradlew :mobile:lintDebug
 
 # View lint report
-open app/build/reports/lint-results-debug.html
+open mobile/build/reports/lint-results-debug.html
 ```
 
 ## Build Optimization
@@ -239,7 +248,7 @@ org.gradle.jvmargs=-Xmx4g -XX:MaxPermSize=2048m -XX:+HeapDumpOnOutOfMemoryError
 
 ### Version Information
 
-Version information is defined in `app/build.gradle`:
+Version information is defined in `mobile/build.gradle`:
 
 ```gradle
 def major = 1
@@ -264,7 +273,7 @@ def getVersionName = { ->
 
 If forking for your own deployment:
 
-1. Update `applicationId` in `app/build.gradle`:
+1. Update `applicationId` in `mobile/build.gradle`:
    ```gradle
    defaultConfig {
        applicationId "com.yourname.yourapp"
@@ -285,29 +294,29 @@ If forking for your own deployment:
 
 ### APK Files
 
-Location: `app/build/outputs/apk/`
+Location: `mobile/build/outputs/apk/`
 
 ```
 apk/
 ├── debug/
-│   └── app-debug.apk
+│   └── mobile-debug.apk
 └── release/
-    └── app-release.apk
+    └── mobile-release.apk
 ```
 
 ### AAB Files
 
-Location: `app/build/outputs/bundle/`
+Location: `mobile/build/outputs/bundle/`
 
 ```
 bundle/
 └── release/
-    └── app-release.aab
+    └── mobile-release.aab
 ```
 
 ### Mapping Files (ProGuard)
 
-Location: `app/build/outputs/mapping/release/`
+Location: `mobile/build/outputs/mapping/release/`
 
 ```
 mapping/
@@ -333,20 +342,20 @@ OpenTransition uses GitHub Actions for CI/CD. See [CI/CD Documentation](../deplo
 ```bash
 # Replicate CI build locally
 cp ./secrets.properties.example ./secrets.properties
-# Add your google-services.json
+# Add your google-services.json to mobile/
 ./gradlew clean build
 
 # Run all checks
-./gradlew check
+./gradlew :mobile:check
 ```
 
 ## Troubleshooting
 
-### Build Fails: "Execution failed for task ':app:processDebugGoogleServices'"
+### Build Fails: "Execution failed for task ':mobile:processDebugGoogleServices'"
 
 **Cause**: Missing or invalid `google-services.json`
 
-**Solution**: Ensure `google-services.json` is in `app/` directory and is valid.
+**Solution**: Ensure `google-services.json` is in `mobile/` directory and is valid.
 
 ### Build Fails: "Could not read script '...secrets.properties'"
 

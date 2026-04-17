@@ -70,10 +70,13 @@ cp secrets.properties.example secrets.properties
 
 # Edit secrets.properties with your configuration
 # Download google-services.json from Firebase Console
-# Place it in the app/ directory
+# Place it in the mobile/ directory
 
-# Build and run
+# Build and run (all modules)
 ./gradlew build
+
+# Or build just the mobile app
+./gradlew :mobile:assembleDebug
 ```
 
 !!! warning "Firebase Configuration Required"
@@ -81,24 +84,44 @@ cp secrets.properties.example secrets.properties
 
 ## Understanding the Project Structure
 
+This is a **monorepo** containing three modules:
+
 ```
 OpenTransition/
 ├── .github/              # GitHub workflows and configurations
 │   └── workflows/        # CI/CD pipeline definitions
-├── app/                  # Main application module
+├── mobile/               # Main Android phone/tablet application
 │   ├── src/
 │   │   ├── main/        # Main source code
 │   │   ├── test/        # Unit tests
 │   │   └── androidTest/ # Instrumentation tests
-│   └── build.gradle     # App-level build configuration
-├── docs/                 # Documentation source files
-├── gradle/              # Gradle wrapper files
-├── keys/                # Keystore files (gitignored)
-├── build.gradle         # Project-level build configuration
-├── settings.gradle      # Gradle settings
-├── mkdocs.yml          # Documentation configuration
-└── README.md           # Project README
+│   └── build.gradle     # Mobile module build configuration
+├── wear/                 # Wear OS companion application
+│   ├── src/
+│   │   └── main/        # Wear OS source code
+│   └── build.gradle     # Wear module build configuration
+├── shared/               # Shared library (data models, Wearable constants)
+│   ├── src/
+│   │   └── main/
+│   └── build.gradle
+├── docs/                 # Documentation source files (MkDocs)
+├── gradle/               # Gradle wrapper files
+├── keys/                 # Keystore files (debug committed; release gitignored)
+├── build.gradle          # Root build configuration
+├── settings.gradle       # Gradle module settings
+├── mkdocs.yml            # Documentation configuration
+└── README.md             # Project README
 ```
+
+### Module Descriptions
+
+| Module | Package | Min SDK | Purpose |
+|--------|---------|---------|---------|
+| `:mobile` | `com.shelbeely.opentransition` | 21 (Android 5.0) | Main phone/tablet app |
+| `:wear` | `com.shelbeely.opentransition.wear` | 30 (Wear OS 3.0) | Smartwatch companion |
+| `:shared` | `com.shelbeely.opentransition.shared` | — | Common models & constants |
+
+Both `:mobile` and `:wear` depend on `:shared`. See [MONOREPO.md](https://github.com/shelbeely/OpenTransition/blob/main/MONOREPO.md) for communication details.
 
 ## Next Steps
 

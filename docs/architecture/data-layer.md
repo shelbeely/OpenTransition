@@ -16,7 +16,7 @@ The data layer consists of:
 
 The `Photo` class represents transition photos stored by users.
 
-**File**: `app/src/main/java/com/shelbeely/opentransition/data/Photo.kt`
+**File**: `mobile/src/main/java/com/shelbeely/opentransition/data/Photo.kt`
 
 ```kotlin
 class Photo : RealmObject {
@@ -50,7 +50,7 @@ class Photo : RealmObject {
 
 The `Milestone` class represents significant events in the transition journey.
 
-**File**: `app/src/main/java/com/shelbeely/opentransition/data/Milestone.kt`
+**File**: `mobile/src/main/java/com/shelbeely/opentransition/data/Milestone.kt`
 
 ```kotlin
 class Milestone : RealmObject {
