@@ -26,6 +26,7 @@ import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.settings.FirebaseSettingUtil
 import com.shelbeely.opentransition.util.settings.LockDelay
 import com.shelbeely.opentransition.util.settings.LockType
+import com.shelbeely.opentransition.util.settings.AppColorVariant
 import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.shelbeely.opentransition.util.settings.SettingsManager.Key
 import com.shelbeely.opentransition.util.settings.SettingsManager.Key.*
@@ -158,6 +159,12 @@ object SettingsConflictDialog {
                         serverValue = itemView.getString(
                             Theme.valueOf(serverConflictValue as String).displayNameRes()
                         )
+                    }
+
+                    colorVariant -> {
+                        nameRes = R.string.theme_label
+                        localValue = SettingsManager.getColorVariant().name
+                        serverValue = serverConflictValue as String
                     }
 
                     enableAnalytics -> {

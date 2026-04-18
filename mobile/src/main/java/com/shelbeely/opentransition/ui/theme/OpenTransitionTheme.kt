@@ -10,18 +10,74 @@
 
 package com.shelbeely.opentransition.ui.theme
 
+import android.os.Build
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.dynamicDarkColorScheme
+import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalContext
+import com.shelbeely.opentransition.util.settings.AppColorVariant
 
 /**
- * Minimal Compose theme wrapper for OpenTransition. Delegates to [MaterialTheme] so that
- * composables can use Material3 typography tokens while the app's full visual theming
- * continues to be applied via the XML [BaseAppTheme] on the host Activity/Fragment.
+ * [CompositionLocal] that provides the resolved [ColorScheme] to all descendants,
+ * including any XML-hosted [androidx.compose.ui.platform.ComposeView] islands that
+ * wrap this theme.  Defaults to a minimal fallback; always consumed through
+ * [MaterialTheme.colorScheme] inside Compose UI.
+ */
+val LocalAppColorScheme = staticCompositionLocalOf<ColorScheme> {
+    PinkLightColorScheme
+}
+
+/**
+ * Full M3 Expressive theme for OpenTransition.
  *
- * As more screens are migrated to Compose the color scheme and typography can be
- * populated here to match the XML theme.
+ * Color selection priority:
+ *  1. [AppColorVariant.dynamic] on API 31+ → Material You wallpaper colours.
+ *  2. [AppColorVariant.dynamic] on API < 31 → falls back to [AppColorVariant.pink].
+ *  3. Any other [AppColorVariant] → corresponding hand-crafted tonal palette.
+ *
+ * @param colorVariant   Which colour palette to use (read from [SettingsManager] by the caller).
+ * @param darkTheme      Whether to apply the dark variant; defaults to system setting.
+ * @param content        Composable subtree that inherits this theme.
  */
 @Composable
-fun OpenTransitionTheme(content: @Composable () -> Unit) {
-    MaterialTheme(content = content)
+fun OpenTransitionTheme(
+    colorVariant: AppColorVariant = AppColorVariant.dynamic,
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) {
+    val context = LocalContext.current
+
+    val colorScheme: ColorScheme = when {
+        colorVariant == AppColorVariant.dynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        }
+        // dynamic requested but API < 31 — fall through to pink palette
+        colorVariant == AppColorVariant.dynamic || colorVariant == AppColorVariant.pink -> {
+            if (darkTheme) PinkDarkColorScheme else PinkLightColorScheme
+        }
+        colorVariant == AppColorVariant.blue -> {
+            if (darkTheme) BlueDarkColorScheme else BlueLightColorScheme
+        }
+        colorVariant == AppColorVariant.purple -> {
+            if (darkTheme) PurpleDarkColorScheme else PurpleLightColorScheme
+        }
+        else -> { // green
+            if (darkTheme) GreenDarkColorScheme else GreenLightColorScheme
+        }
+    }
+
+    CompositionLocalProvider(LocalAppColorScheme provides colorScheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            shapes = AppShapes,
+            content = content,
+        )
+    }
 }
+
