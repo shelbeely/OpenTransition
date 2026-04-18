@@ -12,6 +12,7 @@ package com.shelbeely.opentransition.util.settings
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import com.shelbeely.opentransition.BuildConfig
@@ -449,6 +450,20 @@ object SettingsManager {
             FirebaseSettingUtil.setEnum(colorVariant, newColorVariant, context)
         }
     }
+
+    fun getResolvedComposeColorVariant(): AppColorVariant {
+        val savedVariant = getColorVariant()
+
+        if (savedVariant != AppColorVariant.dynamic) {
+            return savedVariant
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return AppColorVariant.dynamic
+        }
+
+        return getTheme().toAppColorVariant()
+    }
     //endregion
 
     @Suppress("EnumEntryName") //These don't follow standard naming convention to match across platforms
@@ -547,6 +562,13 @@ enum class Theme {
     }
 }
 
+fun Theme.toAppColorVariant(): AppColorVariant = when (this) {
+    Theme.pink -> AppColorVariant.pink
+    Theme.blue -> AppColorVariant.blue
+    Theme.purple -> AppColorVariant.purple
+    Theme.green -> AppColorVariant.green
+}
+
 class UserNotLoggedInException : Exception()
 
 /**
@@ -564,4 +586,3 @@ enum class AppColorVariant {
         fun default() = dynamic
     }
 }
-

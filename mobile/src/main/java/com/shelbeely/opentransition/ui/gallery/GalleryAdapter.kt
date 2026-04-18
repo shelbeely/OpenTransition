@@ -28,6 +28,7 @@ import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
 import com.shelbeely.opentransition.util.RxSchedulers
 import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.openDefault
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.shelbeely.opentransition.util.setVisibleOrGone
 import com.shelbeely.opentransition.util.toFullDateString
 import com.jakewharton.rxrelay3.PublishRelay
@@ -247,7 +248,9 @@ class GalleryAdapter(
         fun bind(item: GalleryAdapterItem) {
             val title = LocalDate.ofEpochDay(item.epochDay!!).toFullDateString(composeView.context)
             composeView.setContent {
-                OpenTransitionTheme {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
                     GalleryDateTitleItem(title = title)
                 }
             }
