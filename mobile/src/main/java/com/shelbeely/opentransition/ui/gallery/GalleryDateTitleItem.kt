@@ -16,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
@@ -28,7 +27,8 @@ import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
  * - Root was a single `TextView` with `layout_width="match_parent"`, `layout_height="wrap_content"`
  * - Padding mapped to Compose `Modifier.padding(start=8dp, top=8dp, end=8dp, bottom=4dp)`
  * - `textAppearance="@style/TextAppearance.AppCompat.Title"` → `MaterialTheme.typography.titleLarge`
- * - `textColor="@color/white_text_selector"` → `Color.White` (enabled state of the selector)
+ * - `textColor="@color/white_text_selector"` is now resolved from `MaterialTheme.colorScheme.primary`
+ *   so the Compose island visibly follows the selected app palette.
  *
  * @param title The formatted date string to display (e.g. "10/09/2018 | 20 Days").
  * @param modifier Optional [Modifier] for layout-level customisation by the caller.
@@ -43,7 +43,7 @@ fun GalleryDateTitleItem(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 8.dp, top = 8.dp, end = 8.dp, bottom = 4.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.primary,
         style = MaterialTheme.typography.titleLarge
     )
 }
