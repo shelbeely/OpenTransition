@@ -52,22 +52,17 @@ fun OpenTransitionTheme(
 ) {
     val context = LocalContext.current
 
-    val colorScheme: ColorScheme = when {
-        colorVariant == AppColorVariant.dynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        // dynamic requested but API < 31 — fall through to pink palette
-        colorVariant == AppColorVariant.dynamic || colorVariant == AppColorVariant.pink -> {
-            if (darkTheme) PinkDarkColorScheme else PinkLightColorScheme
-        }
-        colorVariant == AppColorVariant.blue -> {
-            if (darkTheme) BlueDarkColorScheme else BlueLightColorScheme
-        }
-        colorVariant == AppColorVariant.purple -> {
-            if (darkTheme) PurpleDarkColorScheme else PurpleLightColorScheme
-        }
-        else -> { // green
-            if (darkTheme) GreenDarkColorScheme else GreenLightColorScheme
+    val colorScheme: ColorScheme = if (
+        colorVariant == AppColorVariant.dynamic && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    ) {
+        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else {
+        when (colorVariant) {
+            AppColorVariant.blue -> if (darkTheme) BlueDarkColorScheme else BlueLightColorScheme
+            AppColorVariant.purple -> if (darkTheme) PurpleDarkColorScheme else PurpleLightColorScheme
+            AppColorVariant.green -> if (darkTheme) GreenDarkColorScheme else GreenLightColorScheme
+            // dynamic (API < 31 fallback) and pink both use the pink palette
+            else -> if (darkTheme) PinkDarkColorScheme else PinkLightColorScheme
         }
     }
 
