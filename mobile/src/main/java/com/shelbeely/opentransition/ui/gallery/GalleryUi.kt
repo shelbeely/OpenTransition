@@ -30,14 +30,17 @@ import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
 import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.gone
+import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.setGone
 import com.shelbeely.opentransition.util.setVisible
 import com.shelbeely.opentransition.util.toV3
 import com.shelbeely.opentransition.util.visible
 import com.shelbeely.opentransition.util.applySystemBarInsets
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotterknife.bindView
 import java.lang.ref.WeakReference
 
@@ -89,6 +92,7 @@ class GalleryView(
     private var layoutManager = GridLayoutManager(context, GRID_SPAN)
 
     private val eventRelay: PublishRelay<GalleryUiEvent> = PublishRelay.create()
+    private val viewDisposables: CompositeDisposable = CompositeDisposable()
     val events: Observable<GalleryUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
         Observable.merge(
             toolbar.navigationClicks().toV3().map<GalleryUiEvent> { GalleryUiEvent.Back },
@@ -119,6 +123,16 @@ class GalleryView(
         recyclerView.layoutManager = layoutManager
 
         emptyAdd.setOnClickListener { showPhotoSourceMenu(emptyAdd) }
+
+        viewDisposables += SettingsManager.themeUpdated
+            .subscribe {
+                (recyclerView.adapter as? GalleryAdapter)?.refreshTitleItems()
+            }
+    }
+
+    override fun onDetachedFromWindow() {
+        viewDisposables.clear()
+        super.onDetachedFromWindow()
     }
 
     fun display(state: GalleryUiState) {

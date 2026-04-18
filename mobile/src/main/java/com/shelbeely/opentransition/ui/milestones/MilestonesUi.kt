@@ -22,16 +22,19 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.gone
+import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.setGone
 import com.shelbeely.opentransition.util.setVisible
 import com.shelbeely.opentransition.util.toV3
 import com.shelbeely.opentransition.util.visible
 import com.shelbeely.opentransition.util.applySystemBarInsets
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxbinding3.appcompat.itemClicks
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotterknife.bindView
 
 sealed class MilestonesUiEvent {
@@ -61,6 +64,7 @@ class MilestonesView(
     private val emptyAdd: View by bindView(R.id.milestones_empty_add)
 
     private val eventRelay: PublishRelay<MilestonesUiEvent> = PublishRelay.create()
+    private val viewDisposables: CompositeDisposable = CompositeDisposable()
     val events: Observable<MilestonesUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
         Observable.merge<MilestonesUiEvent>(
             toolbar.navigationClicks().toV3().map { MilestonesUiEvent.Back },
@@ -87,6 +91,16 @@ class MilestonesView(
         toolbar.inflateMenu(R.menu.milestones)
 
         recyclerView.layoutManager = layoutManager
+
+        viewDisposables += SettingsManager.themeUpdated
+            .subscribe {
+                (recyclerView.adapter as? MilestonesAdapter)?.refreshTitleItems()
+            }
+    }
+
+    override fun onDetachedFromWindow() {
+        viewDisposables.clear()
+        super.onDetachedFromWindow()
     }
 
     fun display(state: MilestonesUiState) {

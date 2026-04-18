@@ -225,6 +225,14 @@ class GalleryAdapter(
         generateItems()
     }
 
+    fun refreshTitleItems() {
+        items.forEachIndexed { index, item ->
+            if (item.epochDay != null) {
+                notifyItemChanged(index)
+            }
+        }
+    }
+
     class GalleryAdapterItem {
         val photo: Photo?
         val epochDay: Long?
