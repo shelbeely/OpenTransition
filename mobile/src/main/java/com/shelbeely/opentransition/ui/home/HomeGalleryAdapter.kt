@@ -11,13 +11,11 @@
 package com.shelbeely.opentransition.ui.home
 
 import android.os.Handler
-import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.ImageView
 import androidx.appcompat.widget.PopupMenu
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -26,17 +24,16 @@ import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
+import com.shelbeely.opentransition.util.AudioPlayerManager
 import com.shelbeely.opentransition.util.RxSchedulers
 import com.shelbeely.opentransition.util.isNotDisposed
 import com.shelbeely.opentransition.util.openDefault
 import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxrelay3.PublishRelay
-import com.squareup.picasso.Picasso
 import io.reactivex.rxjava3.disposables.Disposable
 import io.realm.kotlin.Realm
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.rx3.asObservable
-import kotterknife.bindView
 import java.io.File
 import java.lang.ref.WeakReference
 import java.time.LocalDate
@@ -123,14 +120,72 @@ class HomeGalleryAdapter(
 
                 AddViewHolder(itemView, composeView, eventRelayRef.get())
             }
-            TYPE_PHOTO -> PhotoViewHolder(
-                LayoutInflater.from(parent.context).inflate(viewType, parent, false),
-                eventRelayRef.get()
-            )
-            TYPE_AUDIO -> AudioViewHolder(
-                LayoutInflater.from(parent.context).inflate(viewType, parent, false),
-                eventRelayRef.get()
-            )
+            TYPE_PHOTO -> {
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+                val margin = (4 * density).toInt()
+                val padding = (6 * density).toInt()
+
+                val composeView = ComposeView(context).apply {
+                    layoutParams = ConstraintLayout.LayoutParams(0, 0).apply {
+                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                        topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+
+                val itemView = SquareConstraintLayout(context).apply {
+                    layoutParams = RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    ).apply {
+                        marginStart = margin
+                        marginEnd = margin
+                    }
+                    orientation = 0
+                    setBackgroundResource(R.drawable.rounded_image_background)
+                    setPadding(padding, padding, padding, padding)
+                    addView(composeView)
+                }
+
+                PhotoViewHolder(itemView, composeView, eventRelayRef.get())
+            }
+            TYPE_AUDIO -> {
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+                val margin = (4 * density).toInt()
+                val padding = (8 * density).toInt()
+                val width = (120 * density).toInt()
+
+                val composeView = ComposeView(context).apply {
+                    layoutParams = ConstraintLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+
+                val itemView = ConstraintLayout(context).apply {
+                    layoutParams = RecyclerView.LayoutParams(
+                        width,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    ).apply {
+                        marginStart = margin
+                        marginEnd = margin
+                    }
+                    setBackgroundResource(R.drawable.rounded_image_background)
+                    setPadding(padding, padding, padding, padding)
+                    addView(composeView)
+                }
+
+                AudioViewHolder(itemView, composeView, eventRelayRef.get())
+            }
             else -> throw IllegalArgumentException("Unhandled item type")
         }
     }
@@ -196,78 +251,69 @@ class HomeGalleryAdapter(
         }
     }
 
-    class PhotoViewHolder(itemView: View, eventRelay: PublishRelay<HomeUiEvent>?) :
-        BaseViewHolder(itemView) {
-        private val image: ImageView by bindView(R.id.home_adapter_item_image)
-
+    class PhotoViewHolder(
+        itemView: View,
+        private val composeView: ComposeView,
+        eventRelay: PublishRelay<HomeUiEvent>?
+    ) : BaseViewHolder(itemView) {
         private val eventRelayRef = WeakReference(eventRelay)
-
-        private var currentPhotoId = ""
-
-        init {
-            itemView.setOnClickListener {
-                eventRelayRef.get()?.accept(HomeUiEvent.ImageClick(currentPhotoId))
-            }
-        }
 
         fun bind(photo: Photo) {
-            currentPhotoId = photo.id
-
-            Picasso.get()
-                .load(File(photo.filePath))
-                .fit()
-                .centerCrop()
-                .into(image)
-        }
-    }
-
-    class AudioViewHolder(itemView: View, eventRelay: PublishRelay<HomeUiEvent>?) :
-        BaseViewHolder(itemView) {
-        private val playButton: ImageButton by bindView(R.id.home_audio_play_button)
-        private val waveformView: com.shelbeely.opentransition.ui.widget.WaveformView by bindView(R.id.home_audio_waveform)
-
-        private val eventRelayRef = WeakReference(eventRelay)
-        private var currentPhotoId = ""
-        private var currentAudioFile: File? = null
-
-        init {
-            itemView.setOnClickListener {
-                eventRelayRef.get()?.accept(HomeUiEvent.ImageClick(currentPhotoId))
-            }
-
-            playButton.setOnClickListener {
-                currentAudioFile?.let { file ->
-                    val isPlaying = com.shelbeely.opentransition.util.AudioPlayerManager.togglePlayback(currentPhotoId, file)
-                    updatePlayButtonState(isPlaying)
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    HomeGalleryPhotoItem(
+                        filePath = photo.filePath,
+                        onClick = { eventRelayRef.get()?.accept(HomeUiEvent.ImageClick(photo.id)) }
+                    )
                 }
             }
         }
+    }
 
-        private fun updatePlayButtonState(isPlaying: Boolean) {
-            playButton.setImageResource(
-                if (isPlaying) android.R.drawable.ic_media_pause
-                else android.R.drawable.ic_media_play
-            )
-        }
+    class AudioViewHolder(
+        itemView: View,
+        private val composeView: ComposeView,
+        eventRelay: PublishRelay<HomeUiEvent>?
+    ) : BaseViewHolder(itemView) {
+        private val eventRelayRef = WeakReference(eventRelay)
+        private val isPlayingState = mutableStateOf(false)
+        private var currentPhotoId = ""
+        private var currentFilePath = ""
 
         fun bind(photo: Photo) {
             currentPhotoId = photo.id
-            currentAudioFile = File(photo.filePath)
+            currentFilePath = photo.filePath
+            isPlayingState.value = AudioPlayerManager.isPlaying(photo.id)
 
-            // Update play button state based on current playback
-            updatePlayButtonState(com.shelbeely.opentransition.util.AudioPlayerManager.isPlaying(currentPhotoId))
-
-            // Set waveform
-            if (currentAudioFile?.exists() == true) {
-                waveformView.setAudioFile(currentAudioFile!!)
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    HomeGalleryAudioItem(
+                        photoId = currentPhotoId,
+                        audioFilePath = currentFilePath,
+                        isPlaying = isPlayingState.value,
+                        onPlayPause = {
+                            val playing = AudioPlayerManager.togglePlayback(
+                                currentPhotoId, File(currentFilePath)
+                            )
+                            isPlayingState.value = playing
+                        },
+                        onClick = {
+                            eventRelayRef.get()?.accept(HomeUiEvent.ImageClick(currentPhotoId))
+                        }
+                    )
+                }
             }
         }
     }
 
     @Suppress("MayBeConstant")
     companion object {
-        private val TYPE_PHOTO = R.layout.home_adapter_item
-        private val TYPE_ADD = R.layout.home_adapter_add_item
-        private val TYPE_AUDIO = R.layout.home_adapter_audio_item
+        private const val TYPE_ADD = 1
+        private const val TYPE_PHOTO = 2
+        private const val TYPE_AUDIO = 3
     }
 }
