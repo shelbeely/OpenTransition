@@ -19,13 +19,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
 import com.shelbeely.opentransition.ui.widget.CursorRecyclerViewAdapter
 import com.shelbeely.opentransition.util.FileUtil
 import com.shelbeely.opentransition.util.getString
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.shelbeely.opentransition.util.setVisibleOrGone
 import com.jakewharton.rxrelay3.PublishRelay
 import com.squareup.picasso.Callback
@@ -114,10 +117,16 @@ class SingleAlbumAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
         return when (viewType) {
             TYPE_COUNT -> {
-                CountHolder(
-                    LayoutInflater.from(parent.context)
-                        .inflate(R.layout.single_album_adapter_count_item, parent, false)
-                )
+                val composeView = ComposeView(parent.context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+                CountHolder(composeView)
             }
 
             else -> {
@@ -156,6 +165,10 @@ class SingleAlbumAdapter(
     fun updateSelectedUris(newSelectedUris: ArrayList<Uri>) {
         selectedUris = newSelectedUris
         notifyDataSetChanged()
+    }
+
+    fun refreshCountItem() {
+        notifyItemChanged(itemCount - 1)
     }
 
     open class BaseHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
@@ -241,11 +254,15 @@ class SingleAlbumAdapter(
         }
     }
 
-    class CountHolder(itemView: View) : BaseHolder(itemView) {
-        private val text: TextView by bindView(R.id.single_album_adapter_count_item_text)
-
+    class CountHolder(private val composeView: ComposeView) : BaseHolder(composeView) {
         fun bind(count: Int) {
-            text.text = text.resources.getQuantityString(R.plurals.photos, count, count)
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    SingleAlbumPhotoCountItem(count = count)
+                }
+            }
         }
     }
 

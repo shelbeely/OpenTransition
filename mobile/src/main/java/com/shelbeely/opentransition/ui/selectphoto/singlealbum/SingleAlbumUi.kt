@@ -23,12 +23,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
 import com.shelbeely.opentransition.util.isNotDisposed
+import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.settings.PrefUtil
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.shelbeely.opentransition.util.toV3
 import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
 import kotterknife.bindView
 import java.lang.ref.WeakReference
@@ -86,6 +89,7 @@ class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
     }
 
     private var photoClickDisposable: Disposable = Disposable.disposed()
+    private val viewDisposables = CompositeDisposable()
 
     private val gridLayoutManager = GridLayoutManager(context, GRID_SPAN)
     private var adapter: SingleAlbumAdapter? = null
@@ -100,9 +104,15 @@ class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
 
         gridLayoutManager.spanSizeLookup = AdapterSpanSizeLookup(recyclerView, GRID_SPAN)
         recyclerView.layoutManager = gridLayoutManager
+
+        viewDisposables += SettingsManager.themeUpdated
+            .subscribe {
+                adapter?.refreshCountItem()
+            }
     }
 
     override fun onDetachedFromWindow() {
+        viewDisposables.clear()
         super.onDetachedFromWindow()
 
         if (photoClickDisposable.isNotDisposed()) {

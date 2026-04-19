@@ -28,7 +28,6 @@ import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.SwipeGestureListener
-import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.nullAllElements
 import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.setVisibleOrInvisible
@@ -83,7 +82,7 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
 
     private val dateSummaryContainer: FrameLayout by bindView(R.id.home_date_summary_container)
 
-    private val milestones: ImageButton by bindView(R.id.home_milestones)
+    private val milestonesContainer: FrameLayout by bindView(R.id.home_milestones_container)
 
     private val faceGallery: Button by bindView(R.id.home_face_gallery)
     private val faceRecyclerView: RecyclerView by bindView(R.id.home_face_images)
@@ -101,7 +100,6 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
             settings.clicks().toV3().map { HomeUiEvent.Settings },
             previousRecord.clicks().toV3().map { HomeUiEvent.PreviousRecord },
             nextRecord.clicks().toV3().map { HomeUiEvent.NextRecord },
-            milestones.clicks().toV3().map { HomeUiEvent.Milestones(date.toEpochDay()) },
             faceGallery.clicks().toV3().map { HomeUiEvent.FaceGallery(date.toEpochDay()) },
             bodyGallery.clicks().toV3().map { HomeUiEvent.BodyGallery(date.toEpochDay()) },
             audioGallery.clicks().toV3().map { HomeUiEvent.AudioGallery(date.toEpochDay()) },
@@ -116,8 +114,10 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     private var date = LocalDate.MIN
     private var hasPrevious = false
     private var hasNext = true
+    private var hasMilestones = false
     private var dateSummaryContent: DateSummaryContent? = null
     private var dateSummaryView: ComposeView? = null
+    private var milestonesView: ComposeView? = null
 
     private val swipeListener = object : SwipeGestureListener() {
         override fun swipeLeft(): Boolean {
@@ -161,7 +161,21 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
             dateSummaryContainer.addView(dateSummaryView)
         }
 
+        if (milestonesView == null) {
+            milestonesView = ComposeView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnDetachedFromWindow
+                )
+            }
+            milestonesContainer.addView(milestonesView)
+        }
+
         takePhoto.setOnClickListener { showPhotoSourceMenu() }
+        renderMilestones()
 
         faceRecyclerView.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL, false
@@ -174,7 +188,10 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         )
 
         viewDisposables += SettingsManager.themeUpdated
-            .subscribe { renderDateSummary() }
+            .subscribe {
+                renderDateSummary()
+                renderMilestones()
+            }
     }
 
     override fun onDetachedFromWindow() {
@@ -212,11 +229,8 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
                 )
                 renderDateSummary()
 
-                val milestonesRes = when (state.hasMilestones) {
-                    true -> R.drawable.ic_milestone_selected
-                    false -> R.drawable.ic_milestone_unselected
-                }
-                milestones.setImageResource(milestonesRes)
+                hasMilestones = state.hasMilestones
+                renderMilestones()
 
                 faceRecyclerView.adapter = HomeGalleryAdapter(
                     state.currentDate, Photo.TYPE_FACE,
@@ -264,6 +278,21 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
                 HomeDateSummaryItem(
                     startDate = content.startDate,
                     currentDate = content.currentDate
+                )
+            }
+        }
+    }
+
+    private fun renderMilestones() {
+        val milestonesView = milestonesView ?: return
+
+        milestonesView.setContent {
+            OpenTransitionTheme(
+                colorVariant = SettingsManager.getResolvedComposeColorVariant()
+            ) {
+                HomeMilestonesButton(
+                    hasMilestones = hasMilestones,
+                    onClick = { eventRelay.accept(HomeUiEvent.Milestones(date.toEpochDay())) }
                 )
             }
         }
