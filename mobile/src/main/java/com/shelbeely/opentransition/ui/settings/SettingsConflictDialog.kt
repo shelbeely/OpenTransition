@@ -34,7 +34,6 @@ import com.shelbeely.opentransition.util.settings.Theme
 import com.shelbeely.opentransition.util.toFullDateString
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
-import kotterknife.bindView
 import java.time.LocalDate
 
 object SettingsConflictDialog {
@@ -89,10 +88,10 @@ object SettingsConflictDialog {
 
         class SettingsConflictViewHolder(itemView: View, adapter: SettingsConflictAdapter) :
             RecyclerView.ViewHolder(itemView) {
-            private val label: TextView by bindView(R.id.settings_conflict_label)
-            private val group: MaterialButtonToggleGroup by bindView(R.id.settings_conflict_group)
-            private val local: MaterialButton by bindView(R.id.settings_conflict_option_local)
-            private val server: MaterialButton by bindView(R.id.settings_conflict_option_server)
+            private val label: TextView = itemView.findViewById(R.id.settings_conflict_label)
+            private val group: MaterialButtonToggleGroup = itemView.findViewById(R.id.settings_conflict_group)
+            private val local: MaterialButton = itemView.findViewById(R.id.settings_conflict_option_local)
+            private val server: MaterialButton = itemView.findViewById(R.id.settings_conflict_option_server)
 
             init {
                 group.addOnButtonCheckedListener { _, id, isChecked ->
