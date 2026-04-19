@@ -12,20 +12,15 @@ package com.shelbeely.opentransition.ui.editphoto
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
-import android.widget.Button
-import android.widget.ImageView
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.util.toV3
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
-import com.jakewharton.rxbinding3.view.clicks
-import com.squareup.picasso.Picasso
+import com.shelbeely.opentransition.util.settings.SettingsManager
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
-import java.io.File
 
 sealed class EditPhotoUiEvent {
     object Back : EditPhotoUiEvent()
@@ -42,49 +37,40 @@ sealed class EditPhotoUiState {
 }
 
 class EditPhotoView(context: Context, attributeSet: AttributeSet) :
-    ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.edit_photo_toolbar)
-    private val image: ImageView by bindView(R.id.edit_photo_image)
+    FrameLayout(context, attributeSet) {
 
-    private val dateLabel: View by bindView(R.id.edit_photo_date_label)
-    private val date: Button by bindView(R.id.edit_photo_date)
-    private val typeLabel: View by bindView(R.id.edit_photo_type_label)
-    private val type: Button by bindView(R.id.edit_photo_type)
+    private val eventRelay: PublishRelay<EditPhotoUiEvent> = PublishRelay.create()
+    val events: Observable<EditPhotoUiEvent> = eventRelay
 
-    private val save: Button by bindView(R.id.edit_photo_save)
-
-    val events: Observable<EditPhotoUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge(toolbar.navigationClicks().toV3().map { EditPhotoUiEvent.Back },
-            date.clicks().toV3().map { EditPhotoUiEvent.ChangeDate },
-            type.clicks().toV3().map { EditPhotoUiEvent.ChangeType },
-            save.clicks().toV3().map { EditPhotoUiEvent.Update })
+    private var currentState: EditPhotoUiState = EditPhotoUiState.Loading
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-
-        dateLabel.setOnClickListener { date.performClick() }
-        typeLabel.setOnClickListener { type.performClick() }
+        renderCompose()
     }
 
     fun display(state: EditPhotoUiState) {
-        when (state) {
-            is EditPhotoUiState.Loading -> {
-                //TODO update to set to loading state instead of resetting and setting
-            }
+        currentState = state
+        renderCompose()
+    }
 
-            is EditPhotoUiState.Loaded -> {
-                Picasso.get()
-                    .load(File(state.photoPath))
-                    .fit()
-                    .centerInside()
-                    .into(image)
-
-                date.text = state.date
-                type.text = state.type
+    private fun renderCompose() {
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                EditPhotoScreen(
+                    state = currentState,
+                    onBack = { eventRelay.accept(EditPhotoUiEvent.Back) },
+                    onChangeDate = { eventRelay.accept(EditPhotoUiEvent.ChangeDate) },
+                    onChangeType = { eventRelay.accept(EditPhotoUiEvent.ChangeType) },
+                    onUpdate = { eventRelay.accept(EditPhotoUiEvent.Update) }
+                )
             }
         }
     }
