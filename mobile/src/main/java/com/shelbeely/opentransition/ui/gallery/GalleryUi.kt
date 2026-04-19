@@ -17,31 +17,23 @@ import android.util.AttributeSet
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.TextView
-import androidx.annotation.StringRes
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import androidx.appcompat.widget.PopupMenu
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
-import com.shelbeely.opentransition.util.getString
-import com.shelbeely.opentransition.util.gone
-import com.shelbeely.opentransition.util.plusAssign
-import com.shelbeely.opentransition.util.setGone
-import com.shelbeely.opentransition.util.setVisible
-import com.shelbeely.opentransition.util.toV3
-import com.shelbeely.opentransition.util.visible
 import com.shelbeely.opentransition.util.applySystemBarInsets
+import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.settings.SettingsManager
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import kotterknife.bindView
 import java.lang.ref.WeakReference
 
 sealed class GalleryUiEvent {
@@ -81,53 +73,44 @@ sealed class GalleryUiState {
 
 class GalleryView(
     context: Context, attributeSet: AttributeSet
-) : ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.gallery_toolbar)
-    private val title: TextView by bindView(R.id.gallery_title)
-
-    private val recyclerView: RecyclerView by bindView(R.id.gallery_recycler_view)
-    private val emptyMessage: TextView by bindView(R.id.gallery_empty_message)
-    private val emptyAdd: View by bindView(R.id.gallery_empty_add)
-
-    private var layoutManager = GridLayoutManager(context, GRID_SPAN)
+) : FrameLayout(context, attributeSet) {
 
     private val eventRelay: PublishRelay<GalleryUiEvent> = PublishRelay.create()
     private val viewDisposables: CompositeDisposable = CompositeDisposable()
-    val events: Observable<GalleryUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge(
-            toolbar.navigationClicks().toV3().map<GalleryUiEvent> { GalleryUiEvent.Back },
-            eventRelay
-        )
-    }
+    val events: Observable<GalleryUiEvent> = eventRelay
 
     @Photo.Type
     private var type = Photo.TYPE_FACE
+    private var currentState: GalleryUiState? = null
+    private var isEmpty: Boolean = false
+
+    private val layoutManager = GridLayoutManager(context, GRID_SPAN)
+
+    private val recyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            layoutManager = this@GalleryView.layoutManager
+            this@GalleryView.layoutManager.spanSizeLookup = AdapterSpanSizeLookup(this)
+        }
+    }
+
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-
-        toolbar.inflateMenu(R.menu.gallery)
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.gallery_menu_add -> showPhotoSourceMenu(toolbar.findViewById(R.id.gallery_menu_add))
-                R.id.gallery_menu_share -> eventRelay.accept(GalleryUiEvent.StartMultiSelect)
-                else -> return@setOnMenuItemClickListener false
-            }
-            return@setOnMenuItemClickListener true
-        }
-
-        layoutManager.spanSizeLookup = AdapterSpanSizeLookup(recyclerView)
-        recyclerView.layoutManager = layoutManager
-
-        emptyAdd.setOnClickListener { showPhotoSourceMenu(emptyAdd) }
 
         viewDisposables += SettingsManager.themeUpdated
             .subscribe {
                 (recyclerView.adapter as? GalleryAdapter)?.refreshTitleItems()
             }
+
+        renderCompose()
     }
 
     override fun onDetachedFromWindow() {
@@ -136,21 +119,12 @@ class GalleryView(
     }
 
     fun display(state: GalleryUiState) {
+        currentState = state
         type = GalleryUiState.getType(state)
 
-        @StringRes val titleRes: Int = when (type) {
-            Photo.TYPE_FACE -> R.string.face_gallery
-            Photo.TYPE_BODY -> R.string.body_gallery
-            Photo.TYPE_AUDIO -> R.string.audio_gallery
-            else -> throw IllegalArgumentException("Unhandled type")
-        }
-
-        title.setText(titleRes)
-
         val shouldShowActionMode = state is GalleryUiState.Selection
-
         if (shouldShowActionMode && !actionModeHandler.isActive()) {
-            toolbar.startActionMode(actionModeHandler)
+            startActionMode(actionModeHandler)
         } else if (!shouldShowActionMode && actionModeHandler.isActive()) {
             actionModeHandler.finish()
         }
@@ -179,47 +153,38 @@ class GalleryView(
                     }
                 },
                 postLoad = { adapter ->
-                    if (adapter.itemCount > 0) {
-                        setVisible(recyclerView)
-                        setGone(emptyMessage, emptyAdd)
-                    } else {
-                        setVisible(emptyMessage, emptyAdd)
-                        setGone(recyclerView)
-                    }
+                    isEmpty = adapter.itemCount == 0
+                    renderCompose()
                 }
             )
             recyclerView.adapter = adapter
         } else {
             val adapter: GalleryAdapter = recyclerView.adapter!! as GalleryAdapter
-
             adapter.selectionMode = state is GalleryUiState.Selection
-
             if (adapter.selectionMode) {
                 adapter.updateSelectedIds(selectedIds)
             }
         }
+
+        renderCompose()
     }
 
-    private fun showPhotoSourceMenu(view: View) {
-        // For audio type, directly trigger recording instead of showing menu
+    private fun showPhotoSourceMenu() {
         if (type == Photo.TYPE_AUDIO) {
             eventRelay.accept(GalleryUiEvent.AddAudioRecording)
             return
         }
-        
-        val popup = PopupMenu(context, view)
+
+        val popup = PopupMenu(context, composeView)
         popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             when (menuItem.itemId) {
                 R.id.media_source_camera ->
                     eventRelay.accept(GalleryUiEvent.AddPhotoCamera(type = type))
-
                 R.id.media_source_gallery ->
                     eventRelay.accept(GalleryUiEvent.AddPhotoGallery(type = type))
-
                 else -> return@setOnMenuItemClickListener false
             }
-
             return@setOnMenuItemClickListener true
         }
         popup.show()
@@ -231,15 +196,12 @@ class GalleryView(
 
         override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean {
             val adapter: GalleryAdapter = recyclerView.adapter as GalleryAdapter? ?: return false
-
             val event: GalleryUiEvent = when (item.itemId) {
                 R.id.gallery_menu_selection_share -> GalleryUiEvent.Share(adapter.getSelectedIds())
                 R.id.gallery_menu_selection_delete -> GalleryUiEvent.Delete(adapter.getSelectedIds())
                 else -> throw IllegalArgumentException("Unhandled item")
             }
-
             eventRelay.accept(event)
-
             return true
         }
 
@@ -264,13 +226,26 @@ class GalleryView(
             modeRef.get()?.finish()
         }
 
-        fun isActive(): Boolean {
-            return modeRef.get() != null
-        }
+        fun isActive(): Boolean = modeRef.get() != null
 
         fun setTitle(newTitleText: String) {
             titleText = newTitleText
             modeRef.get()?.title = titleText
+        }
+    }
+
+    private fun renderCompose() {
+        val state = currentState ?: return
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                GalleryScreen(
+                    state = state,
+                    isEmpty = isEmpty,
+                    onBack = { eventRelay.accept(GalleryUiEvent.Back) },
+                    onAddPhoto = { showPhotoSourceMenu() },
+                    recyclerView = recyclerView,
+                )
+            }
         }
     }
 
