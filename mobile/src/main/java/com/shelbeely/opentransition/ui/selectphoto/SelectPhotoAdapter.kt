@@ -15,12 +15,16 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
+import com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
 import com.shelbeely.opentransition.ui.widget.CursorRecyclerViewAdapter
 import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.setVisibleOrGone
@@ -56,24 +60,49 @@ class SelectPhotoAdapter(
     override fun getItemCount(): Int = super.getItemCount() + 1
 
     override fun getItemViewType(position: Int): Int = when (position) {
-        0 -> R.layout.select_photo_adapter_add_image_item
-        else -> R.layout.select_photo_adapter_item
+        0 -> TYPE_ADD
+        else -> TYPE_IMAGE
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-
         return when (viewType) {
-            R.layout.select_photo_adapter_add_image_item ->
-                TakePhotoHolder(
-                    layoutInflater.inflate(
-                        R.layout.select_photo_adapter_add_image_item, parent, false
-                    ),
-                    eventRelay
-                )
+            TYPE_ADD -> {
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+                val margin = (2 * density).toInt()
+                val padding = (16 * density).toInt()
+
+                val composeView = ComposeView(context).apply {
+                    layoutParams = ConstraintLayout.LayoutParams(0, 0).apply {
+                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                        topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+
+                val itemView = SquareConstraintLayout(context).apply {
+                    layoutParams = RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(margin, margin, margin, margin)
+                    }
+                    orientation = 1
+                    setPadding(padding, padding, padding, padding)
+                    addView(composeView)
+                }
+
+                TakePhotoHolder(itemView, composeView, eventRelay)
+            }
 
             else -> ImageHolder(
-                layoutInflater.inflate(R.layout.select_photo_adapter_item, parent, false),
+                android.view.LayoutInflater.from(parent.context).inflate(
+                    R.layout.select_photo_adapter_item, parent, false
+                ),
                 this
             )
         }
@@ -138,11 +167,18 @@ class SelectPhotoAdapter(
     open class BaseHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     class TakePhotoHolder(
-        itemView: View, itemClickRelay: PublishRelay<SelectPhotoUiEvent>
+        itemView: View,
+        private val composeView: ComposeView,
+        itemClickRelay: PublishRelay<SelectPhotoUiEvent>
     ) : BaseHolder(itemView) {
         init {
-            //Avoiding subscription so we don't need to dispose it
-            itemView.setOnClickListener { itemClickRelay.accept(SelectPhotoUiEvent.TakePhoto) }
+            composeView.setContent {
+                OpenTransitionTheme {
+                    SelectPhotoAddItem(
+                        onClick = { itemClickRelay.accept(SelectPhotoUiEvent.TakePhoto) }
+                    )
+                }
+            }
         }
     }
 
@@ -217,6 +253,9 @@ class SelectPhotoAdapter(
     }
 
     companion object {
+        private const val TYPE_ADD = 0
+        private const val TYPE_IMAGE = 1
+
         fun getGalleryCursor(context: Context): Cursor {
             return context.contentResolver.query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

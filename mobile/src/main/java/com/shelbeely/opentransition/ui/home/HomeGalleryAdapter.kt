@@ -17,14 +17,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.PopupMenu
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
+import com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
 import com.shelbeely.opentransition.util.RxSchedulers
 import com.shelbeely.opentransition.util.isNotDisposed
 import com.shelbeely.opentransition.util.openDefault
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxrelay3.PublishRelay
 import com.squareup.picasso.Picasso
 import io.reactivex.rxjava3.disposables.Disposable
@@ -83,12 +88,49 @@ class HomeGalleryAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
-
         return when (viewType) {
-            TYPE_ADD -> AddViewHolder(view, eventRelayRef.get())
-            TYPE_PHOTO -> PhotoViewHolder(view, eventRelayRef.get())
-            TYPE_AUDIO -> AudioViewHolder(view, eventRelayRef.get())
+            TYPE_ADD -> {
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+                val margin = (4 * density).toInt()
+                val padding = (6 * density).toInt()
+
+                val composeView = ComposeView(context).apply {
+                    layoutParams = ConstraintLayout.LayoutParams(0, 0).apply {
+                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                        topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+
+                val itemView = SquareConstraintLayout(context).apply {
+                    layoutParams = RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    ).apply {
+                        marginStart = margin
+                        marginEnd = margin
+                    }
+                    orientation = 0
+                    setBackgroundResource(R.drawable.rounded_image_background)
+                    setPadding(padding, padding, padding, padding)
+                    addView(composeView)
+                }
+
+                AddViewHolder(itemView, composeView, eventRelayRef.get())
+            }
+            TYPE_PHOTO -> PhotoViewHolder(
+                LayoutInflater.from(parent.context).inflate(viewType, parent, false),
+                eventRelayRef.get()
+            )
+            TYPE_AUDIO -> AudioViewHolder(
+                LayoutInflater.from(parent.context).inflate(viewType, parent, false),
+                eventRelayRef.get()
+            )
             else -> throw IllegalArgumentException("Unhandled item type")
         }
     }
@@ -102,48 +144,55 @@ class HomeGalleryAdapter(
 
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class AddViewHolder(itemView: View, eventRelay: PublishRelay<HomeUiEvent>?) :
+    class AddViewHolder(
+        itemView: View,
+        private val composeView: ComposeView,
+        eventRelay: PublishRelay<HomeUiEvent>?
+    ) :
         BaseViewHolder(itemView) {
-        private val add: AppCompatImageButton by bindView(R.id.home_adapter_add_button)
-
         private val eventRelayRef = WeakReference(eventRelay)
 
-        private var currentDate: LocalDate = LocalDate.MIN
-
-        @Photo.Type
-        private var type: Int = Photo.TYPE_FACE
-
-        init {
-            add.setOnClickListener {
-                // For audio type, directly navigate to recording
-                if (type == Photo.TYPE_AUDIO) {
-                    eventRelayRef.get()?.accept(HomeUiEvent.AddAudioRecording(currentDate))
-                    return@setOnClickListener
+        fun bind(currentDate: LocalDate, @Photo.Type type: Int) {
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    HomeGalleryAddItem(
+                        contentDescription = itemView.context.getString(
+                            when (type) {
+                                Photo.TYPE_BODY -> R.string.add_body_photo
+                                Photo.TYPE_AUDIO -> R.string.add_audio_recording
+                                else -> R.string.add_face_photo
+                            }
+                        ),
+                        onClick = { onAddClick(currentDate, type) }
+                    )
                 }
-                
-                // For face/body, show camera/gallery menu
-                val popup = PopupMenu(it.context, it)
-                popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
-                popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-                    when (menuItem.itemId) {
-                        R.id.media_source_camera -> eventRelayRef.get()
-                            ?.accept(HomeUiEvent.AddPhotoCamera(currentDate, type))
-
-                        R.id.media_source_gallery -> eventRelayRef.get()
-                            ?.accept(HomeUiEvent.AddPhotoGallery(currentDate, type))
-
-                        else -> return@setOnMenuItemClickListener false
-                    }
-
-                    return@setOnMenuItemClickListener true
-                }
-                popup.show()
             }
         }
 
-        fun bind(currentDate: LocalDate, @Photo.Type type: Int) {
-            this.currentDate = currentDate
-            this.type = type
+        private fun onAddClick(currentDate: LocalDate, @Photo.Type type: Int) {
+            if (type == Photo.TYPE_AUDIO) {
+                eventRelayRef.get()?.accept(HomeUiEvent.AddAudioRecording(currentDate))
+                return
+            }
+
+            val popup = PopupMenu(itemView.context, itemView)
+            popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
+            popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+                when (menuItem.itemId) {
+                    R.id.media_source_camera -> eventRelayRef.get()
+                        ?.accept(HomeUiEvent.AddPhotoCamera(currentDate, type))
+
+                    R.id.media_source_gallery -> eventRelayRef.get()
+                        ?.accept(HomeUiEvent.AddPhotoGallery(currentDate, type))
+
+                    else -> return@setOnMenuItemClickListener false
+                }
+
+                true
+            }
+            popup.show()
         }
     }
 
