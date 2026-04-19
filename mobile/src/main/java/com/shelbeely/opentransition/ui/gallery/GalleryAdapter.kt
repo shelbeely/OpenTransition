@@ -10,34 +10,30 @@
 
 package com.shelbeely.opentransition.ui.gallery
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.data.AudioAnalysis
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
+import com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
+import com.shelbeely.opentransition.util.AudioPlayerManager
 import com.shelbeely.opentransition.util.RxSchedulers
-import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.openDefault
 import com.shelbeely.opentransition.util.settings.SettingsManager
-import com.shelbeely.opentransition.util.setVisibleOrGone
 import com.shelbeely.opentransition.util.toFullDateString
 import com.jakewharton.rxrelay3.PublishRelay
-import com.squareup.picasso.Picasso
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.isValid
 import io.realm.kotlin.query.Sort.DESCENDING
 import kotlinx.coroutines.rx3.asObservable
-import kotterknife.bindView
 import java.io.File
 import java.lang.ref.WeakReference
 import java.time.LocalDate
@@ -109,12 +105,44 @@ class GalleryAdapter(
                 TitleViewHolder(composeView)
             }
             TYPE_PHOTO -> {
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+
                 if (type == Photo.TYPE_AUDIO) {
-                    val view = LayoutInflater.from(parent.context).inflate(R.layout.gallery_adapter_audio_item, parent, false)
-                    AudioViewHolder(view, this)
+                    val m = (8 * density).toInt()
+                    val mv = (6 * density).toInt()
+                    val composeView = ComposeView(context).apply {
+                        layoutParams = RecyclerView.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).apply { setMargins(m, mv, m, mv) }
+                        setViewCompositionStrategy(
+                            ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                        )
+                    }
+                    AudioViewHolder(composeView, this)
                 } else {
-                    val view = LayoutInflater.from(parent.context).inflate(R.layout.gallery_adapter_item, parent, false)
-                    PhotoViewHolder(view, this)
+                    val m = (2 * density).toInt()
+                    val composeView = ComposeView(context).apply {
+                        layoutParams = ConstraintLayout.LayoutParams(0, 0).apply {
+                            startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                            topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                            endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                            bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                        }
+                        setViewCompositionStrategy(
+                            ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                        )
+                    }
+                    val itemView = SquareConstraintLayout(context).apply {
+                        layoutParams = RecyclerView.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        ).apply { setMargins(m, m, m, m) }
+                        orientation = 1 // horizontal → square based on width
+                        addView(composeView)
+                    }
+                    PhotoViewHolder(itemView, composeView, this)
                 }
             }
             else -> throw IllegalArgumentException("Unhandled item type")
@@ -265,185 +293,167 @@ class GalleryAdapter(
         }
     }
 
-    class PhotoViewHolder(itemView: View, creatingAdapter: GalleryAdapter?) :
-        BaseViewHolder(itemView) {
-        private val image: ImageView by bindView(R.id.gallery_adapter_item_image)
-        private val selection: ImageView by bindView(R.id.gallery_adapter_item_selection)
-
+    class PhotoViewHolder(
+        itemView: View,
+        private val composeView: ComposeView,
+        creatingAdapter: GalleryAdapter?
+    ) : BaseViewHolder(itemView) {
         private val adapterRef = WeakReference(creatingAdapter)
-
         private var currentPhotoId = ""
-
-        init {
-            itemView.setOnClickListener {
-                val adapter = adapterRef.get() ?: return@setOnClickListener
-
-                val event: GalleryUiEvent = when (adapter.selectionMode) {
-                    true -> {
-                        if (adapter.selectedIds.contains(currentPhotoId)) {
-                            adapter.selectedIds.remove(currentPhotoId)
-                        } else {
-                            adapter.selectedIds.add(currentPhotoId)
-                        }
-
-                        val returnList = ArrayList<String>(adapter.selectedIds.size)
-                        returnList.addAll(adapter.selectedIds)
-
-                        GalleryUiEvent.SelectionUpdated(returnList)
-                    }
-
-                    false -> GalleryUiEvent.ImageClick(currentPhotoId)
-                }
-
-                adapter.eventRelayRef.get()?.accept(event)
-            }
-
-            itemView.setOnLongClickListener {
-                val adapter = adapterRef.get() ?: return@setOnLongClickListener false
-
-                if (!adapter.selectionMode) {
-                    adapter.eventRelayRef.get()
-                        ?.accept(GalleryUiEvent.SelectionUpdated(arrayListOf(currentPhotoId)))
-                } else {
-                    itemView.performClick()
-                }
-
-                return@setOnLongClickListener true
-            }
-        }
 
         fun bind(item: GalleryAdapterItem, selectionMode: Boolean) {
             currentPhotoId = item.photo!!.id
+            val photoId = currentPhotoId
+            val filePath = item.photo.filePath
+            val isSelected = item.selected
 
-            Picasso.get()
-                .load(File(item.photo.filePath))
-                .fit()
-                .centerCrop()
-                .into(image)
-
-            selection.setVisibleOrGone(selectionMode)
-
-            if (selectionMode) {
-                val selectionRes = when (item.selected) {
-                    true -> R.drawable.ic_selected_primary_36dp
-                    false -> R.drawable.ic_unselected_primary_36dp
-                }
-
-                selection.setImageResource(selectionRes)
-                selection.contentDescription = when (item.selected) {
-                    true -> itemView.getString(R.string.selected)
-                    false -> itemView.getString(R.string.not_selected)
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    GalleryPhotoItem(
+                        filePath = filePath,
+                        isSelected = isSelected,
+                        selectionMode = selectionMode,
+                        onClick = {
+                            val adapter = adapterRef.get() ?: return@GalleryPhotoItem
+                            val event: GalleryUiEvent = when (adapter.selectionMode) {
+                                true -> {
+                                    if (adapter.selectedIds.contains(photoId)) {
+                                        adapter.selectedIds.remove(photoId)
+                                    } else {
+                                        adapter.selectedIds.add(photoId)
+                                    }
+                                    val list = ArrayList<String>(adapter.selectedIds.size)
+                                    list.addAll(adapter.selectedIds)
+                                    GalleryUiEvent.SelectionUpdated(list)
+                                }
+                                false -> GalleryUiEvent.ImageClick(photoId)
+                            }
+                            adapter.eventRelayRef.get()?.accept(event)
+                        },
+                        onLongClick = {
+                            val adapter = adapterRef.get() ?: return@GalleryPhotoItem
+                            if (!adapter.selectionMode) {
+                                adapter.eventRelayRef.get()
+                                    ?.accept(GalleryUiEvent.SelectionUpdated(arrayListOf(photoId)))
+                            } else {
+                                if (adapter.selectedIds.contains(photoId)) {
+                                    adapter.selectedIds.remove(photoId)
+                                } else {
+                                    adapter.selectedIds.add(photoId)
+                                }
+                                val list = ArrayList<String>(adapter.selectedIds.size)
+                                list.addAll(adapter.selectedIds)
+                                adapter.eventRelayRef.get()
+                                    ?.accept(GalleryUiEvent.SelectionUpdated(list))
+                            }
+                        }
+                    )
                 }
             }
         }
     }
 
-    class AudioViewHolder(itemView: View, creatingAdapter: GalleryAdapter?) :
-        BaseViewHolder(itemView) {
-        private val playButton: ImageButton by bindView(R.id.audio_play_button)
-        private val dateText: TextView by bindView(R.id.audio_date)
-        private val pitchText: TextView by bindView(R.id.audio_pitch)
-        private val formantsText: TextView by bindView(R.id.audio_formants)
-        private val waveformView: com.shelbeely.opentransition.ui.widget.WaveformView by bindView(R.id.audio_waveform)
-        private val selectionCheckbox: CheckBox by bindView(R.id.audio_selection_checkbox)
-
+    class AudioViewHolder(
+        composeView: ComposeView,
+        creatingAdapter: GalleryAdapter?
+    ) : BaseViewHolder(composeView) {
+        private val composeView: ComposeView = composeView
         private val adapterRef = WeakReference(creatingAdapter)
+        private val isPlayingState = mutableStateOf(false)
         private var currentPhotoId = ""
-        private var currentAudioFile: File? = null
-
-        init {
-            itemView.setOnClickListener {
-                val adapter = adapterRef.get() ?: return@setOnClickListener
-
-                val event: GalleryUiEvent = when (adapter.selectionMode) {
-                    true -> {
-                        if (adapter.selectedIds.contains(currentPhotoId)) {
-                            adapter.selectedIds.remove(currentPhotoId)
-                        } else {
-                            adapter.selectedIds.add(currentPhotoId)
-                        }
-
-                        val returnList = ArrayList<String>(adapter.selectedIds.size)
-                        returnList.addAll(adapter.selectedIds)
-
-                        GalleryUiEvent.SelectionUpdated(returnList)
-                    }
-
-                    false -> GalleryUiEvent.ImageClick(currentPhotoId)
-                }
-
-                adapter.eventRelayRef.get()?.accept(event)
-            }
-
-            itemView.setOnLongClickListener {
-                val adapter = adapterRef.get() ?: return@setOnLongClickListener false
-
-                if (!adapter.selectionMode) {
-                    adapter.eventRelayRef.get()
-                        ?.accept(GalleryUiEvent.SelectionUpdated(arrayListOf(currentPhotoId)))
-                } else {
-                    itemView.performClick()
-                }
-
-                return@setOnLongClickListener true
-            }
-
-            playButton.setOnClickListener {
-                currentAudioFile?.let { file ->
-                    val isPlaying = com.shelbeely.opentransition.util.AudioPlayerManager.togglePlayback(currentPhotoId, file)
-                    updatePlayButtonState(isPlaying)
-                }
-            }
-        }
-        
-        private fun updatePlayButtonState(isPlaying: Boolean) {
-            playButton.setImageResource(
-                if (isPlaying) android.R.drawable.ic_media_pause
-                else android.R.drawable.ic_media_play
-            )
-        }
+        private var currentFilePath = ""
 
         fun bind(item: GalleryAdapterItem, selectionMode: Boolean) {
             currentPhotoId = item.photo!!.id
-            currentAudioFile = File(item.photo.filePath)
+            currentFilePath = item.photo.filePath
+            isPlayingState.value = AudioPlayerManager.isPlaying(currentPhotoId)
 
-            // Display date
-            dateText.text = LocalDate.ofEpochDay(item.photo.epochDay).toFullDateString(itemView.context)
+            val photoId = currentPhotoId
+            val filePath = currentFilePath
+            val isSelected = item.selected
+            val dateText = LocalDate.ofEpochDay(item.photo.epochDay)
+                .toFullDateString(composeView.context)
 
-            // Update play button state based on current playback
-            updatePlayButtonState(com.shelbeely.opentransition.util.AudioPlayerManager.isPlaying(currentPhotoId))
-
-            // Set waveform
-            if (currentAudioFile?.exists() == true) {
-                waveformView.setAudioFile(currentAudioFile!!)
-            }
-
-            // Load audio analysis if available
             val realm = Realm.openDefault()
-            val analysis = realm.query(com.shelbeely.opentransition.data.AudioAnalysis::class, 
-                "photoId == '$currentPhotoId'")
-                .first()
-                .find()
-
-            if (analysis != null) {
-                pitchText.text = itemView.context.getString(
+            val analysis = realm.query(AudioAnalysis::class, "photoId == '$photoId'")
+                .first().find()
+            val pitchText = if (analysis != null) {
+                composeView.context.getString(
                     R.string.pitch_format,
                     String.format("%.0f", analysis.f0Mean)
                 )
-                formantsText.text = itemView.context.getString(
+            } else {
+                composeView.context.getString(R.string.pitch_format, "N/A")
+            }
+            val formantsText = if (analysis != null) {
+                composeView.context.getString(
                     R.string.formants_format,
                     String.format("%.0f", analysis.f1Mean),
                     String.format("%.0f", analysis.f2Mean)
                 )
             } else {
-                pitchText.text = itemView.context.getString(R.string.pitch_format, "N/A")
-                formantsText.text = itemView.context.getString(R.string.formants_format, "N/A", "N/A")
+                composeView.context.getString(R.string.formants_format, "N/A", "N/A")
             }
-
             realm.close()
 
-            selectionCheckbox.setVisibleOrGone(selectionMode)
-            selectionCheckbox.isChecked = item.selected
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    GalleryAudioItem(
+                        photoId = photoId,
+                        audioFilePath = filePath,
+                        dateText = dateText,
+                        pitchText = pitchText,
+                        formantsText = formantsText,
+                        isPlaying = isPlayingState.value,
+                        isSelected = isSelected,
+                        selectionMode = selectionMode,
+                        onPlayPause = {
+                            val playing = AudioPlayerManager.togglePlayback(
+                                photoId, File(filePath)
+                            )
+                            isPlayingState.value = playing
+                        },
+                        onClick = {
+                            val adapter = adapterRef.get() ?: return@GalleryAudioItem
+                            val event: GalleryUiEvent = when (adapter.selectionMode) {
+                                true -> {
+                                    if (adapter.selectedIds.contains(photoId)) {
+                                        adapter.selectedIds.remove(photoId)
+                                    } else {
+                                        adapter.selectedIds.add(photoId)
+                                    }
+                                    val list = ArrayList<String>(adapter.selectedIds.size)
+                                    list.addAll(adapter.selectedIds)
+                                    GalleryUiEvent.SelectionUpdated(list)
+                                }
+                                false -> GalleryUiEvent.ImageClick(photoId)
+                            }
+                            adapter.eventRelayRef.get()?.accept(event)
+                        },
+                        onLongClick = {
+                            val adapter = adapterRef.get() ?: return@GalleryAudioItem
+                            if (!adapter.selectionMode) {
+                                adapter.eventRelayRef.get()
+                                    ?.accept(GalleryUiEvent.SelectionUpdated(arrayListOf(photoId)))
+                            } else {
+                                if (adapter.selectedIds.contains(photoId)) {
+                                    adapter.selectedIds.remove(photoId)
+                                } else {
+                                    adapter.selectedIds.add(photoId)
+                                }
+                                val list = ArrayList<String>(adapter.selectedIds.size)
+                                list.addAll(adapter.selectedIds)
+                                adapter.eventRelayRef.get()
+                                    ?.accept(GalleryUiEvent.SelectionUpdated(list))
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 
