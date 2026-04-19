@@ -17,21 +17,15 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
 import com.shelbeely.opentransition.ui.widget.CursorRecyclerViewAdapter
-import com.shelbeely.opentransition.util.getString
-import com.shelbeely.opentransition.util.setVisibleOrGone
 import com.jakewharton.rxrelay3.PublishRelay
-import com.squareup.picasso.Picasso
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
 import java.lang.ref.WeakReference
 
 class SelectPhotoAdapter(
@@ -99,12 +93,36 @@ class SelectPhotoAdapter(
                 TakePhotoHolder(itemView, composeView, eventRelay)
             }
 
-            else -> ImageHolder(
-                android.view.LayoutInflater.from(parent.context).inflate(
-                    R.layout.select_photo_adapter_item, parent, false
-                ),
-                this
-            )
+            else -> {
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+                val margin = (2 * density).toInt()
+
+                val composeView = ComposeView(context).apply {
+                    layoutParams = ConstraintLayout.LayoutParams(0, 0).apply {
+                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                        topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+
+                val itemView = SquareConstraintLayout(context).apply {
+                    layoutParams = RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(margin, margin, margin, margin)
+                    }
+                    orientation = 1
+                    addView(composeView)
+                }
+
+                ImageHolder(itemView, composeView, this)
+            }
         }
     }
 
@@ -182,71 +200,45 @@ class SelectPhotoAdapter(
         }
     }
 
-    class ImageHolder(itemView: View, creatingAdapter: SelectPhotoAdapter?) : BaseHolder(itemView) {
-        private val image: ImageView by bindView(R.id.select_photo_adapter_item_image)
-        private val selection: ImageView by bindView(R.id.select_photo_adapter_item_selection)
-
+    class ImageHolder(
+        itemView: View,
+        private val composeView: ComposeView,
+        creatingAdapter: SelectPhotoAdapter
+    ) : BaseHolder(itemView) {
         private val adapterRef = WeakReference(creatingAdapter)
 
-        private var currentUri: Uri? = null
-
-        init {
-            //Avoiding subscription so we don't need to dispose it
-            itemView.setOnClickListener {
-                val uri = currentUri ?: return@setOnClickListener
-                val adapter = adapterRef.get() ?: return@setOnClickListener
-
-                val event: SelectPhotoUiEvent = when (adapter.selectionMode) {
-                    true -> {
-                        if (adapter.selectedUris.contains(uri)) {
-                            adapter.selectedUris.remove(uri)
-                        } else {
-                            adapter.selectedUris.add(uri)
-                        }
-
-                        SelectPhotoUiEvent.SelectionUpdate(adapter.getSelectedUris())
-                    }
-
-                    false -> SelectPhotoUiEvent.PhotoSelected(uri)
-                }
-
-                adapter.eventRelay.accept(event)
-            }
-
-            itemView.setOnLongClickListener {
-                val uri = currentUri ?: return@setOnLongClickListener false
-                val adapter = adapterRef.get() ?: return@setOnLongClickListener false
-
-                if (!adapter.selectionMode) {
-                    adapter.eventRelay.accept(SelectPhotoUiEvent.SelectionUpdate(arrayListOf(uri)))
-                } else {
-                    itemView.performClick()
-                }
-
-                return@setOnLongClickListener true
-            }
-        }
-
         fun bind(uri: Uri, selectionMode: Boolean, isSelected: Boolean) {
-            currentUri = uri
-            Picasso.get()
-                .load(uri)
-                .fit()
-                .centerCrop()
-                .into(image)
-
-            selection.setVisibleOrGone(selectionMode)
-
-            if (selectionMode) {
-                val selectionRes = when (isSelected) {
-                    true -> R.drawable.ic_selected_primary_36dp
-                    false -> R.drawable.ic_unselected_primary_36dp
-                }
-                selection.setImageResource(selectionRes)
-
-                selection.contentDescription = when (isSelected) {
-                    true -> itemView.getString(R.string.selected)
-                    false -> itemView.getString(R.string.not_selected)
+            val adapter = adapterRef.get() ?: return
+            composeView.setContent {
+                OpenTransitionTheme {
+                    SelectPhotoImageItem(
+                        uri = uri,
+                        isSelected = isSelected,
+                        selectionMode = selectionMode,
+                        onClick = {
+                            val event: SelectPhotoUiEvent = when (adapter.selectionMode) {
+                                true -> {
+                                    if (adapter.selectedUris.contains(uri)) {
+                                        adapter.selectedUris.remove(uri)
+                                    } else {
+                                        adapter.selectedUris.add(uri)
+                                    }
+                                    SelectPhotoUiEvent.SelectionUpdate(adapter.getSelectedUris())
+                                }
+                                false -> SelectPhotoUiEvent.PhotoSelected(uri)
+                            }
+                            adapter.eventRelay.accept(event)
+                        },
+                        onLongClick = {
+                            if (!adapter.selectionMode) {
+                                adapter.eventRelay.accept(
+                                    SelectPhotoUiEvent.SelectionUpdate(arrayListOf(uri))
+                                )
+                            } else {
+                                itemView.performClick()
+                            }
+                        }
+                    )
                 }
             }
         }
