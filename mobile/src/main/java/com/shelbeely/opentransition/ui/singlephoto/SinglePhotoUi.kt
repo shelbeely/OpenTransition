@@ -12,19 +12,15 @@ package com.shelbeely.opentransition.ui.singlephoto
 
 import android.content.Context
 import android.util.AttributeSet
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.util.toV3
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.itemClicks
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
-import com.squareup.picasso.Picasso
+import com.shelbeely.opentransition.util.settings.SettingsManager
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
-import java.io.File
 
 sealed class SinglePhotoUiEvent {
     object Back : SinglePhotoUiEvent()
@@ -39,50 +35,41 @@ sealed class SinglePhotoUiState {
     ) : SinglePhotoUiState()
 }
 
-class SinglePhotoView(
-    context: Context, attributeSet: AttributeSet
-) : ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.single_photo_toolbar)
+class SinglePhotoView(context: Context, attributeSet: AttributeSet) :
+    FrameLayout(context, attributeSet) {
 
-    private val image: ImageView by bindView(R.id.single_photo_image)
-    private val details: TextView by bindView(R.id.single_photo_details)
+    private val eventRelay: PublishRelay<SinglePhotoUiEvent> = PublishRelay.create()
+    val events: Observable<SinglePhotoUiEvent> = eventRelay
 
-    val events: Observable<SinglePhotoUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge(
-            toolbar.navigationClicks().toV3().map<SinglePhotoUiEvent> { SinglePhotoUiEvent.Back },
-            toolbar.itemClicks().toV3().map { item ->
-                return@map when (item.itemId) {
-                    R.id.single_photo_menu_edit -> SinglePhotoUiEvent.Edit(photoId)
-                    R.id.single_photo_menu_share -> SinglePhotoUiEvent.Share(photoId)
-                    R.id.single_photo_menu_delete -> SinglePhotoUiEvent.Delete(photoId)
-                    else -> throw IllegalArgumentException("Unhandled menu item")
-                }
-            })
+    private var currentState: SinglePhotoUiState = SinglePhotoUiState.Loaded("", "", "")
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
     }
-
-    private var photoId: String = ""
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-        
-        toolbar.inflateMenu(R.menu.single_photo)
+        renderCompose()
     }
 
     fun display(state: SinglePhotoUiState) {
-        when (state) {
-            is SinglePhotoUiState.Loaded -> {
-                photoId = state.photoId
+        currentState = state
+        renderCompose()
+    }
 
-                Picasso.get()
-                    .load(File(state.photoPath))
-                    .fit()
-                    .centerInside()
-                    .into(image)
-
-                details.text = state.details
+    private fun renderCompose() {
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                SinglePhotoScreen(
+                    state = currentState,
+                    onBack = { eventRelay.accept(SinglePhotoUiEvent.Back) },
+                    onEdit = { id -> eventRelay.accept(SinglePhotoUiEvent.Edit(id)) },
+                    onShare = { id -> eventRelay.accept(SinglePhotoUiEvent.Share(id)) },
+                    onDelete = { id -> eventRelay.accept(SinglePhotoUiEvent.Delete(id)) }
+                )
             }
         }
     }
