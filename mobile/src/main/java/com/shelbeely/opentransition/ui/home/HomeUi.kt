@@ -15,24 +15,31 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.MenuItem
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.appcompat.widget.PopupMenu
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.SwipeGestureListener
 import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.nullAllElements
+import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.setVisibleOrInvisible
 import com.shelbeely.opentransition.util.toFullDateString
 import com.shelbeely.opentransition.util.toV3
 import com.shelbeely.opentransition.util.applySystemBarInsets
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotterknife.bindView
 import java.time.LocalDate
 
@@ -74,8 +81,7 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     private val previousRecord: ImageButton by bindView(R.id.home_previous_record)
     private val nextRecord: ImageButton by bindView(R.id.home_next_record)
 
-    private val startDate: TextView by bindView(R.id.home_start_date)
-    private val currentDate: TextView by bindView(R.id.home_current_date)
+    private val dateSummaryContainer: FrameLayout by bindView(R.id.home_date_summary_container)
 
     private val milestones: ImageButton by bindView(R.id.home_milestones)
 
@@ -89,6 +95,7 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     private val audioRecyclerView: RecyclerView by bindView(R.id.home_audio_images)
 
     private val eventRelay: PublishRelay<HomeUiEvent> = PublishRelay.create()
+    private val viewDisposables: CompositeDisposable = CompositeDisposable()
     val events: Observable<HomeUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
         Observable.mergeArray(
             settings.clicks().toV3().map { HomeUiEvent.Settings },
@@ -109,6 +116,8 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
     private var date = LocalDate.MIN
     private var hasPrevious = false
     private var hasNext = true
+    private var dateSummaryContent: DateSummaryContent? = null
+    private var dateSummaryView: ComposeView? = null
 
     private val swipeListener = object : SwipeGestureListener() {
         override fun swipeLeft(): Boolean {
@@ -139,6 +148,19 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
             return@setOnTouchListener true
         }
 
+        if (dateSummaryView == null) {
+            dateSummaryView = ComposeView(context).apply {
+                layoutParams = FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+                )
+                setViewCompositionStrategy(
+                    ViewCompositionStrategy.DisposeOnDetachedFromWindow
+                )
+            }
+            dateSummaryContainer.addView(dateSummaryView)
+        }
+
         takePhoto.setOnClickListener { showPhotoSourceMenu() }
 
         faceRecyclerView.layoutManager = LinearLayoutManager(
@@ -150,6 +172,14 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         audioRecyclerView.layoutManager = LinearLayoutManager(
             context, LinearLayoutManager.HORIZONTAL, false
         )
+
+        viewDisposables += SettingsManager.themeUpdated
+            .subscribe { renderDateSummary() }
+    }
+
+    override fun onDetachedFromWindow() {
+        viewDisposables.clear()
+        super.onDetachedFromWindow()
     }
 
     fun display(state: HomeUiState) {
@@ -172,12 +202,15 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
                 previousRecord.setVisibleOrInvisible(state.showPreviousRecord)
                 nextRecord.setVisibleOrInvisible(state.showNextRecord)
 
-                startDate.text = startDate.getString(
-                    R.string.start_date, state.startDate.toFullDateString(startDate.context)
+                dateSummaryContent = DateSummaryContent(
+                    startDate = context.getString(
+                        R.string.start_date, state.startDate.toFullDateString(context)
+                    ),
+                    currentDate = context.getString(
+                        R.string.current_date, state.currentDate.toFullDateString(context)
+                    )
                 )
-                currentDate.text = currentDate.getString(
-                    R.string.current_date, state.currentDate.toFullDateString(currentDate.context)
-                )
+                renderDateSummary()
 
                 val milestonesRes = when (state.hasMilestones) {
                     true -> R.drawable.ic_milestone_selected
@@ -219,4 +252,25 @@ class HomeView(context: Context, attributeSet: AttributeSet) :
         }
         popup.show()
     }
+
+    private fun renderDateSummary() {
+        val content = dateSummaryContent ?: return
+        val dateSummaryView = dateSummaryView ?: return
+
+        dateSummaryView.setContent {
+            OpenTransitionTheme(
+                colorVariant = SettingsManager.getResolvedComposeColorVariant()
+            ) {
+                HomeDateSummaryItem(
+                    startDate = content.startDate,
+                    currentDate = content.currentDate
+                )
+            }
+        }
+    }
+
+    private data class DateSummaryContent(
+        val startDate: String,
+        val currentDate: String
+    )
 }
