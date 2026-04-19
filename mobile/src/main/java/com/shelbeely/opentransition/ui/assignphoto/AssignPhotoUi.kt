@@ -13,22 +13,15 @@ package com.shelbeely.opentransition.ui.assignphoto
 import android.content.Context
 import android.net.Uri
 import android.util.AttributeSet
-import android.view.View
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.util.setVisibleOrGone
-import com.shelbeely.opentransition.util.toV3
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
-import com.jakewharton.rxbinding3.view.clicks
-import com.squareup.picasso.Picasso
+import com.shelbeely.opentransition.util.settings.SettingsManager
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
 import java.time.LocalDate
 
 sealed class AssignPhotoUiEvent {
@@ -51,74 +44,43 @@ sealed class AssignPhotoUiState {
 }
 
 class AssignPhotoView(context: Context, attributeSet: AttributeSet) :
-    ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.assign_photo_toolbar)
-    private val title: TextView by bindView(R.id.assign_photo_title)
-    private val image: ImageView by bindView(R.id.assign_photo_image)
+    FrameLayout(context, attributeSet) {
 
-    private val dateLabel: View by bindView(R.id.assign_photo_date_label)
-    private val date: Button by bindView(R.id.assign_photo_date)
-    private val photoDate: ImageButton by bindView(R.id.assign_photo_use_photo_date)
-    private val typeLabel: View by bindView(R.id.assign_photo_type_label)
-    private val type: Button by bindView(R.id.assign_photo_type)
+    private val eventRelay: PublishRelay<AssignPhotoUiEvent> = PublishRelay.create()
+    val events: Observable<AssignPhotoUiEvent> = eventRelay
 
-    private val save: Button by bindView(R.id.assign_photo_save)
-    private val skip: Button by bindView(R.id.assign_photo_skip)
+    private var currentState: AssignPhotoUiState = AssignPhotoUiState.Loading
 
-    val events: Observable<AssignPhotoUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.mergeArray(
-            toolbar.navigationClicks().toV3().map { AssignPhotoUiEvent.Back },
-            date.clicks().toV3().map { AssignPhotoUiEvent.ChangeDate(currentIndex) },
-            photoDate.clicks().toV3().map {
-                AssignPhotoUiEvent.UsePhotoDate(currentIndex, currentPhotoDate)
-            },
-            type.clicks().toV3().map { AssignPhotoUiEvent.ChangeType(currentIndex) },
-            save.clicks().toV3().map { AssignPhotoUiEvent.Save(currentIndex) },
-            skip.clicks().toV3().map { AssignPhotoUiEvent.Skip(currentIndex, currentCount) })
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
     }
-
-    private var currentPhotoDate: LocalDate = LocalDate.MIN
-    private var currentIndex: Int = 0
-    private var currentCount: Int = 0
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-
-        dateLabel.setOnClickListener { date.performClick() }
-        typeLabel.setOnClickListener { type.performClick() }
+        renderCompose()
     }
 
     fun display(state: AssignPhotoUiState) {
-        when (state) {
-            is AssignPhotoUiState.Loading -> {
-                //TODO update to set to loading state instead of resetting and setting
-            }
+        currentState = state
+        renderCompose()
+    }
 
-            is AssignPhotoUiState.Loaded -> {
-                if (state.photoDate != null) {
-                    currentPhotoDate = state.photoDate
-                }
-                currentIndex = state.index
-                currentCount = state.count
-
-                title.text = state.title
-
-                Picasso.get()
-                    .load(state.photoUri)
-                    .fit()
-                    .centerInside()
-                    .into(image)
-
-                date.text = state.date
-
-                photoDate.setVisibleOrGone(state.photoDate != null)
-
-                type.text = state.type
-
-                skip.setVisibleOrGone(state.showSkip)
+    private fun renderCompose() {
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                AssignPhotoScreen(
+                    state = currentState,
+                    onBack = { eventRelay.accept(AssignPhotoUiEvent.Back) },
+                    onChangeDate = { idx -> eventRelay.accept(AssignPhotoUiEvent.ChangeDate(idx)) },
+                    onUsePhotoDate = { idx, date -> eventRelay.accept(AssignPhotoUiEvent.UsePhotoDate(idx, date)) },
+                    onChangeType = { idx -> eventRelay.accept(AssignPhotoUiEvent.ChangeType(idx)) },
+                    onSave = { idx -> eventRelay.accept(AssignPhotoUiEvent.Save(idx)) },
+                    onSkip = { idx, count -> eventRelay.accept(AssignPhotoUiEvent.Skip(idx, count)) }
+                )
             }
         }
     }
