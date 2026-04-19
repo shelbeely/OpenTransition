@@ -14,28 +14,19 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.view.View
-import android.widget.TextView
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.util.gone
-import com.shelbeely.opentransition.util.plusAssign
-import com.shelbeely.opentransition.util.setGone
-import com.shelbeely.opentransition.util.setVisible
-import com.shelbeely.opentransition.util.toV3
-import com.shelbeely.opentransition.util.visible
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
+import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.settings.SettingsManager
-import com.jakewharton.rxbinding3.appcompat.itemClicks
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
-import com.jakewharton.rxbinding3.view.clicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
-import kotterknife.bindView
 
 sealed class MilestonesUiEvent {
     object Back : MilestonesUiEvent()
@@ -55,47 +46,41 @@ sealed class MilestonesUiState {
 
 class MilestonesView(
     context: Context, attributeSet: AttributeSet
-) : ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.milestones_toolbar)
-
-    private val recyclerView: RecyclerView by bindView(R.id.milestones_recycler_view)
-
-    private val emptyMessage: TextView by bindView(R.id.milestones_empty_message)
-    private val emptyAdd: View by bindView(R.id.milestones_empty_add)
+) : FrameLayout(context, attributeSet) {
 
     private val eventRelay: PublishRelay<MilestonesUiEvent> = PublishRelay.create()
     private val viewDisposables: CompositeDisposable = CompositeDisposable()
-    val events: Observable<MilestonesUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge<MilestonesUiEvent>(
-            toolbar.navigationClicks().toV3().map { MilestonesUiEvent.Back },
-            toolbar.itemClicks().toV3().map<MilestonesUiEvent> { item ->
-                return@map when (item.itemId) {
-                    R.id.milestones_menu_add -> MilestonesUiEvent.AddMilestone(day)
-                    else -> throw IllegalArgumentException("Unhandled menu item id")
-                }
-            },
-            emptyAdd.clicks().toV3().map { MilestonesUiEvent.AddMilestone(day) },
-            eventRelay
-        )
+    val events: Observable<MilestonesUiEvent> = eventRelay
+
+    private var currentState: MilestonesUiState = MilestonesUiState.Loaded(0L)
+    private var isEmpty: Boolean = false
+
+    private val layoutManager = LinearLayoutManager(context)
+
+    private val recyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            this.layoutManager = this@MilestonesView.layoutManager
+        }
     }
 
-    private var day: Long = 0L
-    private var layoutManager = LinearLayoutManager(context)
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-
-        toolbar.inflateMenu(R.menu.milestones)
-
-        recyclerView.layoutManager = layoutManager
 
         viewDisposables += SettingsManager.themeUpdated
             .subscribe {
                 (recyclerView.adapter as? MilestonesAdapter)?.refreshComposeItems()
             }
+
+        renderCompose()
     }
 
     override fun onDetachedFromWindow() {
@@ -104,16 +89,14 @@ class MilestonesView(
     }
 
     fun display(state: MilestonesUiState) {
+        currentState = state
         when (state) {
             is MilestonesUiState.Loaded -> {
-                day = state.initialDay
-
                 if (recyclerView.adapter == null) {
                     recyclerView.adapter = MilestonesAdapter(
                         eventRelay,
                         postInitialLoad = { adapter ->
-                            val scrollTo =
-                                adapter.getPositionOfDay(MilestonesUiState.getInitialDay(state))
+                            val scrollTo = adapter.getPositionOfDay(state.initialDay)
                             if (scrollTo != -1) {
                                 Handler(Looper.getMainLooper()).post {
                                     layoutManager.scrollToPositionWithOffset(scrollTo, 0)
@@ -121,15 +104,32 @@ class MilestonesView(
                             }
                         },
                         postLoad = { adapter ->
-                            if (adapter.itemCount > 0) {
-                                setVisible(recyclerView)
-                                setGone(emptyMessage, emptyAdd)
-                            } else {
-                                setVisible(emptyMessage, emptyAdd)
-                                setGone(recyclerView)
-                            }
-                        })
+                            isEmpty = adapter.itemCount == 0
+                            renderCompose()
+                        }
+                    )
                 }
+            }
+        }
+        renderCompose()
+    }
+
+    private fun renderCompose() {
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                MilestonesScreen(
+                    state = currentState,
+                    isEmpty = isEmpty,
+                    onBack = { eventRelay.accept(MilestonesUiEvent.Back) },
+                    onAdd = {
+                        eventRelay.accept(
+                            MilestonesUiEvent.AddMilestone(
+                                MilestonesUiState.getInitialDay(currentState)
+                            )
+                        )
+                    },
+                    recyclerView = recyclerView,
+                )
             }
         }
     }
