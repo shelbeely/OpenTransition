@@ -12,27 +12,15 @@ package com.shelbeely.opentransition.ui.addeditmilestone
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.TextView
-import androidx.annotation.StringRes
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.ui.addeditmilestone.AddEditMilestoneUiState.Display
-import com.shelbeely.opentransition.util.setTextRetainingSelection
-import com.shelbeely.opentransition.util.showKeyboard
-import com.shelbeely.opentransition.util.toFullDateString
-import com.shelbeely.opentransition.util.toV3
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.itemClicks
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
-import com.jakewharton.rxbinding3.view.clicks
-import com.jakewharton.rxbinding3.widget.afterTextChangeEvents
+import com.shelbeely.opentransition.util.settings.SettingsManager
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
-import java.time.LocalDate
 
 sealed class AddEditMilestoneUiEvent {
     object Back : AddEditMilestoneUiEvent()
@@ -52,95 +40,48 @@ sealed class AddEditMilestoneUiState {
     ) : AddEditMilestoneUiState()
 }
 
-class AddEditMilestoneView(
-    context: Context, attributeSet: AttributeSet
-) : ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.add_milestone_toolbar)
-    private val toolbarTitle: TextView by bindView(R.id.add_milestone_toolbar_title)
+class AddEditMilestoneView(context: Context, attributeSet: AttributeSet) :
+    FrameLayout(context, attributeSet) {
 
-    private val titleLabel: View by bindView(R.id.add_milestone_title_label)
-    private val title: EditText by bindView(R.id.add_milestone_title)
-    private val dateLabel: View by bindView(R.id.add_milestone_date_label)
-    private val date: Button by bindView(R.id.add_milestone_date)
-    private val descriptionLabel: View by bindView(R.id.add_milestone_description_label)
-    private val description: EditText by bindView(R.id.add_milestone_description)
+    private val eventRelay: PublishRelay<AddEditMilestoneUiEvent> = PublishRelay.create()
+    val events: Observable<AddEditMilestoneUiEvent> = eventRelay
 
-    private val save: Button by bindView(R.id.add_milestone_save)
+    private var currentState: AddEditMilestoneUiState = AddEditMilestoneUiState.Loading
 
-    private var isUserChange: Boolean = true
-
-    val events: Observable<AddEditMilestoneUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.mergeArray(
-            toolbar.navigationClicks().toV3().map { AddEditMilestoneUiEvent.Back },
-            toolbar.itemClicks().toV3().map { item ->
-                return@map when (item.itemId) {
-                    R.id.add_edit_milestone_menu_delete -> AddEditMilestoneUiEvent.Delete
-                    else -> throw IllegalArgumentException("Unhandled item id")
-                }
-            },
-            title.afterTextChangeEvents().skipInitialValue().toV3()
-                .filter { isUserChange }
-                .map { AddEditMilestoneUiEvent.TitleUpdated(it.editable.toString()) }
-                .distinctUntilChanged(),
-            description.afterTextChangeEvents().skipInitialValue().toV3()
-                .filter { isUserChange }
-                .map { AddEditMilestoneUiEvent.DescriptionUpdated(it.editable.toString()) }
-                .distinctUntilChanged(),
-            date.clicks().toV3().map { AddEditMilestoneUiEvent.ChangeDate(day) },
-            save.clicks().toV3().map {
-                AddEditMilestoneUiEvent.Save(
-                    day, title.text.toString(), description.text.toString()
-                )
-            })
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
     }
-
-    private var day: Long = 0L
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-
-        toolbar.inflateMenu(R.menu.add_edit_milestone)
-
-        titleLabel.setOnClickListener {
-            title.requestFocus()
-            title.showKeyboard()
-        }
-
-        dateLabel.setOnClickListener { date.performClick() }
-
-        descriptionLabel.setOnClickListener {
-            description.requestFocus()
-            description.showKeyboard()
-        }
+        renderCompose()
     }
 
     fun display(state: AddEditMilestoneUiState) {
-        isUserChange = false
-        when (state) {
-            is AddEditMilestoneUiState.Loading -> {
-                //TODO update to set to loading state instead of resetting and setting
-            }
+        currentState = state
+        renderCompose()
+    }
 
-            is Display -> {
-                @StringRes val titleRes: Int = when (state.isAdd) {
-                    true -> R.string.add_milestone
-                    false -> R.string.edit_milestone
-                }
-
-                toolbarTitle.setText(titleRes)
-                toolbar.menu.getItem(0).isVisible = !state.isAdd
-
-                day = state.day
-                title.setTextRetainingSelection(state.title)
-                date.text = LocalDate.ofEpochDay(day).toFullDateString(context)
-                description.setTextRetainingSelection(state.description)
-
-                save.setText(titleRes)
+    private fun renderCompose() {
+        val state = currentState
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                AddEditMilestoneScreen(
+                    state = state,
+                    onBack = { eventRelay.accept(AddEditMilestoneUiEvent.Back) },
+                    onDelete = { eventRelay.accept(AddEditMilestoneUiEvent.Delete) },
+                    onTitleChanged = { eventRelay.accept(AddEditMilestoneUiEvent.TitleUpdated(it)) },
+                    onDescriptionChanged = { eventRelay.accept(AddEditMilestoneUiEvent.DescriptionUpdated(it)) },
+                    onChangeDate = { day -> eventRelay.accept(AddEditMilestoneUiEvent.ChangeDate(day)) },
+                    onSave = { day, title, desc ->
+                        eventRelay.accept(AddEditMilestoneUiEvent.Save(day, title, desc))
+                    }
+                )
             }
         }
-        isUserChange = true
     }
 }
