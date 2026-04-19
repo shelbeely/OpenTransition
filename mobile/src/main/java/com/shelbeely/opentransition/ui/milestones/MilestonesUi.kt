@@ -94,7 +94,7 @@ class MilestonesView(
 
         viewDisposables += SettingsManager.themeUpdated
             .subscribe {
-                (recyclerView.adapter as? MilestonesAdapter)?.refreshTitleItems()
+                (recyclerView.adapter as? MilestonesAdapter)?.refreshComposeItems()
             }
     }
 

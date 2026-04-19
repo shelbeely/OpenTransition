@@ -10,10 +10,8 @@
 
 package com.shelbeely.opentransition.ui.milestones
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.DiffUtil
@@ -23,7 +21,6 @@ import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.RxSchedulers
 import com.shelbeely.opentransition.util.openDefault
-import com.shelbeely.opentransition.util.setVisibleOrGone
 import com.shelbeely.opentransition.util.toFullDateString
 import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxrelay3.PublishRelay
@@ -31,7 +28,6 @@ import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.isValid
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.rx3.asObservable
-import kotterknife.bindView
 import java.lang.ref.WeakReference
 import java.time.LocalDate
 
@@ -94,8 +90,16 @@ class MilestonesAdapter(
                 DayTitleViewHolder(composeView)
             }
             TYPE_MILESTONE -> {
-                val view = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
-                MilestoneViewHolder(view, eventRelayRef.get())
+                val composeView = ComposeView(parent.context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+                MilestoneViewHolder(composeView, eventRelayRef.get())
             }
             else -> throw IllegalArgumentException("Unhandled item type")
         }
@@ -180,11 +184,9 @@ class MilestonesAdapter(
         results.dispatchUpdatesTo(this)
     }
 
-    fun refreshTitleItems() {
-        items.forEachIndexed { index, item ->
-            if (item.epochDay != null) {
-                notifyItemChanged(index)
-            }
+    fun refreshComposeItems() {
+        if (items.isNotEmpty()) {
+            notifyItemRangeChanged(0, items.size)
         }
     }
 
@@ -221,30 +223,28 @@ class MilestonesAdapter(
         }
     }
 
-    class MilestoneViewHolder(itemView: View, eventRelay: PublishRelay<MilestonesUiEvent>?) :
-        BaseViewHolder(itemView) {
-        private val title: TextView by bindView(R.id.milestones_adapter_item_title)
-        private val descriptionIcon: View by bindView(R.id.milestones_adapter_item_description_icon)
-        private val description: TextView by bindView(R.id.milestones_adapter_item_description)
-
+    class MilestoneViewHolder(
+        private val composeView: ComposeView,
+        eventRelay: PublishRelay<MilestonesUiEvent>?
+    ) : BaseViewHolder(composeView) {
         private val eventRelayRef = WeakReference(eventRelay)
-        private var milestoneId: String = ""
-
-        init {
-            itemView.setOnClickListener {
-                eventRelayRef.get()?.accept(MilestonesUiEvent.EditMilestone(milestoneId))
-            }
-        }
 
         fun bind(item: MilestonesAdapterItem) {
-            milestoneId = item.milestone!!.id
-
-            title.text = item.milestone.title
-
-            description.text = item.milestone.description
-            val showDescription = item.milestone.description.isNotEmpty()
-            descriptionIcon.setVisibleOrGone(showDescription)
-            description.setVisibleOrGone(showDescription)
+            val milestone = item.milestone!!
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    MilestoneRowItem(
+                        title = milestone.title,
+                        description = milestone.description,
+                        onClick = {
+                            eventRelayRef.get()
+                                ?.accept(MilestonesUiEvent.EditMilestone(milestone.id))
+                        }
+                    )
+                }
+            }
         }
     }
 
