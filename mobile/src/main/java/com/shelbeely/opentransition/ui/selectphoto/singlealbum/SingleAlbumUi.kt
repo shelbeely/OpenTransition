@@ -16,24 +16,24 @@ import android.util.AttributeSet
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.shelbeely.opentransition.util.isNotDisposed
 import com.shelbeely.opentransition.util.plusAssign
 import com.shelbeely.opentransition.util.settings.PrefUtil
 import com.shelbeely.opentransition.util.settings.SettingsManager
-import com.shelbeely.opentransition.util.toV3
-import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
-import kotterknife.bindView
 import java.lang.ref.WeakReference
 
 sealed class SingleAlbumUiEvent {
@@ -59,56 +59,46 @@ sealed class SingleAlbumUiState {
 }
 
 class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
-    ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.single_album_toolbar)
-    private val recyclerView: RecyclerView by bindView(R.id.single_album_recycler_view)
+    FrameLayout(context, attributeSet) {
 
     private val eventRelay: PublishRelay<SingleAlbumUiEvent> = PublishRelay.create()
-    val events: Observable<SingleAlbumUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge(
-            toolbar.navigationClicks().toV3().map { SingleAlbumUiEvent.Back },
-            eventRelay.doOnNext { event ->
-                if (event !is SingleAlbumUiEvent.SelectPhoto) {
-                    return@doOnNext
-                }
-
-                val position = gridLayoutManager.findFirstVisibleItemPosition()
-
-                if (position == RecyclerView.NO_POSITION) {
-                    return@doOnNext
-                }
-
-                adapter?.let { adapter ->
-                    val uriString: String? = adapter.getUri(position)?.toString()
-
-                    if (uriString != null) {
-                        PrefUtil.setAlbumFirstVisible(bucketId, uriString)
-                    }
-                }
-            })
-    }
+    val events: Observable<SingleAlbumUiEvent> = eventRelay
 
     private var photoClickDisposable: Disposable = Disposable.disposed()
     private val viewDisposables = CompositeDisposable()
 
-    private val gridLayoutManager = GridLayoutManager(context, GRID_SPAN)
+    private var currentState: SingleAlbumUiState? = null
     private var adapter: SingleAlbumAdapter? = null
-
     private var bucketId: String = ""
+
+    private val gridLayoutManager = GridLayoutManager(context, GRID_SPAN)
+
+    val recyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            layoutManager = gridLayoutManager
+        }
+    }
+
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
 
         gridLayoutManager.spanSizeLookup = AdapterSpanSizeLookup(recyclerView, GRID_SPAN)
-        recyclerView.layoutManager = gridLayoutManager
 
         viewDisposables += SettingsManager.themeUpdated
             .subscribe {
                 adapter?.refreshCountItem()
             }
+
+        renderCompose()
     }
 
     override fun onDetachedFromWindow() {
@@ -121,12 +111,13 @@ class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
     }
 
     fun display(state: SingleAlbumUiState) {
+        currentState = state
         bucketId = SingleAlbumUiState.getBucketId(state)
 
         val shouldShowActionMode = state is SingleAlbumUiState.Selection
 
         if (shouldShowActionMode && !actionModeHandler.isActive()) {
-            toolbar.startActionMode(actionModeHandler)
+            startActionMode(actionModeHandler)
         } else if (!shouldShowActionMode && actionModeHandler.isActive()) {
             actionModeHandler.finish()
         }
@@ -144,7 +135,6 @@ class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
             val firstVisibleUriString = PrefUtil.getAlbumFirstVisible(bucketId)
             if (firstVisibleUriString != null) {
                 val position = adapter!!.getItemPosition(Uri.parse(firstVisibleUriString))
-
                 if (position != RecyclerView.NO_POSITION) {
                     recyclerView.scrollToPosition(position)
                 }
@@ -157,12 +147,38 @@ class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
                 is SingleAlbumUiState.Selection -> state.selectedUris
                 else -> ArrayList()
             }
-
             adapter?.updateSelectedUris(selectedUris)
         }
 
         if (photoClickDisposable.isDisposed) {
-            photoClickDisposable = adapter!!.events.subscribe(eventRelay)
+            photoClickDisposable = adapter!!.events
+                .doOnNext { event ->
+                    if (event !is SingleAlbumUiEvent.SelectPhoto) return@doOnNext
+                    val position = gridLayoutManager.findFirstVisibleItemPosition()
+                    if (position == RecyclerView.NO_POSITION) return@doOnNext
+                    adapter?.let { adapter ->
+                        val uriString: String? = adapter.getUri(position)?.toString()
+                        if (uriString != null) {
+                            PrefUtil.setAlbumFirstVisible(bucketId, uriString)
+                        }
+                    }
+                }
+                .subscribe(eventRelay)
+        }
+
+        renderCompose()
+    }
+
+    private fun renderCompose() {
+        val state = currentState ?: return
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                SingleAlbumScreen(
+                    state = state,
+                    recyclerView = recyclerView,
+                    onBack = { eventRelay.accept(SingleAlbumUiEvent.Back) },
+                )
+            }
         }
     }
 
@@ -177,13 +193,11 @@ class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
             val event: SingleAlbumUiEvent = when (item.itemId) {
                 R.id.select_photo_selection_save ->
                     SingleAlbumUiEvent.SaveMultiple(adapter.getSelectedUris())
-
                 else -> throw IllegalArgumentException("Unhandled item")
             }
 
             eventRelay.accept(event)
             finish()
-
             return true
         }
 
@@ -208,9 +222,7 @@ class SingleAlbumView(context: Context, attributeSet: AttributeSet) :
             modeRef.get()?.finish()
         }
 
-        fun isActive(): Boolean {
-            return modeRef.get() != null
-        }
+        fun isActive(): Boolean = modeRef.get() != null
 
         fun setTitle(newTitleText: String) {
             titleText = newTitleText
