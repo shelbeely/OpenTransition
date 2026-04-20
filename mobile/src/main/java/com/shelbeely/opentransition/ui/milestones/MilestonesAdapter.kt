@@ -16,7 +16,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.RxSchedulers
@@ -250,6 +249,6 @@ class MilestonesAdapter(
 
     companion object {
         private const val TYPE_TITLE = 0
-        private const val TYPE_MILESTONE = R.layout.milestones_adapter_item
+        private const val TYPE_MILESTONE = 1
     }
 }
