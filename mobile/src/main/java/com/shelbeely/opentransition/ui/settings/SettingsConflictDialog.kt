@@ -10,18 +10,36 @@
 
 package com.shelbeely.opentransition.ui.settings
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.ui.settings.SettingsConflictDialog.SettingsConflictAdapter.SettingsConflictViewHolder
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.getString
 import com.shelbeely.opentransition.util.settings.FirebaseSettingUtil
 import com.shelbeely.opentransition.util.settings.LockDelay
@@ -32,22 +50,18 @@ import com.shelbeely.opentransition.util.settings.SettingsManager.Key
 import com.shelbeely.opentransition.util.settings.SettingsManager.Key.*
 import com.shelbeely.opentransition.util.settings.Theme
 import com.shelbeely.opentransition.util.toFullDateString
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.button.MaterialButtonToggleGroup
 import java.time.LocalDate
 
 object SettingsConflictDialog {
     fun create(differences: List<Pair<Key, Any>>, context: Context): AlertDialog {
-        val themedContext = context
-
-        @SuppressLint("InflateParams") //We can't pass root for the dialog we haven't created yet
-        val view = LayoutInflater.from(context)
-            .inflate(R.layout.settings_conflict_dialog, null) as RecyclerView
+        val view = RecyclerView(context).apply {
+            layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+        }
         val adapter = SettingsConflictAdapter(differences)
         view.adapter = adapter
-        view.layoutManager = LinearLayoutManager(themedContext)
+        view.layoutManager = LinearLayoutManager(context)
 
-        return AlertDialog.Builder(themedContext)
+        return AlertDialog.Builder(context)
             .setTitle(R.string.settings_conflict)
             .setMessage(R.string.settings_conflict_message)
             .setPositiveButton(R.string.apply_settings) { dialog, _ ->
@@ -69,15 +83,82 @@ object SettingsConflictDialog {
             .create()
     }
 
+    @Composable
+    private fun ConflictItemContent(
+        labelText: String,
+        localText: String,
+        serverText: String,
+        useServer: Boolean,
+        onChoiceChanged: (useServer: Boolean) -> Unit,
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = labelText,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .weight(1f)
+                    .widthIn(min = 128.dp)
+                    .padding(end = 8.dp),
+            )
+            Row {
+                OutlinedButton(
+                    onClick = { onChoiceChanged(false) },
+                    border = BorderStroke(
+                        1.dp,
+                        if (!useServer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (!useServer) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                    ),
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 4.dp),
+                ) {
+                    Text(
+                        text = localText,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        fontSize = 12.sp,
+                    )
+                }
+                OutlinedButton(
+                    onClick = { onChoiceChanged(true) },
+                    border = BorderStroke(
+                        1.dp,
+                        if (useServer) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                    ),
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        containerColor = if (useServer) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                    ),
+                    modifier = Modifier.weight(1f),
+                    contentPadding = PaddingValues(horizontal = 4.dp),
+                ) {
+                    Text(
+                        text = serverText,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        fontSize = 12.sp,
+                    )
+                }
+            }
+        }
+    }
+
     private class SettingsConflictAdapter(val differences: List<Pair<Key, Any>>) :
         RecyclerView.Adapter<SettingsConflictViewHolder>() {
         val choices: Array<Boolean> = Array(differences.size) { true }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
             SettingsConflictViewHolder(
-                LayoutInflater.from(parent.context)
-                    .inflate(R.layout.settings_conflict_item, parent, false),
-                this
+                ComposeView(parent.context).apply {
+                    setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
+                    layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+                },
+                this,
             )
 
         override fun getItemCount(): Int = differences.size
@@ -86,19 +167,10 @@ object SettingsConflictDialog {
             holder.bind(differences[position], choices[position])
         }
 
-        class SettingsConflictViewHolder(itemView: View, adapter: SettingsConflictAdapter) :
-            RecyclerView.ViewHolder(itemView) {
-            private val label: TextView = itemView.findViewById(R.id.settings_conflict_label)
-            private val group: MaterialButtonToggleGroup = itemView.findViewById(R.id.settings_conflict_group)
-            private val local: MaterialButton = itemView.findViewById(R.id.settings_conflict_option_local)
-            private val server: MaterialButton = itemView.findViewById(R.id.settings_conflict_option_server)
-
-            init {
-                group.addOnButtonCheckedListener { _, id, isChecked ->
-                    adapter.choices[adapterPosition] =
-                        (id == local.id && !isChecked) || (id == server.id && isChecked)
-                }
-            }
+        class SettingsConflictViewHolder(
+            private val composeView: ComposeView,
+            private val adapter: SettingsConflictAdapter,
+        ) : RecyclerView.ViewHolder(composeView) {
 
             fun bind(conflict: Pair<Key, Any>, useServer: Boolean) {
                 val (key, serverConflictValue) = conflict
@@ -112,50 +184,50 @@ object SettingsConflictDialog {
                         nameRes = R.string.lock_code_label
                         localValue = when {
                             SettingsManager.getLockCode()
-                                .isEmpty() -> itemView.getString(R.string.no_code)
+                                .isEmpty() -> composeView.getString(R.string.no_code)
 
-                            else -> itemView.getString(R.string.use_local_code)
+                            else -> composeView.getString(R.string.use_local_code)
                         }
                         serverValue = when {
                             ((serverConflictValue as? String)
-                                ?: "").isEmpty() -> itemView.getString(R.string.no_code)
+                                ?: "").isEmpty() -> composeView.getString(R.string.no_code)
 
-                            else -> itemView.getString(R.string.use_server_code)
+                            else -> composeView.getString(R.string.use_server_code)
                         }
                     }
 
                     lockDelay -> {
                         nameRes = R.string.lock_delay_label
-                        localValue = itemView.getString(
+                        localValue = composeView.getString(
                             SettingsManager.getLockDelay().displayNameRes()
                         )
-                        serverValue = itemView.getString(
+                        serverValue = composeView.getString(
                             LockDelay.valueOf(serverConflictValue as String).displayNameRes()
                         )
                     }
 
                     lockType -> {
                         nameRes = R.string.select_lock_mode
-                        localValue = itemView.getString(
+                        localValue = composeView.getString(
                             SettingsManager.getLockType().displayNameRes()
                         )
-                        serverValue = itemView.getString(
+                        serverValue = composeView.getString(
                             LockType.valueOf(serverConflictValue as String).displayNameRes()
                         )
                     }
 
                     startDate -> {
                         nameRes = R.string.start_date_label
-                        localValue = SettingsManager.getStartDate(itemView.context)
-                            .toFullDateString(itemView.context)
+                        localValue = SettingsManager.getStartDate(composeView.context)
+                            .toFullDateString(composeView.context)
                         serverValue = LocalDate.ofEpochDay(serverConflictValue as Long)
-                            .toFullDateString(itemView.context)
+                            .toFullDateString(composeView.context)
                     }
 
                     theme -> {
                         nameRes = R.string.theme_label
-                        localValue = itemView.getString(SettingsManager.getTheme().displayNameRes())
-                        serverValue = itemView.getString(
+                        localValue = composeView.getString(SettingsManager.getTheme().displayNameRes())
+                        serverValue = composeView.getString(
                             Theme.valueOf(serverConflictValue as String).displayNameRes()
                         )
                     }
@@ -168,52 +240,52 @@ object SettingsConflictDialog {
 
                     enableAnalytics -> {
                         nameRes = R.string.anonymous_analytics
-                        localValue = itemView.getString(
+                        localValue = composeView.getString(
                             SettingsManager.getEnableAnalytics().displayNameRes()
                         )
-                        serverValue = itemView.getString(
+                        serverValue = composeView.getString(
                             (serverConflictValue as Boolean).displayNameRes()
                         )
                     }
 
                     enableCrashReports -> {
                         nameRes = R.string.anonymous_crash_reports
-                        localValue = itemView.getString(
+                        localValue = composeView.getString(
                             SettingsManager.getEnableCrashReports().displayNameRes()
                         )
-                        serverValue = itemView.getString(
+                        serverValue = composeView.getString(
                             (serverConflictValue as Boolean).displayNameRes()
                         )
                     }
 
                     showAds -> {
                         nameRes = R.string.support_ads
-                        localValue = itemView.getString(SettingsManager.showAds().displayNameRes())
-                        serverValue = itemView.getString(
+                        localValue = composeView.getString(SettingsManager.showAds().displayNameRes())
+                        serverValue = composeView.getString(
                             (serverConflictValue as Boolean).displayNameRes()
                         )
                     }
-                    
+
                     encryptedDatabaseEnabled -> {
                         nameRes = R.string.encrypted_database
-                        localValue = itemView.getString(SettingsManager.isEncryptedDatabaseEnabled().displayNameRes())
-                        serverValue = itemView.getString(
+                        localValue = composeView.getString(SettingsManager.isEncryptedDatabaseEnabled().displayNameRes())
+                        serverValue = composeView.getString(
                             (serverConflictValue as Boolean).displayNameRes()
                         )
                     }
-                    
+
                     decoyVaultEnabled -> {
                         nameRes = R.string.decoy_vault
-                        localValue = itemView.getString(SettingsManager.isDecoyVaultEnabled().displayNameRes())
-                        serverValue = itemView.getString(
+                        localValue = composeView.getString(SettingsManager.isDecoyVaultEnabled().displayNameRes())
+                        serverValue = composeView.getString(
                             (serverConflictValue as Boolean).displayNameRes()
                         )
                     }
-                    
+
                     quickHideEnabled -> {
                         nameRes = R.string.quick_hide
-                        localValue = itemView.getString(SettingsManager.isQuickHideEnabled().displayNameRes())
-                        serverValue = itemView.getString(
+                        localValue = composeView.getString(SettingsManager.isQuickHideEnabled().displayNameRes())
+                        serverValue = composeView.getString(
                             (serverConflictValue as Boolean).displayNameRes()
                         )
                     }
@@ -224,16 +296,19 @@ object SettingsConflictDialog {
                     )
                 }
 
-                label.setText(nameRes)
-                local.text = localValue
-                server.text = serverValue
+                val labelText = composeView.context.getString(nameRes)
 
-                group.check(
-                    when (useServer) {
-                        true -> R.id.settings_conflict_option_server
-                        false -> R.id.settings_conflict_option_local
+                composeView.setContent {
+                    OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                        ConflictItemContent(
+                            labelText = labelText,
+                            localText = localValue,
+                            serverText = serverValue,
+                            useServer = useServer,
+                            onChoiceChanged = { server -> adapter.choices[bindingAdapterPosition] = server },
+                        )
                     }
-                )
+                }
             }
         }
     }
