@@ -143,8 +143,16 @@ class LockFragment : Fragment(R.layout.lock) {
         BiometricPromptHelper.showBiometricPrompt(
             fragment = this,
             onSuccess = {
-                findNavController().popBackStack()
-                activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
+                // Defer navigation to the next Looper message so the BiometricX library can
+                // finish removing its internal BiometricFragment before we pop the back stack.
+                // Calling popBackStack() synchronously inside onAuthenticationSucceeded races
+                // against that cleanup and causes an IllegalStateException crash.
+                view.post {
+                    if (isAdded) {
+                        findNavController().popBackStack()
+                        activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
+                    }
+                }
             },
             onError = { errorMessage ->
                 Snackbar.make(view, errorMessage, Snackbar.LENGTH_LONG).show()
