@@ -16,6 +16,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.AnalyticsUtil
 import com.shelbeely.opentransition.util.BiometricPromptHelper
@@ -76,13 +77,13 @@ class LockFragment : Fragment(R.layout.lock) {
                     // Real passcode entered - open real vault
                     com.shelbeely.opentransition.database.DatabaseManager.switchToRealVault(requireContext())
                     view.hideKeyboard()
-                    requireActivity().supportFragmentManager.popBackStackImmediate()
+                    findNavController().popBackStack()
                     activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
                 } else if (isDecoyCode) {
                     // Decoy passcode entered - open decoy vault
                     com.shelbeely.opentransition.database.DatabaseManager.switchToDecoyVault(requireContext())
                     view.hideKeyboard()
-                    requireActivity().supportFragmentManager.popBackStackImmediate()
+                    findNavController().popBackStack()
                     activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
                 } else if (SettingsManager.getLockCode() == EncryptionUtil
                         .encryptAndEncode(enteredCode, "tzDEzR6dHptPbKwgkvdCIsY1NPT9YZ6c")
@@ -90,7 +91,7 @@ class LockFragment : Fragment(R.layout.lock) {
                     // Also checking the example salt... for that time we accidentally sent it to production...
                     com.shelbeely.opentransition.database.DatabaseManager.switchToRealVault(requireContext())
                     view.hideKeyboard()
-                    requireActivity().supportFragmentManager.popBackStackImmediate()
+                    findNavController().popBackStack()
                     activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
 
                     //Recording non-fatal to see how many people are effected
@@ -129,7 +130,7 @@ class LockFragment : Fragment(R.layout.lock) {
 
                 dialog.dismiss()
                 view.hideKeyboard()
-                requireActivity().supportFragmentManager.popBackStackImmediate()
+                findNavController().popBackStack()
             }
             .setNegativeButton(R.string.no) { dialog, _ ->
                 SettingsManager.setAccountWarning(false, requireActivity())
@@ -142,8 +143,16 @@ class LockFragment : Fragment(R.layout.lock) {
         BiometricPromptHelper.showBiometricPrompt(
             fragment = this,
             onSuccess = {
-                requireActivity().supportFragmentManager.popBackStackImmediate()
-                activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
+                // Defer navigation to the next Looper message so the BiometricX library can
+                // finish removing its internal BiometricFragment before we pop the back stack.
+                // Calling popBackStack() synchronously inside onAuthenticationSucceeded races
+                // against that cleanup and causes an IllegalStateException crash.
+                view.post {
+                    if (isAdded) {
+                        findNavController().popBackStack()
+                        activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
+                    }
+                }
             },
             onError = { errorMessage ->
                 Snackbar.make(view, errorMessage, Snackbar.LENGTH_LONG).show()
