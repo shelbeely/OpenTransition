@@ -10,16 +10,17 @@
 
 package com.shelbeely.opentransition.ui.settings
 
-import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.text.Editable
-import android.view.LayoutInflater
+import android.text.InputType
 import android.view.View
-import android.widget.EditText
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.view.inputmethod.EditorInfo
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
@@ -27,6 +28,8 @@ import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.shelbeely.opentransition.BuildConfig
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.TransTracksApp
@@ -338,10 +341,18 @@ class SettingsFragment : Fragment(R.layout.settings) {
             val builder = AlertDialog.Builder(view.context)
                 .setTitle(R.string.enter_password_to_disable_lock)
 
-            @SuppressLint("InflateParams") // Unable to provide root
-            val dialogView = LayoutInflater.from(builder.context)
-                .inflate(R.layout.enter_password_dialog, null)
-            val password: EditText = dialogView.findViewById(R.id.set_password_code)
+            val passwordInput = TextInputLayout(builder.context).apply {
+                hint = builder.context.getString(R.string.enter_password)
+                isPasswordVisibilityToggleEnabled = true
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            }
+            val password = TextInputEditText(passwordInput.context).apply {
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                imeOptions = EditorInfo.IME_ACTION_DONE
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            passwordInput.addView(password)
+            val dialogView = passwordInput
 
             val passwordDialog = builder.setView(dialogView)
                 .setPositiveButton(R.string.disable, null)
@@ -382,13 +393,36 @@ class SettingsFragment : Fragment(R.layout.settings) {
         fun showSetPasswordDialog(newLockType: LockType) {
             val builder = AlertDialog.Builder(view.context).setTitle(R.string.set_password)
 
-            @SuppressLint("InflateParams") // Unable to provide root
-            val dialogView = LayoutInflater.from(builder.context)
-                .inflate(R.layout.set_password_dialog, null)
-            val password: EditText = dialogView.findViewById(R.id.set_password_code)
-            val confirm: EditText = dialogView.findViewById(R.id.confirm_password_code)
+            val container = LinearLayout(builder.context).apply {
+                orientation = LinearLayout.VERTICAL
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            }
+            val passwordInput = TextInputLayout(builder.context).apply {
+                hint = builder.context.getString(R.string.enter_password)
+                isPasswordVisibilityToggleEnabled = true
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            }
+            val password = TextInputEditText(passwordInput.context).apply {
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                imeOptions = EditorInfo.IME_ACTION_DONE
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            passwordInput.addView(password)
+            val confirmInput = TextInputLayout(builder.context).apply {
+                hint = builder.context.getString(R.string.confirm_password)
+                isPasswordVisibilityToggleEnabled = true
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            }
+            val confirm = TextInputEditText(confirmInput.context).apply {
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+                imeOptions = EditorInfo.IME_ACTION_DONE
+                inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
+            confirmInput.addView(confirm)
+            container.addView(passwordInput)
+            container.addView(confirmInput)
 
-            val passwordDialog = builder.setView(dialogView)
+            val passwordDialog = builder.setView(container)
                 .setPositiveButton(R.string.set_password, null)
                 .setNegativeButton(R.string.cancel, null)
                 .create()
@@ -529,12 +563,18 @@ class SettingsFragment : Fragment(R.layout.settings) {
 
         val builder = AlertDialog.Builder(view.context).setTitle(R.string.update_account_name)
 
-        @SuppressLint("InflateParams") // Unable to provide root
-        val dialogView =
-            LayoutInflater.from(builder.context).inflate(R.layout.update_name_dialog, null)
-        val nameEditText: EditText = dialogView.findViewById(R.id.set_account_name)
+        val nameInput = TextInputLayout(builder.context).apply {
+            hint = builder.context.getString(R.string.enter_account_name)
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        val nameEditText = TextInputEditText(nameInput.context).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            imeOptions = EditorInfo.IME_ACTION_DONE
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PERSON_NAME or InputType.TYPE_TEXT_FLAG_CAP_WORDS
+        }
+        nameInput.addView(nameEditText)
 
-        val nameDialog = builder.setView(dialogView)
+        val nameDialog = builder.setView(nameInput)
             .setPositiveButton(R.string.update, null)
             .setNegativeButton(R.string.cancel, null)
             .create()
@@ -608,12 +648,18 @@ class SettingsFragment : Fragment(R.layout.settings) {
 
         val builder = AlertDialog.Builder(view.context).setTitle(R.string.update_email_address)
 
-        @SuppressLint("InflateParams") // Unable to provide root
-        val dialogView = LayoutInflater.from(builder.context)
-            .inflate(R.layout.update_email_dialog, null)
-        val emailEditText: EditText = dialogView.findViewById(R.id.set_email_address)
+        val emailInput = TextInputLayout(builder.context).apply {
+            hint = builder.context.getString(R.string.enter_email_address)
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        val emailEditText = TextInputEditText(emailInput.context).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            imeOptions = EditorInfo.IME_ACTION_DONE
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS
+        }
+        emailInput.addView(emailEditText)
 
-        val emailDialog = builder.setView(dialogView)
+        val emailDialog = builder.setView(emailInput)
             .setPositiveButton(R.string.update, null)
             .setNegativeButton(R.string.cancel, null)
             .create()
@@ -772,13 +818,20 @@ class SettingsFragment : Fragment(R.layout.settings) {
      * Show dialog to set decoy passcode
      */
     private fun showSetDecoyPasscodeDialog(view: View) {
-        val editText = EditText(view.context)
-        editText.hint = getString(R.string.decoy_passcode_hint)
-        editText.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        val passcodeInput = TextInputLayout(view.context).apply {
+            hint = getString(R.string.decoy_passcode_hint)
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        }
+        val editText = TextInputEditText(passcodeInput.context).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            imeOptions = EditorInfo.IME_ACTION_DONE
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+        }
+        passcodeInput.addView(editText)
         
         val dialog = AlertDialog.Builder(view.context)
             .setTitle(R.string.set_decoy_passcode)
-            .setView(editText)
+            .setView(passcodeInput)
             .setPositiveButton(R.string.update) { _, _ ->
                 val code = editText.text.toString()
                 if (code.isNotEmpty()) {
