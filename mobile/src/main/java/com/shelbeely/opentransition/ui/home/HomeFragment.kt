@@ -11,15 +11,25 @@
 package com.shelbeely.opentransition.ui.home
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.net.Uri
 import android.os.Build
-import android.view.LayoutInflater
-import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.shelbeely.opentransition.R
@@ -73,14 +83,29 @@ class HomeFragment : Fragment(R.layout.home) {
                 .setTitle(R.string.welcome)
                 .setMessage(R.string.welcome_message)
 
-            @SuppressLint("InflateParams") //Cannot avoid passing null for the root here
-            val welcomeView = LayoutInflater.from(builder.context).inflate(R.layout.welcome, null)
+            val composeView = ComposeView(builder.context).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+                setContent {
+                    val startDateText = SettingsManager.getStartDate(requireActivity()).toFullDateString(context)
+                    val lockText = SettingsManager.getLockType().let { lockType ->
+                        if (lockType == com.shelbeely.opentransition.util.settings.LockType.off) getString(R.string.disabled)
+                        else getString(lockType.displayNameRes())
+                    }
+                    Column(modifier = Modifier.padding(24.dp)) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(getString(R.string.start_date_label), style = MaterialTheme.typography.bodyMedium)
+                            Text(startDateText, style = MaterialTheme.typography.titleMedium)
+                        }
+                        Spacer(Modifier.height(8.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(getString(R.string.lock_label), style = MaterialTheme.typography.bodyMedium)
+                            Text(lockText, style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
+                }
+            }
 
-            val startDate: TextView = welcomeView.findViewById(R.id.welcome_start_date)
-            startDate.text =
-                SettingsManager.getStartDate(requireActivity()).toFullDateString(startDate.context)
-
-            builder.setView(welcomeView)
+            builder.setView(composeView)
                 .setPositiveButton(R.string.looks_good, null)
                 .setNegativeButton(R.string.change_setting) { dialog: DialogInterface, _: Int ->
                     findNavController().navigate(HomeFragmentDirections.actionGoToSettings())

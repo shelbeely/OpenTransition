@@ -10,24 +10,23 @@
 
 package com.shelbeely.opentransition.ui.milestones
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Milestone
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.RxSchedulers
 import com.shelbeely.opentransition.util.openDefault
-import com.shelbeely.opentransition.util.setVisibleOrGone
 import com.shelbeely.opentransition.util.toFullDateString
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxrelay3.PublishRelay
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.isValid
 import io.realm.kotlin.query.Sort
 import kotlinx.coroutines.rx3.asObservable
-import kotterknife.bindView
 import java.lang.ref.WeakReference
 import java.time.LocalDate
 
@@ -76,11 +75,31 @@ class MilestonesAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(viewType, parent, false)
-
         return when (viewType) {
-            TYPE_TITLE -> DayTitleViewHolder(view)
-            TYPE_MILESTONE -> MilestoneViewHolder(view, eventRelayRef.get())
+            TYPE_TITLE -> {
+                val composeView = ComposeView(parent.context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+                DayTitleViewHolder(composeView)
+            }
+            TYPE_MILESTONE -> {
+                val composeView = ComposeView(parent.context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+                MilestoneViewHolder(composeView, eventRelayRef.get())
+            }
             else -> throw IllegalArgumentException("Unhandled item type")
         }
     }
@@ -164,6 +183,12 @@ class MilestonesAdapter(
         results.dispatchUpdatesTo(this)
     }
 
+    fun refreshComposeItems() {
+        if (items.isNotEmpty()) {
+            notifyItemRangeChanged(0, items.size)
+        }
+    }
+
     class MilestonesAdapterItem {
         val epochDay: Long?
 
@@ -184,43 +209,46 @@ class MilestonesAdapter(
 
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class DayTitleViewHolder(itemView: View) : BaseViewHolder(itemView) {
-        private val title: TextView by bindView(R.id.milestones_adapter_item_title)
-
+    class DayTitleViewHolder(private val composeView: ComposeView) : BaseViewHolder(composeView) {
         fun bind(item: MilestonesAdapterItem) {
-            title.text = LocalDate.ofEpochDay(item.epochDay!!).toFullDateString(itemView.context)
+            val title = LocalDate.ofEpochDay(item.epochDay!!).toFullDateString(composeView.context)
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    MilestonesDateTitleItem(title = title)
+                }
+            }
         }
     }
 
-    class MilestoneViewHolder(itemView: View, eventRelay: PublishRelay<MilestonesUiEvent>?) :
-        BaseViewHolder(itemView) {
-        private val title: TextView by bindView(R.id.milestones_adapter_item_title)
-        private val descriptionIcon: View by bindView(R.id.milestones_adapter_item_description_icon)
-        private val description: TextView by bindView(R.id.milestones_adapter_item_description)
-
+    class MilestoneViewHolder(
+        private val composeView: ComposeView,
+        eventRelay: PublishRelay<MilestonesUiEvent>?
+    ) : BaseViewHolder(composeView) {
         private val eventRelayRef = WeakReference(eventRelay)
-        private var milestoneId: String = ""
-
-        init {
-            itemView.setOnClickListener {
-                eventRelayRef.get()?.accept(MilestonesUiEvent.EditMilestone(milestoneId))
-            }
-        }
 
         fun bind(item: MilestonesAdapterItem) {
-            milestoneId = item.milestone!!.id
-
-            title.text = item.milestone.title
-
-            description.text = item.milestone.description
-            val showDescription = item.milestone.description.isNotEmpty()
-            descriptionIcon.setVisibleOrGone(showDescription)
-            description.setVisibleOrGone(showDescription)
+            val milestone = item.milestone!!
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    MilestoneRowItem(
+                        title = milestone.title,
+                        description = milestone.description,
+                        onClick = {
+                            eventRelayRef.get()
+                                ?.accept(MilestonesUiEvent.EditMilestone(milestone.id))
+                        }
+                    )
+                }
+            }
         }
     }
 
     companion object {
-        private const val TYPE_TITLE = R.layout.milestones_adapter_title_item
-        private const val TYPE_MILESTONE = R.layout.milestones_adapter_item
+        private const val TYPE_TITLE = 0
+        private const val TYPE_MILESTONE = 1
     }
 }

@@ -14,11 +14,9 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.core.database.getStringOrNull
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -26,20 +24,25 @@ import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.ui.selectphoto.selectalbum.SelectAlbumAdapter.Album
 import com.shelbeely.opentransition.ui.selectphoto.selectalbum.SelectAlbumAdapter.Holder
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.jakewharton.rxrelay3.PublishRelay
-import com.squareup.picasso.Picasso
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
 
 class SelectAlbumAdapter() : ListAdapter<Album, Holder>(DiffCallback) {
     private val itemClickRelay: PublishRelay<String> = PublishRelay.create<String>()
     val itemClick: Observable<String> = itemClickRelay
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        val view = LayoutInflater.from(parent.context).inflate(
-            R.layout.select_albums_adapter_item, parent, false
-        )
-        return Holder(view, itemClickRelay)
+        val composeView = ComposeView(parent.context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+            )
+        }
+        return Holder(composeView, itemClickRelay)
     }
 
     override fun onBindViewHolder(viewHolder: Holder, position: Int) {
@@ -89,28 +92,19 @@ class SelectAlbumAdapter() : ListAdapter<Album, Holder>(DiffCallback) {
         submitList(folders.values.toList())
     }
 
-    class Holder(itemView: View, private val itemClickRelay: PublishRelay<String>) :
-        RecyclerView.ViewHolder(itemView) {
-        private val image: ImageView by bindView(R.id.select_album_adapter_item_image)
-        private val name: TextView by bindView(R.id.select_album_adapter_item_name)
-        private val count: TextView by bindView(R.id.select_album_adapter_item_count)
-
-        private var currentBucketId: String? = null
-
-        init {
-            //Avoiding subscription so we don't need to dispose it
-            itemView.setOnClickListener {
-                val currentBucketId = currentBucketId
-                if (currentBucketId != null) itemClickRelay.accept(currentBucketId)
-            }
-        }
-
+    class Holder(
+        private val composeView: ComposeView,
+        private val itemClickRelay: PublishRelay<String>
+    ) : RecyclerView.ViewHolder(composeView) {
         fun bind(album: Album) {
-            currentBucketId = album.bucketId
-            Picasso.get().load(album.uri).fit().centerCrop().into(image)
-
-            name.text = album.name
-            count.text = String.format("%1\$d", album.count)
+            composeView.setContent {
+                OpenTransitionTheme {
+                    SelectAlbumRowItem(
+                        album = album,
+                        onClick = { itemClickRelay.accept(album.bucketId) }
+                    )
+                }
+            }
         }
     }
 

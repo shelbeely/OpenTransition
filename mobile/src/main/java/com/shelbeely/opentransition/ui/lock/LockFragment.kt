@@ -11,12 +11,8 @@
 package com.shelbeely.opentransition.ui.lock
 
 import android.content.Context
-import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -35,7 +31,7 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 
-class LockFragment : Fragment() {
+class LockFragment : Fragment(R.layout.lock) {
     private val viewDisposables: CompositeDisposable = CompositeDisposable()
 
     //Blocking the back button from popping the lock
@@ -48,18 +44,6 @@ class LockFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         requireActivity().onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback)
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        @LayoutRes val layoutRes: Int = when (SettingsManager.getLockType()) {
-            LockType.normal -> R.layout.normal_lock
-            LockType.biometric -> R.layout.biometric_lock
-            else -> R.layout.train_lock
-        }
-
-        return inflater.inflate(layoutRes, container, false)
     }
 
     override fun onStart() {

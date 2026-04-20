@@ -12,28 +12,23 @@ package com.shelbeely.opentransition.ui.home
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.GestureDetector
 import android.view.MenuItem
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import androidx.appcompat.widget.PopupMenu
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.Photo
-import com.shelbeely.opentransition.ui.widget.SwipeGestureListener
-import com.shelbeely.opentransition.util.getString
-import com.shelbeely.opentransition.util.nullAllElements
-import com.shelbeely.opentransition.util.setVisibleOrInvisible
-import com.shelbeely.opentransition.util.toFullDateString
-import com.shelbeely.opentransition.util.toV3
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.view.clicks
+import com.shelbeely.opentransition.util.plusAssign
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import java.time.LocalDate
 
 sealed class HomeUiEvent {
@@ -64,159 +59,122 @@ sealed class HomeUiState {
     ) : HomeUiState()
 }
 
-class HomeView(context: Context, attributeSet: AttributeSet) :
-    ConstraintLayout(context, attributeSet) {
-    private val takePhoto: ImageButton by bindView(R.id.home_take_photo)
-    private val settings: ImageButton by bindView(R.id.home_settings)
-
-    private val day: TextView by bindView(R.id.home_day_title)
-
-    private val previousRecord: ImageButton by bindView(R.id.home_previous_record)
-    private val nextRecord: ImageButton by bindView(R.id.home_next_record)
-
-    private val startDate: TextView by bindView(R.id.home_start_date)
-    private val currentDate: TextView by bindView(R.id.home_current_date)
-
-    private val milestones: ImageButton by bindView(R.id.home_milestones)
-
-    private val faceGallery: Button by bindView(R.id.home_face_gallery)
-    private val faceRecyclerView: RecyclerView by bindView(R.id.home_face_images)
-
-    private val bodyGallery: Button by bindView(R.id.home_body_gallery)
-    private val bodyRecyclerView: RecyclerView by bindView(R.id.home_body_images)
-
-    private val audioGallery: Button by bindView(R.id.home_audio_gallery)
-    private val audioRecyclerView: RecyclerView by bindView(R.id.home_audio_images)
+class HomeView(context: Context, attributeSet: AttributeSet) : FrameLayout(context, attributeSet) {
 
     private val eventRelay: PublishRelay<HomeUiEvent> = PublishRelay.create()
-    val events: Observable<HomeUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.mergeArray(
-            settings.clicks().toV3().map { HomeUiEvent.Settings },
-            previousRecord.clicks().toV3().map { HomeUiEvent.PreviousRecord },
-            nextRecord.clicks().toV3().map { HomeUiEvent.NextRecord },
-            milestones.clicks().toV3().map { HomeUiEvent.Milestones(date.toEpochDay()) },
-            faceGallery.clicks().toV3().map { HomeUiEvent.FaceGallery(date.toEpochDay()) },
-            bodyGallery.clicks().toV3().map { HomeUiEvent.BodyGallery(date.toEpochDay()) },
-            audioGallery.clicks().toV3().map { HomeUiEvent.AudioGallery(date.toEpochDay()) },
-            eventRelay
-        )
-    }
+    private val viewDisposables: CompositeDisposable = CompositeDisposable()
+    val events: Observable<HomeUiEvent> = eventRelay
 
-    private val facePhotoIds = Array<String?>(3) { _ -> null }
-    private val bodyPhotoIds = Array<String?>(3) { _ -> null }
-    private val audioPhotoIds = Array<String?>(3) { _ -> null }
+    private var currentState: HomeUiState = HomeUiState.Loading
 
-    private var date = LocalDate.MIN
-    private var hasPrevious = false
-    private var hasNext = true
-
-    private val swipeListener = object : SwipeGestureListener() {
-        override fun swipeLeft(): Boolean {
-            if (hasPrevious) {
-                eventRelay.accept(HomeUiEvent.PreviousRecord)
-            }
-
-            return hasPrevious
-        }
-
-        override fun swipeRight(): Boolean {
-            if (hasNext) {
-                eventRelay.accept(HomeUiEvent.NextRecord)
-            }
-            return hasNext
+    val faceRecyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         }
     }
-    private val gestureDetector = GestureDetector(context, swipeListener)
+
+    val bodyRecyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        }
+    }
+
+    val audioRecyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        }
+    }
+
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-        
-        setOnTouchListener { _, event ->
-            gestureDetector.onTouchEvent(event)
-            return@setOnTouchListener true
-        }
 
-        takePhoto.setOnClickListener { showPhotoSourceMenu() }
+        viewDisposables += SettingsManager.themeUpdated
+            .subscribe { renderCompose() }
 
-        faceRecyclerView.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL, false
-        )
-        bodyRecyclerView.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL, false
-        )
-        audioRecyclerView.layoutManager = LinearLayoutManager(
-            context, LinearLayoutManager.HORIZONTAL, false
-        )
+        renderCompose()
+    }
+
+    override fun onDetachedFromWindow() {
+        viewDisposables.clear()
+        super.onDetachedFromWindow()
     }
 
     fun display(state: HomeUiState) {
-        facePhotoIds.nullAllElements()
-        bodyPhotoIds.nullAllElements()
-
-        when (state) {
-            is HomeUiState.Loading -> {
-                //TODO update to set to loading state instead of resetting and setting
-            }
-
-            is HomeUiState.Loaded -> {
-                date = state.currentDate
-
-                day.text = state.dayString
-
-                hasPrevious = state.showPreviousRecord
-                hasNext = state.showNextRecord
-
-                previousRecord.setVisibleOrInvisible(state.showPreviousRecord)
-                nextRecord.setVisibleOrInvisible(state.showNextRecord)
-
-                startDate.text = startDate.getString(
-                    R.string.start_date, state.startDate.toFullDateString(startDate.context)
-                )
-                currentDate.text = currentDate.getString(
-                    R.string.current_date, state.currentDate.toFullDateString(currentDate.context)
-                )
-
-                val milestonesRes = when (state.hasMilestones) {
-                    true -> R.drawable.ic_milestone_selected
-                    false -> R.drawable.ic_milestone_unselected
-                }
-                milestones.setImageResource(milestonesRes)
-
-                faceRecyclerView.adapter = HomeGalleryAdapter(
-                    state.currentDate, Photo.TYPE_FACE,
-                    eventRelay
-                )
-                bodyRecyclerView.adapter = HomeGalleryAdapter(
-                    state.currentDate, Photo.TYPE_BODY,
-                    eventRelay
-                )
-                audioRecyclerView.adapter = HomeGalleryAdapter(
-                    state.currentDate, Photo.TYPE_AUDIO,
-                    eventRelay
-                )
-            }
+        currentState = state
+        if (state is HomeUiState.Loaded) {
+            faceRecyclerView.adapter = HomeGalleryAdapter(
+                state.currentDate, Photo.TYPE_FACE, eventRelay
+            )
+            bodyRecyclerView.adapter = HomeGalleryAdapter(
+                state.currentDate, Photo.TYPE_BODY, eventRelay
+            )
+            audioRecyclerView.adapter = HomeGalleryAdapter(
+                state.currentDate, Photo.TYPE_AUDIO, eventRelay
+            )
         }
+        renderCompose()
     }
 
-    private fun showPhotoSourceMenu(currentDate: LocalDate? = null, @Photo.Type type: Int? = null) {
-        val popup = PopupMenu(context, takePhoto)
+    private fun showPhotoSourceMenu() {
+        val popup = PopupMenu(context, composeView)
         popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             when (menuItem.itemId) {
                 R.id.media_source_camera ->
-                    eventRelay.accept(HomeUiEvent.AddPhotoCamera(currentDate, type))
+                    eventRelay.accept(HomeUiEvent.AddPhotoCamera())
 
                 R.id.media_source_gallery ->
-                    eventRelay.accept(HomeUiEvent.AddPhotoGallery(currentDate, type))
+                    eventRelay.accept(HomeUiEvent.AddPhotoGallery())
 
                 else -> return@setOnMenuItemClickListener false
             }
-
-            return@setOnMenuItemClickListener true
+            true
         }
         popup.show()
+    }
+
+    private fun renderCompose() {
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                HomeScreen(
+                    state = currentState,
+                    onTakePhoto = { showPhotoSourceMenu() },
+                    onSettings = { eventRelay.accept(HomeUiEvent.Settings) },
+                    onPreviousDay = { eventRelay.accept(HomeUiEvent.PreviousRecord) },
+                    onNextDay = { eventRelay.accept(HomeUiEvent.NextRecord) },
+                    onFaceGallery = {
+                        (currentState as? HomeUiState.Loaded)?.currentDate?.toEpochDay()?.let { day ->
+                            eventRelay.accept(HomeUiEvent.FaceGallery(day))
+                        }
+                    },
+                    onBodyGallery = {
+                        (currentState as? HomeUiState.Loaded)?.currentDate?.toEpochDay()?.let { day ->
+                            eventRelay.accept(HomeUiEvent.BodyGallery(day))
+                        }
+                    },
+                    onAudioGallery = {
+                        (currentState as? HomeUiState.Loaded)?.currentDate?.toEpochDay()?.let { day ->
+                            eventRelay.accept(HomeUiEvent.AudioGallery(day))
+                        }
+                    },
+                    onMilestonesClick = {
+                        (currentState as? HomeUiState.Loaded)?.currentDate?.toEpochDay()?.let { day ->
+                            eventRelay.accept(HomeUiEvent.Milestones(day))
+                        }
+                    },
+                    faceRecyclerView = faceRecyclerView,
+                    bodyRecyclerView = bodyRecyclerView,
+                    audioRecyclerView = audioRecyclerView,
+                )
+            }
+        }
     }
 }

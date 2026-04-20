@@ -11,30 +11,15 @@
 package com.shelbeely.opentransition.ui.settings
 
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.method.LinkMovementMethod
-import android.text.style.ClickableSpan
 import android.util.AttributeSet
-import android.view.View
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.databinding.SettingsBinding
-import com.shelbeely.opentransition.ui.settings.SettingsUiState.Content
-import com.shelbeely.opentransition.ui.settings.SettingsUiState.Loading
-import com.shelbeely.opentransition.util.getString
-import com.shelbeely.opentransition.util.gone
-import com.shelbeely.opentransition.util.toFullDateString
-import com.shelbeely.opentransition.util.toV3
-import com.shelbeely.opentransition.util.visible
-import com.shelbeely.opentransition.util.bounceOnClick
-import com.shelbeely.opentransition.util.springReveal
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
-import com.jakewharton.rxbinding3.view.clicks
-import com.jakewharton.rxbinding3.widget.checkedChanges
+import com.shelbeely.opentransition.util.settings.SettingsManager
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import java.time.LocalDate
 
@@ -81,236 +66,61 @@ sealed class SettingsUiState {
 }
 
 class SettingsView(context: Context, attributeSet: AttributeSet) :
-    ConstraintLayout(context, attributeSet) {
-    private lateinit var binding: SettingsBinding
+    FrameLayout(context, attributeSet) {
 
-    val events: Observable<SettingsUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.mergeArray(
-            binding.settingsToolbar.navigationClicks().toV3().map { SettingsUiEvent.Back },
-            binding.settingsAccountName.clicks().toV3().map { SettingsUiEvent.ChangeName },
-            binding.settingsAccountEmail.clicks().toV3().map { SettingsUiEvent.ChangeEmail },
-            binding.settingsAccountSignIn.clicks().toV3().map { SettingsUiEvent.SignIn },
-            binding.settingsAccountChangePassword.clicks().toV3()
-                .map { SettingsUiEvent.ChangePassword },
-            binding.settingsAccountDeleteAccount.clicks().toV3()
-                .map { SettingsUiEvent.DeleteAccount },
-            binding.settingsAccountSignOut.clicks().toV3().map { SettingsUiEvent.SignOut },
-            binding.settingsStartDate.clicks().toV3().map { SettingsUiEvent.ChangeStartDate },
-            binding.settingsTheme.clicks().toV3().map { SettingsUiEvent.ChangeTheme },
-            binding.settingsLock.clicks().toV3().map { SettingsUiEvent.ChangeLockMode },
-            binding.settingsLockDelay.clicks().toV3().map { SettingsUiEvent.ChangeLockDelay },
-            binding.settingsImport.clicks().toV3().map { SettingsUiEvent.Import },
-            binding.settingsExport.clicks().toV3().map { SettingsUiEvent.Export },
-            binding.settingsAnalytics.checkedChanges().toV3()
-                .filter { userAction }.map { SettingsUiEvent.ToggleAnalytics },
-            binding.settingsCrashReports.checkedChanges().toV3()
-                .filter { userAction }.map { SettingsUiEvent.ToggleCrashReports },
-            binding.settingsEncryptedDatabase.checkedChanges().toV3()
-                .filter { userAction }.map { SettingsUiEvent.ToggleEncryptedDatabase },
-            binding.settingsDecoyVault.checkedChanges().toV3()
-                .filter { userAction }.map { SettingsUiEvent.ToggleDecoyVault },
-            binding.settingsSetDecoyPasscode.clicks().toV3().map { SettingsUiEvent.SetDecoyPasscode },
-            binding.settingsQuickHide.checkedChanges().toV3()
-                .filter { userAction }.map { SettingsUiEvent.ToggleQuickHide },
-            binding.settingsImportBackup.clicks().toV3().map { SettingsUiEvent.ImportRealmBackup },
-            binding.settingsContribute.clicks().toV3().map { SettingsUiEvent.Contribute },
-            binding.settingsPrivacyPolicy.clicks().toV3().map { SettingsUiEvent.PrivacyPolicy }
-        )
-    }
+    private val eventRelay: PublishRelay<SettingsUiEvent> = PublishRelay.create()
+    val events: Observable<SettingsUiEvent> = eventRelay
 
-    private var currentStartDate: LocalDate? = null
+    private var currentState: SettingsUiState? = null
 
-    private var userAction = false
-
-    override fun onFinishInflate() {
-        super.onFinishInflate()
-        binding = SettingsBinding.bind(this)
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-
-        binding.settingsAccountNameLabel.setOnClickListener { binding.settingsAccountName.performClick() }
-        binding.settingsAccountEmailLabel.setOnClickListener { binding.settingsAccountEmail.performClick() }
-        binding.settingsStartLabel.setOnClickListener { binding.settingsStartDate.performClick() }
-        binding.settingsThemeLabel.setOnClickListener { binding.settingsTheme.performClick() }
-        binding.settingsLockLabel.setOnClickListener { binding.settingsLock.performClick() }
-        binding.settingsLockDescription.setOnClickListener { binding.settingsLock.performClick() }
-        binding.settingsLockDelayLabel.setOnClickListener { binding.settingsLockDelay.performClick() }
-        
-        // Apply M3 Expressive spring animations to buttons for bouncy, delightful interactions
-        applySpringAnimationsToButtons()
-    }
-    
-    /**
-     * Apply Material Design 3 Expressive spring animations to all interactive buttons
-     * Creates bouncy, playful feedback following "Big and Bouncy" principle
-     */
-    private fun applySpringAnimationsToButtons() {
-        // Primary action buttons - bigger bounce for emphasis
-        binding.settingsAccountSignIn.bounceOnClick { /* handled by event stream */ }
-        binding.settingsAccountChangePassword.bounceOnClick { /* handled by event stream */ }
-        binding.settingsImport.bounceOnClick { /* handled by event stream */ }
-        binding.settingsExport.bounceOnClick { /* handled by event stream */ }
-        
-        // Secondary action buttons
-        binding.settingsAccountDeleteAccount.bounceOnClick { /* handled by event stream */ }
-        binding.settingsAccountSignOut.bounceOnClick { /* handled by event stream */ }
-        binding.settingsSetDecoyPasscode.bounceOnClick { /* handled by event stream */ }
-        binding.settingsImportBackup.bounceOnClick { /* handled by event stream */ }
-        
-        // Text buttons - subtle bounce
-        binding.settingsAccountName.bounceOnClick { /* handled by event stream */ }
-        binding.settingsAccountEmail.bounceOnClick { /* handled by event stream */ }
-        binding.settingsStartDate.bounceOnClick { /* handled by event stream */ }
-        binding.settingsTheme.bounceOnClick { /* handled by event stream */ }
-        binding.settingsLock.bounceOnClick { /* handled by event stream */ }
-        binding.settingsLockDelay.bounceOnClick { /* handled by event stream */ }
-        binding.settingsContribute.bounceOnClick { /* handled by event stream */ }
-        binding.settingsPrivacyPolicy.bounceOnClick { /* handled by event stream */ }
-        
-        // Apply spring reveal animation to section headers for editorial feel
-        binding.settingsTitle.springReveal(delay = 50)
+        renderCompose()
     }
 
     fun display(state: SettingsUiState) {
-        userAction = false
-        when (state) {
-            is Content -> {
-                binding.settingsLoadingLayout.gone()
-                displayContent(state)
-            }
-
-            is Loading -> {
-                binding.settingsLoadingLayout.visible()
-                binding.settingsLoadingProgress.progress = state.overallProgress
-                binding.settingsLoadingProgress.secondaryProgress = state.stepProgress
-            }
-        }
-        userAction = true
+        currentState = state
+        renderCompose()
     }
 
-    private fun displayContent(content: Content) {
-        if (content.userDetails != null) {
-            displayUserDetails(content.userDetails)
-        } else {
-            binding.settingsAccountDescription.visible()
-            binding.settingsAccountNameLayout.gone()
-            binding.settingsAccountEmailLayout.gone()
-            binding.settingsAccountSignIn.visible()
-            binding.settingsAccountChangePassword.gone()
-            binding.settingsAccountLoggedInButtonSpace1.gone()
-            binding.settingsAccountDeleteAccount.gone()
-            binding.settingsAccountLoggedInButtonSpace2.gone()
-            binding.settingsAccountSignOut.gone()
+    private fun renderCompose() {
+        val state = currentState ?: return
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                SettingsScreen(
+                    state = state,
+                    onBack = { eventRelay.accept(SettingsUiEvent.Back) },
+                    onChangeName = { eventRelay.accept(SettingsUiEvent.ChangeName) },
+                    onChangeEmail = { eventRelay.accept(SettingsUiEvent.ChangeEmail) },
+                    onSignIn = { eventRelay.accept(SettingsUiEvent.SignIn) },
+                    onChangePassword = { eventRelay.accept(SettingsUiEvent.ChangePassword) },
+                    onDeleteAccount = { eventRelay.accept(SettingsUiEvent.DeleteAccount) },
+                    onSignOut = { eventRelay.accept(SettingsUiEvent.SignOut) },
+                    onChangeStartDate = { eventRelay.accept(SettingsUiEvent.ChangeStartDate) },
+                    onChangeTheme = { eventRelay.accept(SettingsUiEvent.ChangeTheme) },
+                    onChangeLockMode = { eventRelay.accept(SettingsUiEvent.ChangeLockMode) },
+                    onChangeLockDelay = { eventRelay.accept(SettingsUiEvent.ChangeLockDelay) },
+                    onImport = { eventRelay.accept(SettingsUiEvent.Import) },
+                    onExport = { eventRelay.accept(SettingsUiEvent.Export) },
+                    onToggleAnalytics = { eventRelay.accept(SettingsUiEvent.ToggleAnalytics) },
+                    onToggleCrashReports = { eventRelay.accept(SettingsUiEvent.ToggleCrashReports) },
+                    onToggleEncryptedDatabase = { eventRelay.accept(SettingsUiEvent.ToggleEncryptedDatabase) },
+                    onToggleDecoyVault = { eventRelay.accept(SettingsUiEvent.ToggleDecoyVault) },
+                    onSetDecoyPasscode = { eventRelay.accept(SettingsUiEvent.SetDecoyPasscode) },
+                    onToggleQuickHide = { eventRelay.accept(SettingsUiEvent.ToggleQuickHide) },
+                    onImportRealmBackup = { eventRelay.accept(SettingsUiEvent.ImportRealmBackup) },
+                    onContribute = { eventRelay.accept(SettingsUiEvent.Contribute) },
+                    onPrivacyPolicy = { eventRelay.accept(SettingsUiEvent.PrivacyPolicy) }
+                )
+            }
         }
-
-        currentStartDate = content.startDate
-
-        binding.settingsStartDate.text = content.startDate.toFullDateString(context)
-        binding.settingsTheme.text = content.theme
-        binding.settingsLock.text = content.lockMode
-
-        binding.settingsLockDelayLabel.isEnabled = content.enableLockDelay
-        binding.settingsLockDelay.isEnabled = content.enableLockDelay
-
-        binding.settingsLockDelay.text = content.lockDelay
-
-        binding.settingsAnalytics.isChecked = content.enableAnalytics
-        binding.settingsCrashReports.isChecked = content.enableCrashReports
-        
-        // Security settings
-        binding.settingsEncryptedDatabase.isChecked = content.encryptedDatabaseEnabled
-        binding.settingsDecoyVault.isChecked = content.decoyVaultEnabled
-        binding.settingsDecoyVault.isEnabled = content.encryptedDatabaseEnabled
-        binding.settingsSetDecoyPasscode.isEnabled = content.encryptedDatabaseEnabled && content.decoyVaultEnabled
-        binding.settingsQuickHide.isChecked = content.quickHideEnabled
-
-        binding.settingsAppVersion.text = content.appVersion
-
-        // Make copyright text clickable with links
-        val copyrightText = content.copyright
-        val spannableString = SpannableString(copyrightText)
-        
-        // Find and make "TransTracks" clickable
-        val transTracksStart = copyrightText.indexOf("TransTracks")
-        if (transTracksStart >= 0) {
-            val transTracksEnd = transTracksStart + "TransTracks".length
-            spannableString.setSpan(
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/TransTracks/TransTracks"))
-                        context.startActivity(intent)
-                    }
-                },
-                transTracksStart,
-                transTracksEnd,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-        
-        // Find and make "Shelbeely" clickable
-        val shelBeelyStart = copyrightText.indexOf("Shelbeely")
-        if (shelBeelyStart >= 0) {
-            val shelBeelyEnd = shelBeelyStart + "Shelbeely".length
-            spannableString.setSpan(
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/shelbeely"))
-                        context.startActivity(intent)
-                    }
-                },
-                shelBeelyStart,
-                shelBeelyEnd,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-        
-        // Find and make "OpenTransition contributors" clickable
-        val openTransitionStart = copyrightText.indexOf("OpenTransition contributors")
-        if (openTransitionStart >= 0) {
-            val openTransitionEnd = openTransitionStart + "OpenTransition contributors".length
-            spannableString.setSpan(
-                object : ClickableSpan() {
-                    override fun onClick(widget: View) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/shelbeely/OpenTransition/graphs/contributors"))
-                        context.startActivity(intent)
-                    }
-                },
-                openTransitionStart,
-                openTransitionEnd,
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
-        
-        binding.settingsCopyright.text = spannableString
-        binding.settingsCopyright.movementMethod = LinkMovementMethod.getInstance()
-    }
-
-    private fun displayUserDetails(user: SettingsUIUserDetails) {
-        binding.settingsAccountDescription.gone()
-        binding.settingsAccountNameLayout.visible()
-        binding.settingsAccountEmailLayout.visible()
-        binding.settingsAccountSignIn.gone()
-        binding.settingsAccountLoggedInButtonSpace1.visible()
-        binding.settingsAccountDeleteAccount.visible()
-        binding.settingsAccountLoggedInButtonSpace2.visible()
-        binding.settingsAccountSignOut.visible()
-
-        if (user.email != null) {
-            binding.settingsAccountChangePassword.visible()
-
-            val buttonRes =
-                if (user.hasPasswordProvider) R.string.change_password else R.string.set_password
-            binding.settingsAccountChangePassword.setText(buttonRes)
-        } else {
-            binding.settingsAccountChangePassword.gone()
-        }
-
-        binding.settingsAccountName.text = user.name ?: getString(R.string.unknown)
-        binding.settingsAccountEmail.text = user.email ?: getString(R.string.unknown)
     }
 }

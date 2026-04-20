@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright © 2018 TransTracks. All rights reserved.
   ~
@@ -9,17 +8,7 @@
   ~
   ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
-
-<com.shelbeely.opentransition.ui.widget.SquareImageView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/select_photo_adapter_item_image"
-    android:gravity="center"
-    android:layout_gravity="center"
-    android:layout_height="wrap_content"
-    android:layout_margin="2dp"
-    android:layout_weight="1"
+<com.shelbeely.opentransition.ui.lock.LockView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:padding="16dp"
-    android:scaleType="fitCenter"
-    android:src="@drawable/ic_add_circle_white_48dp"
-    app:ttOrientation="horizontal" />
+    android:layout_height="match_parent" />

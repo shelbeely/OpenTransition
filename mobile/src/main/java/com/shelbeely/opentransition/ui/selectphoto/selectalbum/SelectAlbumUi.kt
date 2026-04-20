@@ -12,20 +12,18 @@ package com.shelbeely.opentransition.ui.selectphoto.selectalbum
 
 import android.content.Context
 import android.util.AttributeSet
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.util.isNotDisposed
-import com.shelbeely.opentransition.util.toV3
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
+import com.shelbeely.opentransition.util.isNotDisposed
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
-
-import kotterknife.bindView
 
 sealed class SelectAlbumUiEvent {
     object Back : SelectAlbumUiEvent()
@@ -38,35 +36,41 @@ sealed class SelectAlbumUiState {
 
 class AlbumView(
     context: Context, attributeSet: AttributeSet
-) : ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.select_album_toolbar)
-    private val recyclerView: RecyclerView by bindView(R.id.select_album_recycler_view)
+) : FrameLayout(context, attributeSet) {
 
-    private val eventRelay: PublishRelay<SelectAlbumUiEvent> =
-        PublishRelay.create<SelectAlbumUiEvent>()
-    val events: Observable<SelectAlbumUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge(
-            toolbar.navigationClicks().toV3().map { SelectAlbumUiEvent.Back },
-            eventRelay
-        )
+    private val eventRelay: PublishRelay<SelectAlbumUiEvent> = PublishRelay.create()
+    val events: Observable<SelectAlbumUiEvent> = eventRelay
+
+    private var currentState: SelectAlbumUiState = SelectAlbumUiState.Loaded
+    private var albumClickDisposable: Disposable = Disposable.disposed()
+
+    private val recyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            layoutManager = LinearLayoutManager(context)
+        }
     }
 
-    private var albumClickDisposable: Disposable = Disposable.disposed()
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
+        renderCompose()
     }
 
     fun display(state: SelectAlbumUiState) {
+        currentState = state
         when (state) {
             is SelectAlbumUiState.Loaded -> {
                 val selectAlbumAdapter: SelectAlbumAdapter
 
                 if (recyclerView.adapter == null) {
-                    recyclerView.layoutManager = LinearLayoutManager(context)
                     selectAlbumAdapter = SelectAlbumAdapter()
                     recyclerView.adapter = selectAlbumAdapter
                 } else {
@@ -79,12 +83,25 @@ class AlbumView(
                     .subscribe(eventRelay)
             }
         }
+        renderCompose()
     }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         if (albumClickDisposable.isNotDisposed()) {
             albumClickDisposable.dispose()
+        }
+    }
+
+    private fun renderCompose() {
+        composeView.setContent {
+            OpenTransitionTheme {
+                SelectAlbumScreen(
+                    state = currentState,
+                    onBack = { eventRelay.accept(SelectAlbumUiEvent.Back) },
+                    recyclerView = recyclerView,
+                )
+            }
         }
     }
 }

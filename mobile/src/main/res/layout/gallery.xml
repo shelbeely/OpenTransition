@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright © 2018 TransTracks. All rights reserved.
   ~
@@ -10,74 +9,7 @@
   ~ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
   -->
 
-<com.shelbeely.opentransition.ui.gallery.GalleryView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<com.shelbeely.opentransition.ui.gallery.GalleryView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/gradient_background">
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/gallery_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.PopupOverlay"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
-
-        <TextView
-            android:id="@+id/gallery_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            android:textColor="@color/white_text_selector"
-            tools:text="@string/face_gallery" />
-    </androidx.appcompat.widget.Toolbar>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/gallery_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingStart="@dimen/edge_margin_small"
-        android:paddingEnd="@dimen/edge_margin_small"
-        android:paddingBottom="@dimen/spacer_grid_half"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/gallery_toolbar" />
-
-    <TextView
-        android:id="@+id/gallery_empty_message"
-        style="@style/TextAppearance.AppCompat.Large.Inverse"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:padding="16dp"
-        android:text="@string/gallery_empty"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/gallery_empty_add"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/gallery_toolbar"
-        app:layout_constraintVertical_chainStyle="packed"
-        tools:visibility="visible" />
-
-    <com.shelbeely.opentransition.ui.widget.SquareImageView
-        android:id="@+id/gallery_empty_add"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
-        android:background="@color/transparent"
-        android:contentDescription="@string/add"
-        android:src="@drawable/ic_add_circle_white_48dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/gallery_empty_message"
-        tools:visibility="visible" />
-</com.shelbeely.opentransition.ui.gallery.GalleryView>
+    android:layout_height="match_parent" />

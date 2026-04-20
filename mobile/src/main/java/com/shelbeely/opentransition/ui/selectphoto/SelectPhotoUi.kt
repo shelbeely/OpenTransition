@@ -16,22 +16,21 @@ import android.util.AttributeSet
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import androidx.appcompat.widget.Toolbar
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
+import com.shelbeely.opentransition.util.applySystemBarInsets
 import com.shelbeely.opentransition.util.isNotDisposed
 import com.shelbeely.opentransition.util.settings.PrefUtil
-import com.shelbeely.opentransition.util.toV3
-import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.appcompat.itemClicks
-import com.jakewharton.rxbinding3.appcompat.navigationClicks
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
-
-import kotterknife.bindView
 import java.lang.ref.WeakReference
 
 sealed class SelectPhotoUiEvent {
@@ -51,50 +50,35 @@ sealed class SelectPhotoUiState {
 }
 
 class SelectPhotoView(context: Context, attributeSet: AttributeSet) :
-    ConstraintLayout(context, attributeSet) {
-    private val toolbar: Toolbar by bindView(R.id.select_photo_toolbar)
-    private val recyclerView: RecyclerView by bindView(R.id.select_photo_recycler_view)
-
-    private var adapterDisposable: Disposable = Disposable.disposed()
+    FrameLayout(context, attributeSet) {
 
     private val eventRelay: PublishRelay<SelectPhotoUiEvent> = PublishRelay.create()
-    val events: Observable<SelectPhotoUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        Observable.merge(
-            toolbar.navigationClicks().toV3().map { SelectPhotoUiEvent.Back },
-            toolbar.itemClicks().toV3().map<SelectPhotoUiEvent> { item ->
-                return@map when (item.itemId) {
-                    R.id.select_photo_menu_folders -> SelectPhotoUiEvent.ViewAlbums
-                    R.id.select_photo_menu_external -> SelectPhotoUiEvent.ExternalGalleries
-                    else -> throw IllegalArgumentException("Unhandled toolbar item")
-                }
-            },
-            eventRelay.doOnNext { event ->
-                if (event !is SelectPhotoUiEvent.PhotoSelected) {
-                    return@doOnNext
-                }
+    val events: Observable<SelectPhotoUiEvent> = eventRelay
 
-                val position = gridLayoutManager.findFirstVisibleItemPosition()
-
-                if (position == RecyclerView.NO_POSITION) {
-                    return@doOnNext
-                }
-
-                val uriString: String = adapter?.getUri(position)?.toString() ?: ""
-                PrefUtil.setSelectPhotoFirstVisible(uriString)
-            })
-    }
+    private var adapterDisposable: Disposable = Disposable.disposed()
+    private var currentState: SelectPhotoUiState? = null
+    private var adapter: SelectPhotoAdapter? = null
 
     private val gridLayoutManager = GridLayoutManager(context, GRID_SPAN)
-    private var adapter: SelectPhotoAdapter? = null
+
+    val recyclerView: RecyclerView by lazy {
+        RecyclerView(context).apply {
+            layoutParams = LayoutParams(MATCH_PARENT, MATCH_PARENT)
+            layoutManager = gridLayoutManager
+        }
+    }
+
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-
-        // Apply window insets for system bars
         applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-
-        toolbar.inflateMenu(R.menu.select_photo)
-        recyclerView.layoutManager = gridLayoutManager
+        renderCompose()
     }
 
     override fun onDetachedFromWindow() {
@@ -105,27 +89,28 @@ class SelectPhotoView(context: Context, attributeSet: AttributeSet) :
     }
 
     fun display(state: SelectPhotoUiState) {
+        currentState = state
         val shouldShowActionMode = state is SelectPhotoUiState.Selection
 
         if (shouldShowActionMode && !actionModeHandler.isActive()) {
-            toolbar.startActionMode(actionModeHandler)
+            startActionMode(actionModeHandler)
         } else if (!shouldShowActionMode && actionModeHandler.isActive()) {
             actionModeHandler.finish()
         }
 
         if (shouldShowActionMode) {
-            actionModeHandler.setTitle((state as SelectPhotoUiState.Selection).selectedUris.size.toString())
+            actionModeHandler.setTitle(
+                (state as SelectPhotoUiState.Selection).selectedUris.size.toString()
+            )
         }
 
         if (adapter == null) {
             adapter = SelectPhotoAdapter(context)
-
             recyclerView.adapter = adapter
 
             val firstVisibleUriString = PrefUtil.getSelectPhotoFirstVisible()
             if (firstVisibleUriString.isNotBlank()) {
                 val position = adapter!!.getItemPosition(Uri.parse(firstVisibleUriString))
-
                 if (position != RecyclerView.NO_POSITION) {
                     recyclerView.scrollToPosition(position)
                 }
@@ -138,12 +123,36 @@ class SelectPhotoView(context: Context, attributeSet: AttributeSet) :
                 is SelectPhotoUiState.Selection -> state.selectedUris
                 else -> ArrayList()
             }
-
             adapter?.updateSelectedUris(selectedUris)
         }
 
         if (adapterDisposable.isDisposed) {
-            adapterDisposable = adapter!!.events.subscribe(eventRelay)
+            adapterDisposable = adapter!!.events
+                .doOnNext { event ->
+                    if (event !is SelectPhotoUiEvent.PhotoSelected) return@doOnNext
+                    val position = gridLayoutManager.findFirstVisibleItemPosition()
+                    if (position == RecyclerView.NO_POSITION) return@doOnNext
+                    val uriString: String = adapter?.getUri(position)?.toString() ?: ""
+                    PrefUtil.setSelectPhotoFirstVisible(uriString)
+                }
+                .subscribe(eventRelay)
+        }
+
+        renderCompose()
+    }
+
+    private fun renderCompose() {
+        val state = currentState ?: return
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                SelectPhotoScreen(
+                    state = state,
+                    recyclerView = recyclerView,
+                    onBack = { eventRelay.accept(SelectPhotoUiEvent.Back) },
+                    onViewAlbums = { eventRelay.accept(SelectPhotoUiEvent.ViewAlbums) },
+                    onExternalGalleries = { eventRelay.accept(SelectPhotoUiEvent.ExternalGalleries) },
+                )
+            }
         }
     }
 
@@ -158,13 +167,11 @@ class SelectPhotoView(context: Context, attributeSet: AttributeSet) :
             val event: SelectPhotoUiEvent = when (item.itemId) {
                 R.id.select_photo_selection_save ->
                     SelectPhotoUiEvent.SaveMultiple(adapter.getSelectedUris())
-
                 else -> throw IllegalArgumentException("Unhandled item")
             }
 
             eventRelay.accept(event)
             finish()
-
             return true
         }
 
@@ -189,9 +196,7 @@ class SelectPhotoView(context: Context, attributeSet: AttributeSet) :
             modeRef.get()?.finish()
         }
 
-        fun isActive(): Boolean {
-            return modeRef.get() != null
-        }
+        fun isActive(): Boolean = modeRef.get() != null
 
         fun setTitle(newTitleText: String) {
             titleText = newTitleText

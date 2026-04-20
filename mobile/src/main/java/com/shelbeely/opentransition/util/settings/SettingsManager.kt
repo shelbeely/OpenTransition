@@ -12,6 +12,7 @@ package com.shelbeely.opentransition.util.settings
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import com.shelbeely.opentransition.BuildConfig
@@ -232,6 +233,7 @@ object SettingsManager {
         addProperty(currentAndroidVersion.name, getCurrentAndroidVersion())
         addProperty(startDate.name, PrefUtil.getDate(startDate)?.toEpochDay())
         addProperty(theme.name, getTheme().name)
+        addProperty(colorVariant.name, getColorVariant().name)
     }
 
     @Throws(IOException::class)
@@ -254,6 +256,14 @@ object SettingsManager {
                 theme.name -> {
                     try {
                         setTheme(Theme.valueOf(jsonReader.nextString()), context = null)
+                    } catch (e: java.lang.Exception) {
+                        e.printStackTrace()
+                    }
+                }
+
+                colorVariant.name -> {
+                    try {
+                        setColorVariant(AppColorVariant.valueOf(jsonReader.nextString()), context = null)
                     } catch (e: java.lang.Exception) {
                         e.printStackTrace()
                     }
@@ -316,6 +326,10 @@ object SettingsManager {
                                     && safeValueOf<Theme>(value) != null
                                     && value != getTheme().name
 
+                            colorVariant -> value is String
+                                    && safeValueOf<AppColorVariant>(value) != null
+                                    && value != getColorVariant().name
+
                             enableAnalytics -> value is Boolean && value != getEnableAnalytics()
 
                             enableCrashReports -> value is Boolean && value != getEnableCrashReports()
@@ -370,6 +384,7 @@ object SettingsManager {
         encryptedDatabaseEnabled -> isEncryptedDatabaseEnabled()
         decoyVaultEnabled -> isDecoyVaultEnabled()
         quickHideEnabled -> isQuickHideEnabled()
+        colorVariant -> getColorVariant().name
 
         currentAndroidVersion, incorrectPasswordCount, saveToFirebase, showAccountWarning,
         userLastSeen, decoyLockCode -> null
@@ -424,6 +439,33 @@ object SettingsManager {
     }
     //endregion
 
+    //region Color Variant (Compose Material You / static palette selector)
+    fun getColorVariant(): AppColorVariant = PrefUtil.getEnum(colorVariant, AppColorVariant.default())
+
+    fun setColorVariant(newColorVariant: AppColorVariant, context: Context?) {
+        PrefUtil.setEnum(colorVariant, newColorVariant)
+        userSettingsUpdatedRelay.accept(Unit)
+
+        if (saveToFirebase()) {
+            FirebaseSettingUtil.setEnum(colorVariant, newColorVariant, context)
+        }
+    }
+
+    fun getResolvedComposeColorVariant(): AppColorVariant {
+        val savedVariant = getColorVariant()
+
+        if (savedVariant != AppColorVariant.dynamic) {
+            return savedVariant
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            return AppColorVariant.dynamic
+        }
+
+        return getTheme().toAppColorVariant()
+    }
+    //endregion
+
     @Suppress("EnumEntryName") //These don't follow standard naming convention to match across platforms
     enum class Key {
         currentAndroidVersion,
@@ -443,7 +485,8 @@ object SettingsManager {
         encryptedDatabaseEnabled,
         decoyVaultEnabled,
         decoyLockCode,
-        quickHideEnabled
+        quickHideEnabled,
+        colorVariant
     }
 }
 
@@ -519,5 +562,27 @@ enum class Theme {
     }
 }
 
+fun Theme.toAppColorVariant(): AppColorVariant = when (this) {
+    Theme.pink -> AppColorVariant.pink
+    Theme.blue -> AppColorVariant.blue
+    Theme.purple -> AppColorVariant.purple
+    Theme.green -> AppColorVariant.green
+}
+
 class UserNotLoggedInException : Exception()
 
+/**
+ * Determines which colour scheme [OpenTransitionTheme] should apply.
+ *
+ *  - [Dynamic]  → Material You wallpaper colours on API 31+; falls back to [Pink] on older devices.
+ *  - [Pink]/[Blue]/[Purple]/[Green] → hand-crafted static tonal palettes that override dynamic
+ *    colour when explicitly chosen by the user in Settings.
+ */
+@Suppress("EnumEntryName")
+enum class AppColorVariant {
+    dynamic, pink, blue, purple, green;
+
+    companion object {
+        fun default() = dynamic
+    }
+}

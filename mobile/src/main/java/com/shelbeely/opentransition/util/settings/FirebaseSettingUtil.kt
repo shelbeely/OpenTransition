@@ -168,6 +168,18 @@ class FirebaseSettingUtil {
                                 else -> Log.d(LOG_TAG, "${key.name} is not a String : '$value'")
                             }
 
+                            colorVariant -> when (value) {
+                                is String -> when (val variant = safeValueOf<AppColorVariant>(value)) {
+                                    null -> Log.d(LOG_TAG, "$value is not a valid AppColorVariant")
+                                    else -> {
+                                        PrefUtil.setEnum(key, variant)
+                                        SettingsManager.userSettingsUpdatedRelay.accept(Unit)
+                                    }
+                                }
+
+                                else -> Log.d(LOG_TAG, "${key.name} is not a String : '$value'")
+                            }
+
                             currentAndroidVersion, incorrectPasswordCount, saveToFirebase,
                             showAccountWarning, userLastSeen, decoyLockCode -> {
                                 //No-op

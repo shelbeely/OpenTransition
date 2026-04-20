@@ -12,71 +12,45 @@ package com.shelbeely.opentransition.ui.lock
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.inputmethod.EditorInfo
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
-import androidx.constraintlayout.widget.ConstraintLayout
-import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.util.toV3
+import android.widget.FrameLayout
+import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.applySystemBarInsets
-import com.jakewharton.rxbinding3.view.clicks
-import com.jakewharton.rxbinding3.widget.editorActions
-import com.squareup.picasso.Picasso
+import com.shelbeely.opentransition.util.settings.SettingsManager
+import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindOptionalView
-import kotterknife.bindView
 
 sealed class LockUiEvent {
     data class Unlock(val code: String) : LockUiEvent()
     object UseBiometric : LockUiEvent()
 }
 
-class LockView(
-    context: Context, attributeSet: AttributeSet
-) : ConstraintLayout(context, attributeSet) {
-    private val background: ImageView? by bindOptionalView(R.id.lock_background_image)
-    private val code: EditText by bindView(R.id.lock_code)
-    private val go: Button by bindView(R.id.lock_go)
-    private val biometricButton: Button? by bindOptionalView(R.id.lock_biometric_button)
+class LockView(context: Context, attributeSet: AttributeSet) :
+    FrameLayout(context, attributeSet) {
 
-    val events: Observable<LockUiEvent> by lazy(LazyThreadSafetyMode.NONE) {
-        val baseEvents = listOf(
-            code.editorActions().toV3()
-                .filter { action ->
-                    action == EditorInfo.IME_ACTION_SEARCH || action == EditorInfo.IME_ACTION_DONE
-                }
-                .map { action ->
-                    return@map when (action) {
-                        EditorInfo.IME_ACTION_SEARCH,
-                        EditorInfo.IME_ACTION_DONE -> LockUiEvent.Unlock(code.text.toString())
+    private val eventRelay: PublishRelay<LockUiEvent> = PublishRelay.create()
+    val events: Observable<LockUiEvent> = eventRelay
 
-                        else -> throw IllegalArgumentException("Unhandled IME Action '$action'")
-                    }
-                },
-            go.clicks().toV3().map { LockUiEvent.Unlock(code.text.toString()) }
-        )
-        
-        val biometricEvents = biometricButton?.let { button ->
-            listOf(button.clicks().toV3().map { LockUiEvent.UseBiometric })
-        } ?: emptyList()
-        
-        Observable.merge(baseEvents + biometricEvents)
+    private val composeView: ComposeView by lazy {
+        ComposeView(context).also { cv ->
+            cv.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
+            addView(cv, LayoutParams(MATCH_PARENT, MATCH_PARENT))
+        }
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        
-        // Apply window insets for system bars
-        applySystemBarInsets(left = false, top = true, right = false, bottom = true)
-        
-        if (background != null && !isInEditMode) {
-            Picasso.get()
-                .load(R.drawable.train_track_background)
-                .placeholder(R.color.black)
-                .fit()
-                .centerCrop()
-                .into(background)
+        applySystemBarInsets(left = false, top = false, right = false, bottom = false)
+        composeView.setContent {
+            OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
+                LockScreen(
+                    lockType = SettingsManager.getLockType(),
+                    onUnlock = { code -> eventRelay.accept(LockUiEvent.Unlock(code)) },
+                    onUseBiometric = { eventRelay.accept(LockUiEvent.UseBiometric) }
+                )
+            }
         }
     }
 }

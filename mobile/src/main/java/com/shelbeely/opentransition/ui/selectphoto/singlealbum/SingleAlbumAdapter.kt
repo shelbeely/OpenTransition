@@ -15,24 +15,20 @@ import android.content.Context
 import android.database.Cursor
 import android.net.Uri
 import android.provider.MediaStore
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
-import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.ui.widget.AdapterSpanSizeLookup
 import com.shelbeely.opentransition.ui.widget.CursorRecyclerViewAdapter
+import com.shelbeely.opentransition.ui.widget.SquareConstraintLayout
 import com.shelbeely.opentransition.util.FileUtil
-import com.shelbeely.opentransition.util.getString
-import com.shelbeely.opentransition.util.setVisibleOrGone
+import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.jakewharton.rxrelay3.PublishRelay
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 import io.reactivex.rxjava3.core.Observable
-import kotterknife.bindView
-import java.io.FileNotFoundException
 import java.lang.ref.WeakReference
 
 class SingleAlbumAdapter(
@@ -114,18 +110,47 @@ class SingleAlbumAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseHolder {
         return when (viewType) {
             TYPE_COUNT -> {
-                CountHolder(
-                    LayoutInflater.from(parent.context)
-                        .inflate(R.layout.single_album_adapter_count_item, parent, false)
-                )
+                val composeView = ComposeView(parent.context).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+                CountHolder(composeView)
             }
 
             else -> {
-                ImageHolder(
-                    LayoutInflater.from(parent.context)
-                        .inflate(R.layout.single_album_adapter_image_item, parent, false),
-                    this
-                )
+                val context = parent.context
+                val density = context.resources.displayMetrics.density
+                val margin = (2 * density).toInt()
+
+                val composeView = ComposeView(context).apply {
+                    layoutParams = ConstraintLayout.LayoutParams(0, 0).apply {
+                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                        topToTop = ConstraintLayout.LayoutParams.PARENT_ID
+                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    }
+                    setViewCompositionStrategy(
+                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
+                    )
+                }
+
+                val itemView = SquareConstraintLayout(context).apply {
+                    layoutParams = RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        setMargins(margin, margin, margin, margin)
+                    }
+                    orientation = 1
+                    addView(composeView)
+                }
+
+                ImageHolder(itemView, composeView, this)
             }
         }
     }
@@ -158,94 +183,71 @@ class SingleAlbumAdapter(
         notifyDataSetChanged()
     }
 
+    fun refreshCountItem() {
+        notifyItemChanged(itemCount - 1)
+    }
+
     open class BaseHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
-    class ImageHolder(itemView: View, creatingAdapter: SingleAlbumAdapter?) : BaseHolder(itemView) {
-        private val image: ImageView by bindView(R.id.single_album_image_item_image)
-        private val selection: ImageView by bindView(R.id.single_album_image_item_selection)
-
+    class ImageHolder(
+        itemView: View,
+        private val composeView: ComposeView,
+        creatingAdapter: SingleAlbumAdapter
+    ) : BaseHolder(itemView) {
         private val adapterRef = WeakReference(creatingAdapter)
 
-        private var currentUri: Uri? = null
-
-        init {
-            //Avoiding subscription so we don't need to dispose it
-            itemView.setOnClickListener {
-                val uri = currentUri ?: return@setOnClickListener
-                val adapter = adapterRef.get() ?: return@setOnClickListener
-
-                val event: SingleAlbumUiEvent = when (adapter.selectionMode) {
-                    true -> {
-                        if (adapter.selectedUris.contains(uri)) {
-                            adapter.selectedUris.remove(uri)
-                        } else {
-                            adapter.selectedUris.add(uri)
-                        }
-
-                        SingleAlbumUiEvent.SelectionUpdate(adapter.getSelectedUris())
-                    }
-
-                    false -> SingleAlbumUiEvent.SelectPhoto(uri)
-                }
-
-                adapter.eventRelay.accept(event)
-            }
-
-            itemView.setOnLongClickListener {
-                val uri = currentUri ?: return@setOnLongClickListener false
-                val adapter = adapterRef.get() ?: return@setOnLongClickListener false
-
-                if (!adapter.selectionMode) {
-                    adapter.eventRelay.accept(SingleAlbumUiEvent.SelectionUpdate(arrayListOf(uri)))
-                } else {
-                    itemView.performClick()
-                }
-
-                return@setOnLongClickListener true
-            }
-        }
-
         fun bind(uri: Uri, selectionMode: Boolean, isSelected: Boolean) {
-            currentUri = uri
             val adapter = adapterRef.get() ?: return
-
-            Picasso.get()
-                .load(uri)
-                .fit()
-                .centerCrop()
-                .into(image, object : Callback {
-                    override fun onSuccess() {}
-
-                    override fun onError(e: Exception?) {
-                        if (e != null && e is FileNotFoundException) {
-                            FileUtil.removeImageFromGallery(uri.path!!)
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    SingleAlbumImageItem(
+                        uri = uri,
+                        isSelected = isSelected,
+                        selectionMode = selectionMode,
+                        onClick = {
+                            val event: SingleAlbumUiEvent = when (adapter.selectionMode) {
+                                true -> {
+                                    if (adapter.selectedUris.contains(uri)) {
+                                        adapter.selectedUris.remove(uri)
+                                    } else {
+                                        adapter.selectedUris.add(uri)
+                                    }
+                                    SingleAlbumUiEvent.SelectionUpdate(adapter.getSelectedUris())
+                                }
+                                false -> SingleAlbumUiEvent.SelectPhoto(uri)
+                            }
+                            adapter.eventRelay.accept(event)
+                        },
+                        onLongClick = {
+                            if (!adapter.selectionMode) {
+                                adapter.eventRelay.accept(
+                                    SingleAlbumUiEvent.SelectionUpdate(arrayListOf(uri))
+                                )
+                            } else {
+                                itemView.performClick()
+                            }
+                        },
+                        onFileNotFound = {
+                            uri.path?.let { FileUtil.removeImageFromGallery(it) }
                             adapter.notifyDataSetChanged()
                         }
-                    }
-                })
-
-            selection.setVisibleOrGone(selectionMode)
-
-            if (selectionMode) {
-                val selectionRes = when (isSelected) {
-                    true -> R.drawable.ic_selected_primary_36dp
-                    false -> R.drawable.ic_unselected_primary_36dp
-                }
-                selection.setImageResource(selectionRes)
-
-                selection.contentDescription = when (isSelected) {
-                    true -> itemView.getString(R.string.selected)
-                    false -> itemView.getString(R.string.not_selected)
+                    )
                 }
             }
         }
     }
 
-    class CountHolder(itemView: View) : BaseHolder(itemView) {
-        private val text: TextView by bindView(R.id.single_album_adapter_count_item_text)
-
+    class CountHolder(private val composeView: ComposeView) : BaseHolder(composeView) {
         fun bind(count: Int) {
-            text.text = text.resources.getQuantityString(R.plurals.photos, count, count)
+            composeView.setContent {
+                OpenTransitionTheme(
+                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
+                ) {
+                    SingleAlbumPhotoCountItem(count = count)
+                }
+            }
         }
     }
 
