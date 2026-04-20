@@ -1,0 +1,27 @@
+# Allowlist for the boycott check
+# https://github.com/shelbeely/OpenTransition/blob/main/.github/boycott/denylist.yml
+#
+# Add entries here when a package, plugin, action, or domain would otherwise be
+# flagged by the denylist but is known to be acceptable for this project.
+#
+# This file is intentionally empty on initial setup — add exceptions only after
+# deliberate review. Each entry must include a `reason` so the exemption is
+# auditable.
+#
+# Structure (all fields are optional — include only those that apply):
+#
+#   - name:           Short description of what is being allowed
+#     reason:         Why this exception is acceptable (required)
+#     gradle_groups:  Exact group-ID prefixes to exempt
+#     gradle_plugins: Exact plugin-ID prefixes to exempt
+#     action_orgs:    GitHub org names to exempt
+#     domains:        Domain substrings to exempt
+
+exemptions: []
+
+# Example:
+# exemptions:
+#   - name: "Some fork of a blocked library maintained outside Russia"
+#     reason: "This fork is maintained by a Ukrainian team; the original vendor is blocked"
+#     gradle_groups:
+#       - "com.example.fork"

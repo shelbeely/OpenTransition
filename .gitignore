@@ -41,6 +41,10 @@ _sandbox
 /mobile/google-services.json
 release-keystore.jks
 
+# Python cache
+__pycache__/
+*.pyc
+
 # MkDocs
 site/
 .cache/

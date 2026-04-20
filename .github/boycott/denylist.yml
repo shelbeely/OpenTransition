@@ -1,0 +1,290 @@
+# Denylist derived from the StandWithUkraine Boycott list
+# https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/Boycott.md
+#
+# Each entry represents a vendor/product on the boycott list, with its
+# known package identifiers so the check is deterministic.
+#
+# Structure:
+#   - name:           Human-readable vendor/product name (from upstream list)
+#     reason:         Why it is on the list
+#     gradle_groups:  Maven groupId prefixes to block (substring match on group)
+#     gradle_plugins: Gradle plugin ID prefixes to block (substring match)
+#     action_orgs:    GitHub org names used in workflow `uses:` references
+#     domains:        Domain substrings to block in curl/wget URLs inside workflow steps
+#
+# TLD rule: all URLs/packages whose group or domain ends in .ru / .su / .by are
+# caught by the domain_tld_patterns list below; vendor-specific entries here add
+# coverage for vendors that operate under other TLDs.
+
+# ---------------------------------------------------------------------------
+# Top-level TLD block (Russian Federation / Soviet Union / Belarus)
+# Any Maven group resolving through a .ru/.su/.by registry URL or any workflow
+# curl to those TLDs is flagged.
+# ---------------------------------------------------------------------------
+domain_tld_patterns:
+  - ".ru"
+  - ".su"
+  - ".by"
+
+# ---------------------------------------------------------------------------
+# Vendor-specific entries
+# ---------------------------------------------------------------------------
+vendors:
+
+  - name: Yandex
+    reason: Russian state-aligned technology company; all Yandex products
+    gradle_groups:
+      - "com.yandex"
+      - "ru.yandex"
+    gradle_plugins:
+      - "com.yandex"
+      - "ru.yandex"
+    action_orgs:
+      - "yandex"
+    domains:
+      - "yandex.com"
+      - "yandex.ru"
+      - "cdn.yandex.net"
+
+  - name: VK (VKontakte)
+    reason: Russian social network; VK Group companies
+    gradle_groups:
+      - "com.vk"
+      - "ru.vk"
+    gradle_plugins:
+      - "com.vk"
+    action_orgs:
+      - "VKCOM"
+      - "vkcom"
+    domains:
+      - "vk.com"
+      - "vk.ru"
+
+  - name: Kaspersky Lab
+    reason: Russian cybersecurity company
+    gradle_groups:
+      - "com.kaspersky"
+      - "ru.kaspersky"
+    gradle_plugins:
+      - "com.kaspersky"
+    action_orgs: []
+    domains:
+      - "kaspersky.com"
+      - "kaspersky.ru"
+
+  - name: PVS-Studio
+    reason: Russian static analysis tool (Svyatoslav Razmyslov / PVS-Studio LLC)
+    gradle_groups:
+      - "com.pvsstudio"
+    gradle_plugins:
+      - "com.pvsstudio.pvs-studio"
+      - "com.viva64.pvs-studio"
+    action_orgs: []
+    domains:
+      - "viva64.com"
+      - "pvsstudio.com"
+
+  - name: Dr.Web
+    reason: Russian antivirus / security company
+    gradle_groups:
+      - "com.drweb"
+      - "ru.drweb"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "drweb.com"
+      - "drweb.ru"
+      - "doctor-web.ru"
+
+  - name: Mail.ru / VK Group
+    reason: Part of VK Group (Russian); MyTracker analytics, etc.
+    gradle_groups:
+      - "com.mailru"
+      - "ru.mail"
+    gradle_plugins:
+      - "com.mailru"
+    action_orgs: []
+    domains:
+      - "mail.ru"
+      - "mytracker.ru"
+      - "mytracker.com"
+
+  - name: OK (Odnoklassniki)
+    reason: Russian social network; owned by VK Group
+    gradle_groups:
+      - "ru.ok"
+      - "com.ok.android"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "ok.ru"
+      - "odnoklassniki.ru"
+
+  - name: Telegram
+    reason: Founded by Russian nationals; on the boycott list
+    gradle_groups:
+      - "org.telegram"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "telegram.org"
+      - "core.telegram.org"
+      - "api.telegram.org"
+
+  - name: ABBYY
+    reason: Russian OCR / document processing company
+    gradle_groups:
+      - "com.abbyy"
+    gradle_plugins:
+      - "com.abbyy"
+    action_orgs:
+      - "abbyy"
+    domains:
+      - "abbyy.com"
+
+  - name: JivoSite
+    reason: Russian live-chat software
+    gradle_groups:
+      - "com.jivosite"
+    gradle_plugins: []
+    action_orgs:
+      - "JivoSite"
+    domains:
+      - "jivosite.com"
+
+  - name: Waves
+    reason: Russian crypto/blockchain company
+    gradle_groups:
+      - "com.wavesplatform"
+      - "com.wavesplatform.sdk"
+    gradle_plugins: []
+    action_orgs:
+      - "wavesplatform"
+    domains:
+      - "wavesplatform.com"
+      - "waves.exchange"
+
+  - name: QIWI
+    reason: Russian payment system
+    gradle_groups:
+      - "com.qiwi"
+    gradle_plugins: []
+    action_orgs:
+      - "qiwi"
+    domains:
+      - "qiwi.com"
+
+  - name: Elcomsoft
+    reason: Russian cybersecurity / forensics company
+    gradle_groups:
+      - "com.elcomsoft"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "elcomsoft.com"
+
+  - name: FaceApp
+    reason: Russian AI photo-editing app (Wireless Lab)
+    gradle_groups:
+      - "io.faceapp"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "faceapp.com"
+
+  - name: Voximplant
+    reason: Russian cloud communications platform
+    gradle_groups:
+      - "com.voximplant"
+    gradle_plugins: []
+    action_orgs:
+      - "voximplant"
+    domains:
+      - "voximplant.com"
+
+  - name: Semrush
+    reason: Russian-founded digital marketing company
+    gradle_groups:
+      - "com.semrush"
+    gradle_plugins: []
+    action_orgs:
+      - "semrush"
+    domains:
+      - "semrush.com"
+
+  - name: Bitrix24 / 1C-Bitrix
+    reason: Russian project management / CRM; subsidiary of 1C Company
+    gradle_groups:
+      - "com.bitrix24"
+      - "ru.bitrix"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "bitrix24.com"
+      - "bitrix.ru"
+
+  - name: AmoCRM
+    reason: Russian CRM platform
+    gradle_groups:
+      - "com.amocrm"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "amocrm.com"
+      - "amocrm.ru"
+
+  - name: Tilda
+    reason: Russian website builder
+    gradle_groups:
+      - "com.tildapublishing"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "tilda.cc"
+
+  - name: iSpring
+    reason: Russian e-learning software (iSpring Solutions)
+    gradle_groups:
+      - "com.ispringsolutions"
+    gradle_plugins: []
+    action_orgs:
+      - "ispring"
+    domains:
+      - "ispringsolutions.com"
+
+  - name: Joom
+    reason: Russian e-commerce marketplace
+    gradle_groups:
+      - "com.joom"
+    gradle_plugins: []
+    action_orgs:
+      - "joom"
+    domains:
+      - "joom.com"
+
+  - name: LightShot
+    reason: Russian screenshot tool (Skillbrains / developers based in Russia)
+    gradle_groups: []
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "app.prntscr.com"
+      - "prntscr.com"
+
+  - name: Readymag
+    reason: Russian web design tool
+    gradle_groups: []
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "readymag.com"
+
+  - name: Maps.me
+    reason: Russian-linked offline maps (formerly owned by Mail.ru)
+    gradle_groups:
+      - "com.mapsme"
+      - "app.organicmaps"
+    gradle_plugins: []
+    action_orgs: []
+    domains:
+      - "maps.me"

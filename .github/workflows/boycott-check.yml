@@ -1,0 +1,29 @@
+name: Boycott Check
+
+on:
+  pull_request:
+
+# Cancel an in-progress run for the same PR when a new commit is pushed
+concurrency:
+  group: boycott-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  boycott-check:
+    name: Check dependencies against boycott list
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚚 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 📦 Install PyYAML
+        run: pip install --quiet pyyaml
+
+      - name: 🔍 Scan for blocked dependencies and actions
+        run: python .github/scripts/boycott_check.py --repo-root "$GITHUB_WORKSPACE"
