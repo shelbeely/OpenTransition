@@ -16,6 +16,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.navigation.fragment.findNavController
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.AnalyticsUtil
@@ -31,9 +33,14 @@ import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.launch
 
 class LockFragment : Fragment(R.layout.lock) {
     private val viewDisposables: CompositeDisposable = CompositeDisposable()
+
+    // Guard against the biometric prompt being auto-shown more than once per view
+    // lifecycle (e.g. when the system biometric overlay causes onStop/onStart cycles).
+    private var biometricPromptShown = false
 
     //Blocking the back button from popping the lock
     private val onBackPressedCallback = object : OnBackPressedCallback(enabled = true) {
@@ -49,14 +56,22 @@ class LockFragment : Fragment(R.layout.lock) {
 
     override fun onStart() {
         super.onStart()
+        // Clear previous subscriptions first so that onStop/onStart cycles (which can be
+        // triggered by the system biometric overlay on some devices) don't accumulate
+        // duplicate event handlers.
+        viewDisposables.clear()
         val view = view as? LockView ?: throw AssertionError("View must be LockView")
 
         AnalyticsUtil.logEvent(Event.LockControllerShown(SettingsManager.getLockType()))
 
         // Handle biometric authentication
         if (SettingsManager.getLockType() == LockType.biometric) {
-            // Automatically show biometric prompt when screen is shown
-            showBiometricPrompt(view)
+            // Only auto-show the biometric prompt once per view lifecycle to avoid
+            // creating overlapping BiometricPrompt instances across onStop/onStart cycles.
+            if (!biometricPromptShown) {
+                biometricPromptShown = true
+                showBiometricPrompt(view)
+            }
             
             viewDisposables += view.events
                 .ofType<LockUiEvent.UseBiometric>()
@@ -115,6 +130,7 @@ class LockFragment : Fragment(R.layout.lock) {
     }
 
     override fun onDestroyView() {
+        biometricPromptShown = false
         viewDisposables.clear()
         super.onDestroyView()
     }
@@ -143,12 +159,19 @@ class LockFragment : Fragment(R.layout.lock) {
         BiometricPromptHelper.showBiometricPrompt(
             fragment = this,
             onSuccess = {
-                // Defer navigation to the next Looper message so the BiometricX library can
-                // finish removing its internal BiometricFragment before we pop the back stack.
-                // Calling popBackStack() synchronously inside onAuthenticationSucceeded races
-                // against that cleanup and causes an IllegalStateException crash.
-                view.post {
-                    if (isAdded) {
+                // Navigate using a lifecycle-aware coroutine so the navigation is deferred
+                // until the fragment is in a stable STARTED state.
+                //
+                // The previous view.post{} approach was insufficient: the system biometric
+                // overlay can pause the host activity, causing onSaveInstanceState() to be
+                // called before the callback fires.  In that state FragmentManager.isStateSaved
+                // is true and Navigation 2.8.x silently ignores popBackStack(), leaving the
+                // user permanently stuck on the lock screen.
+                //
+                // lifecycle.withStarted{} suspends until the lifecycle is at least STARTED,
+                // at which point the fragment manager is always writable.
+                viewLifecycleOwner.lifecycleScope.launch {
+                    viewLifecycleOwner.lifecycle.withStarted {
                         findNavController().popBackStack()
                         activity?.let { SettingsManager.resetIncorrectPasswordCount(it) }
                     }
