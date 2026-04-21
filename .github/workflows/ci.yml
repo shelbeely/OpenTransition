@@ -7,6 +7,8 @@ on:
   push:
     branches: [ "production" ]
   pull_request:
+    branches-ignore:
+      - 'copilot/**'
 
 concurrency:
   group: build-android-${{ github.ref }}
@@ -21,38 +23,11 @@ jobs:
     - name: 🚚 Checkout PR
       uses: actions/checkout@v4
 
-    - name: ☕️ Set up JDK 11
-      uses: actions/setup-java@v4
+    - name: 🤖 Android setup
+      uses: ./.github/actions/android-setup
       with:
-        java-version: '17'
-        distribution: 'liberica'
-        cache: gradle
-
-    - name: 🤖 Set up Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: 📝 Generate local.properties
-      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-
-    - name: 📲 Install Android CLI
-      run: |
-        curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/android -o android
-        chmod +x android
-        sudo mv android /usr/local/bin/android
-
-    - name: 🚀 Init Android CLI
-      run: android init
-
-    - name: 🙌 Copy secrets file
-      run: cp ./secrets.properties.example ./secrets.properties
-
-    - name: 📑 Create Google Services file
-      env:
-        GOOGLE_SERVICES_JSON_64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
-      run: echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./mobile/google-services.json
-
-    - name: 📝 Grant execute permission for gradlew
-      run: chmod +x gradlew
+        secrets-properties-b64: ''
+        google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
 
     - name: 👷‍♀️ Build with Gradle
       run: ./gradlew build
@@ -85,40 +60,11 @@ jobs:
     - name: 🚚 Checkout PR
       uses: actions/checkout@v4
 
-    - name: ☕️ Set up JDK 11
-      uses: actions/setup-java@v4
+    - name: 🤖 Android setup
+      uses: ./.github/actions/android-setup
       with:
-        java-version: '17'
-        distribution: 'liberica'
-        cache: gradle
-
-    - name: 🤖 Set up Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: 📝 Generate local.properties
-      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-
-    - name: 📲 Install Android CLI
-      run: |
-        curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/android -o android
-        chmod +x android
-        sudo mv android /usr/local/bin/android
-
-    - name: 🚀 Init Android CLI
-      run: android init
-
-    - name: 🙌 Copy secrets file
-      env:
-        SECRETS_PROPERTIES_64: ${{ secrets.SECRETS_PROPERTIES_64 }}
-      run: echo $SECRETS_PROPERTIES_64 | base64 -di > ./secrets.properties
-
-    - name: 📑 Create Google Services file
-      env:
-        GOOGLE_SERVICES_JSON_64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
-      run: echo $GOOGLE_SERVICES_JSON_64 | base64 -di > ./mobile/google-services.json
-
-    - name: 📝 Grant execute permission for gradlew
-      run: chmod +x gradlew
+        secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_64 }}
+        google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
 
     - name: 📑 Create keystore file
       env:
