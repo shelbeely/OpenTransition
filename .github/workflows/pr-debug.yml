@@ -2,6 +2,8 @@ name: PR Debug Build
 
 on:
   pull_request:
+    branches-ignore:
+      - 'copilot/**'
 
 jobs:
   debug:
@@ -11,42 +13,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      - name: Android setup
+        uses: ./.github/actions/android-setup
         with:
-          distribution: temurin
-          java-version: 17
-
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android CLI
-        run: |
-          curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/android -o android
-          chmod +x android
-          sudo mv android /usr/local/bin/android
-
-      - name: Init Android CLI
-        run: android init
-
-      - name: Generate local.properties
-        run: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-
-      - name: Prepare secrets.properties
-        env:
-          SECRETS_PROPERTIES_B64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
-        run: |
-          bash .github/ci-scripts/prepare-secrets.sh
-
-      - name: Prepare google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          bash .github/ci-scripts/prepare-google-services.sh
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
+          secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
+          google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
       - name: Build Debug APK
         run: ./gradlew --stacktrace :mobile:assembleDebug
@@ -62,21 +33,15 @@ jobs:
 
       - name: 🚀 Start Android Emulator
         run: |
-          android emulator start medium_phone &
-          adb wait-for-device
-          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
-          echo "Emulator booted successfully"
+          android emulator start medium_phone
+          android emulator wait medium_phone
 
       - name: 🧪 Run Instrumented Tests
         run: ./gradlew --stacktrace :mobile:connectedDebugAndroidTest
 
       - name: 🛑 Stop Android Emulator
         if: always()
-        run: |
-          SERIAL=$(adb devices | grep emulator | awk '{print $1}' | head -1)
-          if [ -n "$SERIAL" ]; then
-            android emulator stop "$SERIAL"
-          fi
+        run: android emulator stop medium_phone
 
       - name: 📊 Upload Instrumented Test Results
         if: always()

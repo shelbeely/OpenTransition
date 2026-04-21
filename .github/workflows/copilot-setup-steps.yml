@@ -23,18 +23,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # JDK 17 is required by AGP 8+ and matches the rest of the CI pipeline.
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
+      # Common Android build environment: JDK 17, SDK, CLI (cached), secrets, etc.
+      - name: Android setup
+        uses: ./.github/actions/android-setup
         with:
-          distribution: temurin
-          java-version: 17
-          cache: gradle
-
-      # Install Android SDK command-line tools so the agent can run avdmanager,
-      # sdkmanager, etc. without guesswork.
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+          secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
+          google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
       # KVM acceleration is required for the Android emulator to run at usable
       # speed on GitHub-hosted ubuntu runners.
@@ -44,94 +38,30 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # libpulse0 is required by the QEMU binary bundled with the Android
-      # emulator. Without it the emulator process dies immediately on startup
-      # with "error while loading shared libraries: libpulse.so.0".
-      # libxcb-cursor0 is required by Qt ≥6.5 to load the xcb platform plugin.
-      # Xvfb provides a virtual framebuffer so the emulator can initialise its
-      # Qt window even in a headless CI environment.
+      # libpulse0: required by the QEMU binary (emulator dies without it).
+      # libxcb-cursor0: required by Qt ≥6.5 xcb platform plugin.
+      # Xvfb: virtual framebuffer for headless emulator initialisation.
       - name: Install emulator system dependencies
-        run: sudo apt-get install -y libpulse0 libxcb-cursor0 xvfb
+        run: sudo apt-get update && sudo apt-get install -y libpulse0 libxcb-cursor0 xvfb
 
-      # Android CLI is a single binary that gives agents a clean interface for
-      # SDK management, project creation, and emulator control.
-      # Download URL: https://developer.android.com/tools/agents/android-cli/archive
-      - name: Install Android CLI
-        run: |
-          curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/android -o android
-          chmod +x android
-          sudo mv android /usr/local/bin/android
+      # Cache the emulator system image and AVD so the large image download is
+      # skipped on warm runs (~3–5 min saved per session).
+      - name: Cache Android emulator system image and AVD
+        id: cache-emulator
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.ANDROID_SDK_ROOT }}/system-images
+            ~/.android/avd/medium_phone.avd
+            ~/.android/avd/medium_phone.ini
+          key: emulator-medium_phone-${{ runner.os }}-v1
 
-      # Installs the android-cli skill into the agent context so Copilot
-      # understands all available CLI commands and their best practices.
-      - name: Init Android CLI for agent
-        run: android init
-
-      # Create a default medium_phone virtual device that the agent can deploy
-      # to and interact with during the session.
+      # Create the AVD only when the cache doesn't already have it.
       - name: Create Android emulator
+        if: steps.cache-emulator.outputs.cache-hit != 'true'
         run: android emulator create --profile=medium_phone
-
-      # Gradle requires local.properties to locate the Android SDK.
-      - name: Generate local.properties
-        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
-
-      # Stub secrets so the build can run without real credentials.
-      # Real secrets are injected from the `copilot` environment when available.
-      - name: Prepare secrets.properties
-        env:
-          SECRETS_PROPERTIES_B64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
-        run: bash .github/ci-scripts/prepare-secrets.sh
-
-      # Stub google-services.json with safe dummy values so Firebase plugins
-      # don't fail the configuration phase.
-      - name: Prepare google-services.json
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-        run: |
-          if [ -z "${GOOGLE_SERVICES_JSON:-}" ]; then
-            echo "Creating dummy google-services.json for agent environment"
-            mkdir -p mobile
-            cat > mobile/google-services.json << 'EOF'
-          {
-            "project_info": {
-              "project_number": "123456789",
-              "firebase_url": "https://test.firebaseio.com",
-              "project_id": "test-project",
-              "storage_bucket": "test-project.appspot.com"
-            },
-            "client": [
-              {
-                "client_info": {
-                  "mobilesdk_app_id": "1:123456789:android:abc123",
-                  "android_client_info": {
-                    "package_name": "com.shelbeely.opentransition"
-                  }
-                },
-                "oauth_client": [],
-                "api_key": [
-                  {
-                    "current_key": "AIzaSyDummy-Key-For-Build-Purposes"
-                  }
-                ],
-                "services": {
-                  "appinvite_service": {
-                    "other_platform_oauth_client": []
-                  }
-                }
-              }
-            ],
-            "configuration_version": "1"
-          }
-          EOF
-          else
-            bash .github/ci-scripts/prepare-google-services.sh
-          fi
-
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
 
       # Pre-warm the Gradle dependency cache so the agent's first real build
       # resolves no dependencies from the network.
       - name: Pre-warm Gradle dependency cache
-        run: ./gradlew :mobile:assembleDebug --dry-run
+        run: ./gradlew :mobile:dependencies --quiet

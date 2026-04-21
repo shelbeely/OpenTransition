@@ -1,0 +1,119 @@
+name: 'Android Setup'
+description: >
+  Sets up the common Android build environment: JDK 17 (temurin), Android SDK,
+  Android CLI (cached), local.properties, secrets.properties, google-services.json,
+  and gradlew execute permission.
+
+inputs:
+  secrets-properties-b64:
+    description: >
+      Base64-encoded secrets.properties content.
+      If empty, secrets.properties.example is used as a safe fallback.
+    required: false
+    default: ''
+  google-services-json-b64:
+    description: >
+      Base64-encoded google-services.json content.
+      If empty, a safe dummy file is written so Firebase plugins don't fail.
+    required: false
+    default: ''
+
+runs:
+  using: composite
+  steps:
+    # JDK 17 is required by AGP 8+. `cache: gradle` saves ~/.gradle between runs.
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: 17
+        cache: gradle
+
+    # Install Android SDK command-line tools (sdkmanager, avdmanager, etc.).
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+    # Cache the CLI binary so the curl download is skipped on warm runs.
+    - name: Cache Android CLI binary
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/android-cli
+        key: android-cli-linux-latest
+
+    # Download the CLI only when the cache misses; always symlink to /usr/local/bin.
+    - name: Install Android CLI
+      shell: bash
+      run: |
+        if [ ! -f ~/.cache/android-cli/android ]; then
+          mkdir -p ~/.cache/android-cli
+          curl -fsSL https://dl.google.com/android/cli/latest/linux_x86_64/android \
+            -o ~/.cache/android-cli/android
+          chmod +x ~/.cache/android-cli/android
+        fi
+        sudo ln -sf ~/.cache/android-cli/android /usr/local/bin/android
+
+    # Init registers CLI skills so Copilot understands all available commands.
+    - name: Init Android CLI
+      shell: bash
+      run: android init
+
+    # Gradle requires local.properties to locate the Android SDK root.
+    - name: Generate local.properties
+      shell: bash
+      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+    # prepare-secrets.sh falls back to secrets.properties.example when the input is empty.
+    - name: Prepare secrets.properties
+      shell: bash
+      env:
+        SECRETS_PROPERTIES_B64: ${{ inputs.secrets-properties-b64 }}
+      run: bash .github/ci-scripts/prepare-secrets.sh
+
+    # Write the supplied google-services.json, or a safe dummy when none is provided.
+    - name: Prepare google-services.json
+      shell: bash
+      env:
+        GOOGLE_SERVICES_JSON: ${{ inputs.google-services-json-b64 }}
+      run: |
+        if [ -z "${GOOGLE_SERVICES_JSON:-}" ]; then
+          echo "Writing dummy google-services.json for build"
+          mkdir -p mobile
+          cat > mobile/google-services.json << 'EOF'
+        {
+          "project_info": {
+            "project_number": "123456789",
+            "firebase_url": "https://test.firebaseio.com",
+            "project_id": "test-project",
+            "storage_bucket": "test-project.appspot.com"
+          },
+          "client": [
+            {
+              "client_info": {
+                "mobilesdk_app_id": "1:123456789:android:abc123",
+                "android_client_info": {
+                  "package_name": "com.shelbeely.opentransition"
+                }
+              },
+              "oauth_client": [],
+              "api_key": [
+                {
+                  "current_key": "AIzaSyDummy-Key-For-Build-Purposes"
+                }
+              ],
+              "services": {
+                "appinvite_service": {
+                  "other_platform_oauth_client": []
+                }
+              }
+            }
+          ],
+          "configuration_version": "1"
+        }
+        EOF
+        else
+          bash .github/ci-scripts/prepare-google-services.sh
+        fi
+
+    - name: Make Gradle wrapper executable
+      shell: bash
+      run: chmod +x ./gradlew
