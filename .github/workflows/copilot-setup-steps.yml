@@ -61,7 +61,22 @@ jobs:
         if: steps.cache-emulator.outputs.cache-hit != 'true'
         run: android emulator create --profile=medium_phone
 
-      # Pre-warm the Gradle dependency cache so the agent's first real build
-      # resolves no dependencies from the network.
-      - name: Pre-warm Gradle dependency cache
-        run: ./gradlew :mobile:dependencies --quiet
+      # Cache project build outputs so warm setup runs skip recompilation.
+      # Key hashes all Kotlin/Java source files and build scripts so the cache
+      # is invalidated whenever sources change.
+      - name: Cache project build outputs
+        uses: actions/cache@v4
+        with:
+          path: |
+            mobile/build
+            shared/build
+            wear/build
+            .gradle/configuration-cache
+          key: build-outputs-debug-${{ runner.os }}-${{ hashFiles('**/*.kt', '**/*.java', '**/build.gradle', 'gradle.properties', 'settings.gradle') }}
+          restore-keys: |
+            build-outputs-debug-${{ runner.os }}-
+
+      # Pre-build the debug APK so the agent's first build is already compiled.
+      # Subsequent agent builds will be fast incremental or no-op rebuilds.
+      - name: Pre-build debug APK
+        run: ./gradlew :mobile:assembleDebug --build-cache --quiet
