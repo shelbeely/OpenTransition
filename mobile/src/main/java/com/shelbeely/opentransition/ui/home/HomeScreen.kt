@@ -10,7 +10,7 @@
 
 package com.shelbeely.opentransition.ui.home
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -126,7 +127,7 @@ fun HomeScreen(
                 modifier = Modifier.alpha(if (loaded?.showPreviousRecord == true) 1f else 0f)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.previous),
+                    painter = painterResource(R.drawable.ic_chevron_left_white_64dp),
                     contentDescription = stringResource(R.string.previous_record),
                     tint = Color.Unspecified
                 )
@@ -145,7 +146,7 @@ fun HomeScreen(
                 modifier = Modifier.alpha(if (loaded?.showNextRecord == true) 1f else 0f)
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.next),
+                    painter = painterResource(R.drawable.ic_chevron_right_white_64dp),
                     contentDescription = stringResource(R.string.next_record),
                     tint = Color.Unspecified
                 )
@@ -153,13 +154,16 @@ fun HomeScreen(
         }
 
         // Divider
-        Image(
-            painter = painterResource(R.drawable.fading_line),
-            contentDescription = null,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
                 .padding(horizontal = 24.dp)
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(Color.Transparent, Color.White, Color.Transparent)
+                    )
+                )
         )
 
         // Date summary + Milestones button
@@ -190,13 +194,16 @@ fun HomeScreen(
         }
 
         // Divider
-        Image(
-            painter = painterResource(R.drawable.fading_line),
-            contentDescription = null,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(2.dp)
                 .padding(horizontal = 24.dp)
+                .background(
+                    Brush.horizontalGradient(
+                        listOf(Color.Transparent, Color.White, Color.Transparent)
+                    )
+                )
         )
 
         // Face gallery section

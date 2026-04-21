@@ -37,7 +37,7 @@ fun HomeGalleryAddItem(
         contentAlignment = Alignment.Center
     ) {
         Icon(
-            painter = painterResource(R.drawable.add),
+            painter = painterResource(R.drawable.ic_add_circle_white_48dp),
             contentDescription = null,
             tint = Color.Unspecified
         )
