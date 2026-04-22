@@ -252,6 +252,27 @@ If not found: Disable buttons, show "Disconnected"
 - No editing features (too complex for watch UI)
 - Read-mostly interface (write operations on phone)
 
+## Known Gaps (Not Yet Implemented)
+
+The following features are described in this document or in `ARCHITECTURE.md` but are
+**not yet implemented** in the current codebase:
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Wearable capability registration | ❌ Not implemented | `wear.xml` files now added; apps will advertise capabilities on next release |
+| Milestone sync (phone → watch) | ❌ Not implemented | `handleSyncRequest()` is a log stub; the Wear UI always shows 0 milestones |
+| `WearableListenerService` handlers | ❌ Empty bodies | `handleMilestoneSync`, `handleSettingsSync`, `handleMilestoneUpdate` are stubs |
+| Watch Tiles / Complications | ❌ Not implemented | Planned for a future release |
+| Ambient mode support | ❌ Not implemented | Standard Wear OS requirement for non-interactive display |
+| Rotary input support | ❌ Not implemented | Wear OS UX guideline for scroll/navigate |
+
+**What this means for users today:**
+- The watch will always show "Phone Disconnected" until capability registration is deployed.
+- "Sync Now" sends a request to the phone but the phone does not respond with data.
+- Milestone count on the watch is always 0.
+
+These gaps are tracked in the project's audit backlog (ISSUE-001, ISSUE-003, ISSUE-007).
+
 ## Summary
 
 The Wear OS companion app is designed to be a **quick-access remote control** for your OpenTransition journey:

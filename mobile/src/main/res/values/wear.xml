@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Declares the Wearable capability advertised by the mobile app.
+         The wear app queries for this string to confirm the phone companion is installed. -->
+    <string-array name="android_wear_capabilities">
+        <item>opentransition_mobile_app</item>
+    </string-array>
+</resources>

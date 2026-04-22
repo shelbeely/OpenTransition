@@ -160,7 +160,15 @@ class MobileWearableListenerService : WearableListenerService() {
                     audioDir.mkdirs()
                 }
                 
-                val audioFile = File(audioDir, filename)
+                // Canonicalize the path to prevent path-traversal attacks: reject any filename
+                // that resolves outside the designated audio directory.
+                val resolvedFile = File(audioDir, filename).canonicalFile
+                if (!resolvedFile.canonicalPath.startsWith(audioDir.canonicalPath + File.separator)) {
+                    Log.w(TAG, "Rejected audio filename with path traversal: $filename")
+                    return
+                }
+                
+                val audioFile = resolvedFile
                 FileOutputStream(audioFile).use { fos ->
                     fos.write(audioBytes)
                 }

@@ -303,3 +303,15 @@ implementation project(':shared')
 - [Wearable Data Layer API Guide](https://developer.android.com/training/wearables/data/data-layer)
 - [Wear OS Development](https://developer.android.com/training/wearables)
 - [Google Play Services](https://developers.google.com/android/guides/overview)
+
+## Known Gaps
+
+The following items are described in this document but are **not yet fully implemented**.
+New contributors should be aware of these gaps to avoid debugging the wrong layer.
+
+| Item | Description | Tracking |
+|------|-------------|---------|
+| Capability registration | `ARCHITECTURE.md §3` documents `opentransition_mobile_app` / `opentransition_wear_app` capabilities being registered. `wear.xml` files have now been added to both modules, but end-to-end capability detection has not been validated at runtime yet. | ISSUE-001 |
+| Milestone sync (mobile → wear) | `MobileWearableListenerService.handleSyncRequest()` is a `Log.d` stub. The watch always shows 0 milestones. | ISSUE-003 |
+| Wear `WearableListenerService` handlers | `handleMilestoneSync`, `handleSettingsSync`, and `handleMilestoneUpdate` are empty method bodies. Data sent from the phone is silently dropped unless the watch `MainActivity` is in the foreground. | ISSUE-007 |
+| Database encryption | Settings toggle is disabled while the Realm → Room migration is in progress. The Room + SQLCipher infrastructure exists but is not connected to the live data path. | ISSUE-004 |

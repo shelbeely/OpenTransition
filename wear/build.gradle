@@ -4,6 +4,19 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
+def major = 1
+def minor = 3
+
+def getVersionCode = { ->
+    def envBuildNumber = System.getenv("BUILD_NUMBER")?.toInteger() ?: 0
+    def baseBuildNumber = 25
+    return baseBuildNumber + (major * 100) + minor + envBuildNumber
+}
+
+def getVersionName = { ->
+    return "$major.$minor.${getVersionCode()}"
+}
+
 android {
     compileSdk 36
     
@@ -11,8 +24,8 @@ android {
         applicationId "com.shelbeely.opentransition.wear"
         minSdk 30  // Wear OS 3.0 minimum
         targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        versionCode getVersionCode()
+        versionName getVersionName()
     }
 
     signingConfigs {
@@ -25,10 +38,10 @@ android {
         }
         release {
             def releaseKey = file("${rootDir.getAbsolutePath()}/keys/release-keystore.jks")
-            storeFile = releaseKey.exists() ? releaseKey : debugKey
-            storePassword = System.getenv("STORE_PASS") ?: "debugkey"
-            keyAlias = System.getenv("KEY_ALIAS") ?: "transtracks"
-            keyPassword = System.getenv("KEY_PASS") ?: "debugkey"
+            storeFile = releaseKey.exists() ? releaseKey : null
+            storePassword = System.getenv("STORE_PASS")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASS")
         }
     }
 
@@ -90,4 +103,26 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.5.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+gradle.taskGraph.whenReady { graph ->
+    def isReleaseBuild = graph.hasTask(":wear:bundleRelease") || graph.hasTask(":wear:assembleRelease")
+    if (isReleaseBuild) {
+        def releaseKey = file("${rootDir.getAbsolutePath()}/keys/release-keystore.jks")
+        if (!releaseKey.exists()) {
+            throw new GradleException(
+                "Release keystore not found at ${releaseKey.absolutePath}. " +
+                "Inject it via the KEYSTORE_64 CI secret."
+            )
+        }
+        if (!System.getenv("STORE_PASS")) {
+            throw new GradleException("STORE_PASS environment variable is required for release builds.")
+        }
+        if (!System.getenv("KEY_ALIAS")) {
+            throw new GradleException("KEY_ALIAS environment variable is required for release builds.")
+        }
+        if (!System.getenv("KEY_PASS")) {
+            throw new GradleException("KEY_PASS environment variable is required for release builds.")
+        }
+    }
 }

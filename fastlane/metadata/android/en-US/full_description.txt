@@ -1,0 +1,34 @@
+OpenTransition is a transition tracking app made specifically for transgender people. It helps you privately document your journey through photo tracking, milestone recording, and voice sample logging — all stored locally on your device.
+
+OpenTransition is the active successor to the original TransTracks app, which was retired from the Play Store in 2025. If you were a TransTracks user, OpenTransition can import your existing .ttbackup data files.
+
+FEATURES
+
+📸 Photo Tracking
+Organize your progress photos by type (face, body, custom). Browse and compare them over time in a clear gallery view. The built-in camera uses ML Kit face detection to help frame face photos consistently.
+
+🎯 Milestone Management
+Record and celebrate important moments in your journey — medical appointments, personal achievements, and anything else that matters to you.
+
+🎙️ Voice Recording
+Log voice samples over time to track changes in your voice. Recordings are organized by date alongside your photos.
+
+🔒 Privacy First
+Everything stays on your device. App lock (PIN, pattern, or biometric) keeps your data private. The Quick Hide feature lets you instantly conceal the app when needed and prevents screenshots.
+
+⌚ Wear OS Companion (Coming Soon)
+An Android smartwatch companion app is included. Capability integration and milestone sync are in active development.
+
+💾 Import from TransTracks
+Fully compatible with .ttbackup backup files from the original TransTracks app. Import all your photos, milestones, and audio recordings with no data loss.
+
+🎨 Customizable Themes
+Multiple color themes including pink, blue, purple, and green, with Material You dynamic color support on Android 12+.
+
+PRIVACY & DATA SAFETY
+• All photos, milestones, and audio recordings are stored only on your device
+• Optional Firebase account sync for settings only (not photos or milestones)
+• No personal data is sold or shared with third parties
+• See our Privacy Policy for full details
+
+OpenTransition is free and open source (GPL v3). Contributions are welcome at github.com/shelbeely/OpenTransition.

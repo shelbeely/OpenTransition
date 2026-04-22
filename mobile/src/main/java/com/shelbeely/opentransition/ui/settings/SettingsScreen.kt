@@ -329,19 +329,22 @@ private fun SecuritySection(
 ) {
     SectionHeader(text = stringResource(R.string.security))
 
+    // Encrypted database and decoy vault are disabled while the database migration from Realm to
+    // Room is in progress. The toggle is shown as unavailable so users know the feature is planned.
     SwitchRow(
         label = stringResource(R.string.encrypted_database),
-        description = stringResource(R.string.encrypted_database_description),
-        checked = content.encryptedDatabaseEnabled,
-        onCheckedChange = { onToggleEncryptedDatabase() }
+        description = stringResource(R.string.encrypted_database_description_coming_soon),
+        checked = false,
+        enabled = false,
+        onCheckedChange = {}
     )
 
     SwitchRow(
         label = stringResource(R.string.decoy_vault),
         description = stringResource(R.string.decoy_vault_description),
-        checked = content.decoyVaultEnabled,
-        enabled = content.encryptedDatabaseEnabled,
-        onCheckedChange = { onToggleDecoyVault() }
+        checked = false,
+        enabled = false,
+        onCheckedChange = {}
     )
 
     Row(
@@ -352,7 +355,7 @@ private fun SecuritySection(
     ) {
         Button(
             onClick = onSetDecoyPasscode,
-            enabled = content.encryptedDatabaseEnabled && content.decoyVaultEnabled
+            enabled = false
         ) {
             Text(text = stringResource(R.string.set_decoy_passcode))
         }
