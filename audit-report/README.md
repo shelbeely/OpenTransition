@@ -1,12 +1,14 @@
 # OpenTransition Monorepo Audit Report
 
 **Audit date:** 2026-04-22
-**Commit SHA:** `dd22666efb42e7f3f2d7e83a9f57ab7c8123852e`
+**Commit SHA:** `dd22666efb42e7f3f2d7e83a9f57ab7c8123852e` (base) → `37d5e50…` (current branch tip)
 **Branch:** `copilot/audit-monorepo-analysis`
-**Scope:** Read-only audit of the entire monorepo (`:mobile`, `:wear`, `:shared`, build / CI / docs).
+**Scope:** Read-only audit of the entire monorepo (`:mobile`, `:wear`, `:shared`, build / CI / docs),
+plus runtime observation on a freshly booted emulator (per follow-up requirement).
 
 > ⚠️ **No production code was modified.** This audit is analysis only.
 > Every finding cites file paths and line ranges as evidence.
+> Runtime artifacts (screenshots, logcat excerpts) live under `runtime-artifacts/`.
 
 ---
 
@@ -31,15 +33,23 @@
 | 14 | [`14-dependencies-and-supply-chain.md`](14-dependencies-and-supply-chain.md) | Inventory, outdated, license, Renovate/Dependabot. |
 | 15 | [`15-release-and-distribution.md`](15-release-and-distribution.md) | Variants, signing, Play Store coupling, versioning. |
 | 16 | [`16-prioritized-action-plan.md`](16-prioritized-action-plan.md) | Ordered backlog (Now / Next / Later) tagged by platform. |
+| 17 | [`17-runtime-observations.md`](17-runtime-observations.md) | **Emulator-driven** runtime findings (cold-start jank, memory, hidden-API warnings, dual launcher icons). |
+
+`runtime-artifacts/` contains the captured screenshots and supporting evidence referenced from doc 17.
 
 ---
 
 ## Tools / approach
 
 - **Static, read-only inspection** of the repo at the SHA above using `view`, `grep`, `glob`, and `find`.
-- **No builds, no tests, no linters were executed** during this audit (consistent with the read-only mandate).
-  Where ratings depend on tool config (e.g. Detekt, ktlint), the configuration is inspected — not the report
-  output — and that limitation is noted.
+- **Live builds and lint were executed** in this audit (added per follow-up requirement):
+  - `./gradlew :mobile:assembleDebug` ✅ (74 MB APK)
+  - `./gradlew :wear:assembleDebug` ✅ (27 MB APK; could not be installed because no Wear AVD was available)
+  - `./gradlew :mobile:lintDebug` ✅ (`0 errors, 235 warnings, 1 hint`; key findings folded into docs 06, 09, 11)
+- **Live emulator run** on a headless KVM-accelerated `medium_phone` AVD: installed the debug APK,
+  exercised welcome → home → audio gallery, captured screenshots, `dumpsys meminfo`, `dumpsys procstats`,
+  and Choreographer skipped-frame logs. See `17-runtime-observations.md`.
+- No code, no tests, no other linters were modified or created during this audit.
 - **Severity emoji:** 🔴 Critical · 🟠 High · 🟡 Medium · 🟢 Low
 - **Platform tags:** `[MOBILE]` `[WEAR]` `[SHARED]` `[INTEGRATION]`
 - **Rating scale (1–10):** 10 exemplary · 8–9 solid · 6–7 functional w/ concerns · 4–5 needs work · 2–3 broken · 1 dangerous.
