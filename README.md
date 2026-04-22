@@ -58,10 +58,10 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 - 📸 **Face-Detection Camera** - CameraX-powered camera with ML Kit face detection for perfectly framed face photos
 - 🎯 **Milestone Management** - Record and celebrate important events
 - 🖼️ **Gallery View** - Browse and compare your progress photos
-- 🎙️ **Audio Tracking** - Record voice samples and track vocal changes with pitch/formant analysis
+- 🎙️ **Audio Tracking** - Record voice samples and track vocal changes (note: pitch/formant values are estimated averages, not a measurement of each individual recording — real DSP analysis is coming)
 - 🔒 **Privacy First** - App lock (PIN, pattern, or biometric), disguised mode, and local storage
-- 🔐 **Optional Encryption** - Encrypt your database with SQLCipher (optional)
-- 🎭 **Decoy Vault** - Create a separate vault with different passcode for added security
+- 🔐 **Optional Encryption** - SQLCipher database encryption is in development (the Settings toggle is disabled while the Realm → Room migration is in progress)
+- 🎭 **Decoy Vault** - Planned: a separate vault with different passcode for added security
 - 💾 **Data Control** - Export, backup, and sync on your terms
 - 🔄 **Import Backups** - Import `.ttbackup` data from the original TransTracks app
 - 🎨 **Customizable** - Multiple themes and personalization options
@@ -93,12 +93,12 @@ If you have already uninstalled TransTracks but used the same Google account, yo
 
 ### Technical Details
 
-OpenTransition uses **Room database** instead of the Realm database used by the original TransTracks. Backwards-compatible import utilities handle the conversion automatically:
+OpenTransition currently uses **Realm** as its primary database (inherited from TransTracks) and is in the process of migrating to **Room**. Import utilities handle `.ttbackup` files from TransTracks:
 
-- **Realm data models preserved** — used only for reading TransTracks backups
-- **Automatic conversion** from Realm to Room format during import
-- **No data loss** — all photos, milestones, and audio analyses are preserved
-- **One-time process** — after import, everything runs on the Room database
+- **Realm data models preserved** — used for reading TransTracks backups and as the current live database
+- **Room database** — being built in parallel; will become the primary store once migration is complete
+- **No data loss** — all photos, milestones, and audio analyses are preserved during import
+- **One-time process** — after import, data is available in the app
 
 All Realm-related code is marked with `BACKWARDS COMPATIBILITY` comments.
 

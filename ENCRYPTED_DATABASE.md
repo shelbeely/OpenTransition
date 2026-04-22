@@ -1,30 +1,38 @@
 # Encrypted Database Features
 
-OpenTransition now includes advanced security features for protecting sensitive data:
+> **⚠️ Status: Work In Progress**
+>
+> The database encryption feature is currently in development. While the infrastructure
+> (Room, SQLCipher, KeystoreManager) is implemented, the app's primary data store is still
+> **Realm** — the encryption toggle in Settings is disabled until the Realm → Room migration
+> is complete. See [ISSUE-004] in the audit report for the full context.
 
-## Features
+OpenTransition is building advanced security features for protecting sensitive data:
 
-### 1. **Encrypted Database (Room + SQLCipher)**
-- **Full database encryption at rest** using SQLCipher
-- All sensitive data (photos, milestones, audio analyses) are encrypted on disk
+## Planned Features
+
+### 1. **Encrypted Database (Room + SQLCipher)** *(in progress — not yet active)*
+- Full database encryption at rest using SQLCipher
+- All sensitive data (photos, milestones, audio analyses) will be encrypted on disk
 - Encryption keys stored securely in **Android Keystore**
 - Hardware-backed security when available
-- Zero plaintext data exposure
+- **Current state**: Room + SQLCipher infrastructure exists; the UI currently reads from
+  Realm. The Settings toggle is disabled while the migration is ongoing.
 
-### 2. **Decoy Vault (Two-Passcode Model)**
+### 2. **Decoy Vault (Two-Passcode Model)** *(planned)*
 - Create a separate, harmless vault accessible with a different passcode
 - **Passcode A**: Opens the decoy vault (empty or with generic content)
 - **Passcode B**: Opens the real vault with actual data
 - Powerful protection against coercion scenarios
 - Each vault has its own encrypted database
 
-### 3. **Quick Hide UX**
+### 3. **Quick Hide UX** *(active)*
 - Instantly hide app content when needed
 - Prevents screenshots and screen recording when enabled
 - Quick exit to home screen
 - Can be triggered manually or via gestures (extensible)
 
-### 4. **Enhanced Biometric Support**
+### 4. **Enhanced Biometric Support** *(active)*
 - Supports **fingerprint, face recognition, and iris scanning**
 - Uses Android's `BIOMETRIC_STRONG` authentication
 - Compatible with all modern biometric sensors
@@ -170,11 +178,11 @@ Encryption is **optional** - the Room database works fine without it.
 
 ## Security Considerations
 
-### What's Protected
-✅ Database files encrypted at rest  
+### What's Protected *(once migration is complete)*
+⏳ Database files encrypted at rest (Realm → Room migration in progress)  
 ✅ Encryption keys in hardware-backed keystore  
 ✅ Screenshot/screen recording prevention  
-✅ Decoy vault for coercion scenarios  
+⏳ Decoy vault for coercion scenarios (planned)  
 ✅ Biometric authentication
 
 ### What's NOT Protected

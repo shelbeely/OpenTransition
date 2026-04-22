@@ -16,11 +16,11 @@ jobs:
       - name: Android setup
         uses: ./.github/actions/android-setup
         with:
-          secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
-          google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_64 }}
+          google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON_64 }}
 
       - name: Build Debug APK
-        run: ./gradlew --stacktrace :mobile:assembleDebug
+        run: ./gradlew --stacktrace :mobile:assembleDebug :wear:assembleDebug
 
       - name: 🔧 Enable KVM for Android Emulator
         run: |

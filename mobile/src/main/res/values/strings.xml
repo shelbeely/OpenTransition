@@ -252,7 +252,7 @@
     <string name="permission_audio_required">Microphone permission is required to record audio</string>
     <string name="audio_record_error">Error recording audio</string>
     <string name="audio_analysis_error">Error analyzing audio</string>
-    <string name="audio_analysis_complete">Voice analysis complete</string>
+    <string name="audio_analysis_complete">Recording saved. Voice values shown are estimated averages, not a measurement of this recording.</string>
 
     <!-- Single Photo -->
     <string name="photo_details">Photo Details</string>
@@ -348,6 +348,7 @@
     <string name="decoy_vault">Decoy Vault</string>
     <string name="quick_hide">Quick Hide</string>
     <string name="encrypted_database_description">Encrypt all sensitive data at rest using SQLCipher</string>
+    <string name="encrypted_database_description_coming_soon">Database encryption is coming soon. Currently all data is stored using the standard Realm database.</string>
     <string name="decoy_vault_description">Create a separate vault that opens with a different passcode</string>
     <string name="quick_hide_description">Instantly hide app content when triggered</string>
     <string name="set_decoy_passcode">Set Decoy Passcode</string>

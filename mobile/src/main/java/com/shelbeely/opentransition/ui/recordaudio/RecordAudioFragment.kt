@@ -184,7 +184,7 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
             }
             realm.close()
             
-            Snackbar.make(requireView(), R.string.audio_analysis_complete, Snackbar.LENGTH_SHORT).show()
+            Snackbar.make(requireView(), R.string.audio_analysis_complete, Snackbar.LENGTH_LONG).show()
             findNavController().popBackStack()
         } catch (e: Exception) {
             e.printStackTrace()

@@ -1,0 +1,10 @@
+Initial release of OpenTransition — the active successor to TransTracks.
+
+• Photo tracking for face, body, and custom areas
+• Milestone management
+• Voice recording
+• Import from TransTracks .ttbackup files
+• Multiple color themes
+• App lock with PIN, pattern, and biometric support
+• Quick Hide for instant privacy
+• Wear OS companion app (capability sync in development)
