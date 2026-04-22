@@ -6,29 +6,29 @@ description: Orchestrates Android development tasks including project creation, 
 
 This skill provides instructions for using the `android` CLI tool. The tool includes various commands for creating projects, running applications, interacting with devices, and managing the CLI environment.
 
-## Sdk management
-You can manage the installation of Android SDKs and tools using the `sdk` command for example
+## SDK management
+To manage the installation of Android SDKs and tools, use the `sdk` command. For example:
 
-- `android sdk install <package>[@<version>]...`: Install specific packages. Multiple packages can be specified. `<version>` defaults to latest. e.g. `android sdk install "platforms;android-34"`
+- `android sdk install <package>[@<version>]...`: Install specific packages. Multiple packages can be specified, separated by spaces. `<version>` defaults to latest. For example: `android sdk install platforms/android-30@2 platforms/android-34`
 - `android sdk update [<pkg-name>]`: Update a specific package or all packages to the latest version.
 - `android sdk remove <pkg-name>`: Remove a package from the local SDK.
 - `android sdk list --all`: List installed and available SDK packages.
 
-##  Project creation
-You can create projects from templates using the `create` command.
+## Project creation
+Create projects from templates using the `create` command.
 
 For example: `android create empty-activity --name="My App" --output=./my-app`
 
 ## Interacting with devices
-For more information on interacting with running devices, see [here](interact.md)
+For more information on interacting with running devices, see [here](references/interact.md)
 
 ## Running journey tests
-For more information on running journeys, see [here](journeys.md)
+For more information on running journeys, see [here](references/journeys.md)
 
 ## Doc searching
 The `docs` command searches authoritative, high-quality Android developer documentation in the Android Knowledge Base.
 By providing a few keywords, this tool will return high quality articles that contain examples or guidance on how to use Android APIs or libraries.
-Use this tool to obtain additional information on how to achieve Android-specific tasks or to know more about Android APIs, surfaces, libraries or devices.
+Use this tool to obtain additional information on how to achieve Android-specific tasks or to know more about Android APIs, surfaces, libraries, or devices.
 
 Always use this tool to get the most up-to-date information about Android concepts. Typical good use cases are:
   - Finding migration guides for APIs.
@@ -37,24 +37,30 @@ Always use this tool to get the most up-to-date information about Android concep
   - Finding best practices for Android concepts.
 
 ## Running APKs
-Use the `run` command to run Android Application.
+Use the `run` command to run Android apps.
 
 ## Managing emulators
+
 Manage Android Virtual Devices (AVDs) using the `android emulator` command
 
 ## Capturing screenshots
-Capture an image of the current screen of a connected Android device and outputs it to a file using the `android screenshot` command.
+
+Capture an image of the current screen of a connected Android device and output it to a file using the `android screenshot` command.
 
 ## Managing skills
+
 Manage antigravity agent skills for Android using the `android skills` command.
 
 ## Inspecting UI Layouts
-Using the `android layout` command you can inspect the UI layout of an Android application. It returns the layout tree of an Android application in JSON format. When debugging UI errors, this is often a much faster approach than taking a screenshot.
+
+Use the `android layout` command to inspect the UI layout of an Android application. It returns the layout tree of an Android application in JSON format. When debugging UI errors, this is often a much faster approach than taking a screenshot.
 
 ## Updating the CLI
+
 Update the Android CLI using the `android update` command.
 
 # `android help` output
+
 Usage: android [-hV] [--sdk=PARAM] [COMMAND]
   -h, --help        Show this help message and exit.
       --sdk=PARAM   Path to the Android SDK
@@ -114,7 +120,8 @@ emulator
             -h, --help   Show this help message and exit.
           Commands:
             create  Creates a virtual device
-            start   Launches the specified virtual device
+            start   Launches the specified virtual device. This command will return when
+                      the emulator is fully started and ready to use.
             stop    Stops the specified virtual device
             list    Lists available virtual devices
             remove  Delete a virtual device
