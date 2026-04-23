@@ -1,8 +1,8 @@
 name: 'Android Setup'
 description: >
   Sets up the common Android build environment: JDK 17 (temurin), Android SDK,
-  Android CLI (cached), local.properties, secrets.properties, google-services.json,
-  and gradlew execute permission.
+  Android CLI (cached, optional), local.properties, secrets.properties,
+  google-services.json, and gradlew execute permission.
 
 inputs:
   secrets-properties-b64:
@@ -17,6 +17,18 @@ inputs:
       If empty, a safe dummy file is written so Firebase plugins don't fail.
     required: false
     default: ''
+  init-android-cli:
+    description: >
+      When 'true', downloads the custom Android CLI binary and runs `android init`.
+      Set to 'false' on the fast path to skip the download + init cost.
+    required: false
+    default: 'true'
+  cli-version:
+    description: >
+      Version tag used in the CLI binary cache key.
+      Bump this value to force a fresh download when the upstream binary changes.
+    required: false
+    default: 'v1'
 
 runs:
   using: composite
@@ -33,15 +45,22 @@ runs:
     - name: Set up Android SDK
       uses: android-actions/setup-android@v3
 
+    # ── Optional: custom Android CLI ──────────────────────────────────────────
+    # These steps are skipped when init-android-cli == 'false' (the default fast
+    # path in copilot-setup-steps.yml).  Enable via INIT_ANDROID_CLI variable.
+
     # Cache the CLI binary so the curl download is skipped on warm runs.
+    # Key is versioned via `cli-version` so cache invalidation is explicit.
     - name: Cache Android CLI binary
+      if: inputs.init-android-cli == 'true'
       uses: actions/cache@v4
       with:
         path: ~/.cache/android-cli
-        key: android-cli-linux-latest
+        key: android-cli-linux-${{ inputs.cli-version }}
 
     # Download the CLI only when the cache misses; always symlink to /usr/local/bin.
     - name: Install Android CLI
+      if: inputs.init-android-cli == 'true'
       shell: bash
       run: |
         if [ ! -f ~/.cache/android-cli/android ]; then
@@ -54,8 +73,11 @@ runs:
 
     # Init registers CLI skills so Copilot understands all available commands.
     - name: Init Android CLI
+      if: inputs.init-android-cli == 'true'
       shell: bash
       run: android init
+
+    # ── Always-on: build environment ──────────────────────────────────────────
 
     # Gradle requires local.properties to locate the Android SDK root.
     - name: Generate local.properties

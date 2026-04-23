@@ -19,20 +19,58 @@ jobs:
     permissions:
       contents: read
 
+    # ---------------------------------------------------------------------------
+    # Snapshot: after setup steps complete, Copilot captures the runner state so
+    # subsequent sessions can restore from it instead of re-running every step.
+    # Paths listed here are the heaviest parts of the environment to warm.
+    # ---------------------------------------------------------------------------
+    snapshot:
+      paths:
+        - ~/.gradle
+        - ~/.android
+        - ~/.cache/android-cli
+
+    # ---------------------------------------------------------------------------
+    # Fast-path vs optional heavy-path behaviour
+    #
+    # By default every session gets only the base Android build environment
+    # (JDK 17, SDK, secrets, local.properties) – startup is fast.
+    #
+    # To opt in to the heavy paths, set the corresponding variable to "true" in
+    # the repository's `copilot` Actions environment
+    # (Settings → Environments → copilot → Variables):
+    #
+    #   ENABLE_ANDROID_EMULATOR  – KVM, emulator system deps, AVD setup
+    #   PREWARM_GRADLE           – `./gradlew :mobile:dependencies` pre-warm
+    #   INIT_ANDROID_CLI         – custom Android CLI download + `android init`
+    # ---------------------------------------------------------------------------
+    env:
+      ENABLE_ANDROID_EMULATOR: ${{ vars.ENABLE_ANDROID_EMULATOR || 'false' }}
+      PREWARM_GRADLE: ${{ vars.PREWARM_GRADLE || 'false' }}
+      INIT_ANDROID_CLI: ${{ vars.INIT_ANDROID_CLI || 'false' }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # ── Fast path ─────────────────────────────────────────────────────────────
       # Common Android build environment: JDK 17, SDK, CLI (cached), secrets, etc.
+      # `init-android-cli` is forwarded so heavy CLI download/init is skipped
+      # unless INIT_ANDROID_CLI is explicitly enabled.
       - name: Android setup
         uses: ./.github/actions/android-setup
         with:
           secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
           google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          init-android-cli: ${{ env.INIT_ANDROID_CLI }}
+
+      # ── Optional: emulator path ───────────────────────────────────────────────
+      # All steps below are skipped unless ENABLE_ANDROID_EMULATOR == 'true'.
 
       # KVM acceleration is required for the Android emulator to run at usable
       # speed on GitHub-hosted ubuntu runners.
       - name: Enable KVM group perms
+        if: env.ENABLE_ANDROID_EMULATOR == 'true'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -42,12 +80,14 @@ jobs:
       # libxcb-cursor0: required by Qt ≥6.5 xcb platform plugin.
       # Xvfb: virtual framebuffer for headless emulator initialisation.
       - name: Install emulator system dependencies
+        if: env.ENABLE_ANDROID_EMULATOR == 'true'
         run: sudo apt-get update && sudo apt-get install -y libpulse0 libxcb-cursor0 xvfb
 
       # Cache the emulator system image and AVD so the large image download is
       # skipped on warm runs (~3–5 min saved per session).
       - name: Cache Android emulator system image and AVD
         id: cache-emulator
+        if: env.ENABLE_ANDROID_EMULATOR == 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -58,10 +98,12 @@ jobs:
 
       # Create the AVD only when the cache doesn't already have it.
       - name: Create Android emulator
-        if: steps.cache-emulator.outputs.cache-hit != 'true'
+        if: env.ENABLE_ANDROID_EMULATOR == 'true' && steps.cache-emulator.outputs.cache-hit != 'true'
         run: android emulator create --profile=medium_phone
 
-      # Pre-warm the Gradle dependency cache so the agent's first real build
-      # resolves no dependencies from the network.
+      # ── Optional: Gradle prewarm ──────────────────────────────────────────────
+      # Resolves all :mobile dependencies into ~/.gradle so the agent's first
+      # real build hits no network. Skipped by default (~2–4 min saved).
       - name: Pre-warm Gradle dependency cache
+        if: env.PREWARM_GRADLE == 'true'
         run: ./gradlew :mobile:dependencies --quiet
