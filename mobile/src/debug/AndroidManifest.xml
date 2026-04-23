@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright © 2025 OpenTransition. All rights reserved.
+  ~
+  ~ Debug-only manifest overlay. Suppresses LeakCanary's auto-installed
+  ~ launcher icon so debug builds do not show two app icons in the launcher.
+  ~ The leak-watcher background service still runs; only the launcher entry
+  ~ is removed.
+  ~ See audit-report/16-prioritized-action-plan.md item 10.
+  -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <activity-alias
+            android:name="leakcanary.internal.activity.LeakLauncherActivity"
+            tools:node="remove" />
+    </application>
+</manifest>
+

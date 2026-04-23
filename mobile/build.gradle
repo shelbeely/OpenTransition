@@ -16,17 +16,19 @@ plugins.withId("com.android.application") {
     android.buildTypes.debug.ext.enableCrashlytics = false
 }
 
-def major = 1
-def minor = 3
+def major = rootProject.ext.appMajor
+def minor = rootProject.ext.appMinor
 
-def getVersionCode = { ->
-    def envBuildNumber = System.getenv("BUILD_NUMBER")?.toInteger() ?: 0
-    def baseBuildNumber = 25
-    return baseBuildNumber + (major * 100) + minor + envBuildNumber
-}
+def getVersionCode = { -> rootProject.ext.getAppVersionCode() }
 
-def getVersionName = { ->
-    return "$major.$minor.${getVersionCode()}"
+def getVersionName = { -> rootProject.ext.getAppVersionName() }
+
+// Detect whether a release build task is on the requested task graph.
+// Used to fail-loud when the release keystore is missing instead of
+// silently signing a "release" artefact with the debug keystore.
+// See audit-report/15-release-and-distribution.md §3.
+def isReleaseBuildRequested = gradle.startParameter.taskNames.any {
+    it.contains('Release') || it.endsWith(':bundleRelease') || it.endsWith(':assembleRelease')
 }
 
 android {
@@ -39,6 +41,13 @@ android {
         versionCode getVersionCode()
         versionName getVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        // Export Room schemas so future migrations can be reasoned about.
+        // See audit-report/07-issues-and-bugs.md ISSUE-006.
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
+            arg("room.incremental", "true")
+        }
     }
 
     signingConfigs {
@@ -51,10 +60,32 @@ android {
         }
         release {
             def releaseKey = file("${rootDir.getAbsolutePath()}/keys/release-keystore.jks")
+            def storePass = System.getenv("STORE_PASS")
+            def alias = System.getenv("KEY_ALIAS")
+            def keyPass = System.getenv("KEY_PASS")
+
+            if (isReleaseBuildRequested) {
+                // Fail loudly so a misconfigured release build cannot silently
+                // produce a debug-signed AAB that looks legitimate.
+                if (!releaseKey.exists()) {
+                    throw new GradleException(
+                        "Release keystore missing at ${releaseKey.absolutePath}. " +
+                        "Provide keys/release-keystore.jks (CI injects it from KEYSTORE_64)."
+                    )
+                }
+                if (!storePass || !alias || !keyPass) {
+                    throw new GradleException(
+                        "Release signing requires STORE_PASS, KEY_ALIAS, and KEY_PASS env vars."
+                    )
+                }
+            }
+
+            // Fall back to debug values for non-release task graphs (e.g. Studio
+            // sync, lint, unit tests) so configuration does not fail there.
             storeFile = releaseKey.exists() ? releaseKey : debugKey
-            storePassword = System.getenv("STORE_PASS") ?: "debugkey"
-            keyAlias = System.getenv("KEY_ALIAS") ?: "transtracks"
-            keyPassword = System.getenv("KEY_PASS") ?: "debugkey"
+            storePassword = storePass ?: "debugkey"
+            keyAlias = alias ?: "transtracks"
+            keyPassword = keyPass ?: "debugkey"
         }
     }
 

@@ -31,7 +31,7 @@ import net.sqlcipher.database.SupportFactory
         AudioAnalysisEntity::class
     ],
     version = 1,
-    exportSchema = false
+    exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun milestoneDao(): MilestoneDao
@@ -86,9 +86,11 @@ abstract class AppDatabase : RoomDatabase() {
             }
             
             return builder
-                // TODO: Replace with proper migration strategy before production use
-                // Currently using fallbackToDestructiveMigration for initial development
-                .fallbackToDestructiveMigration()
+                // No migrations are required at version 1. Future schema bumps
+                // MUST add an explicit `Migration` here; the previous
+                // `fallbackToDestructiveMigration()` call would have silently
+                // wiped user data on any version bump.
+                // See audit-report/07-issues-and-bugs.md ISSUE-006.
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)

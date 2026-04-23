@@ -77,16 +77,24 @@ jobs:
         STORE_PASS: ${{ secrets.STORE_PASS }}
         KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         KEY_PASS: ${{ secrets.KEY_PASS }}
-      run: ./gradlew :mobile:bundleRelease
+      run: ./gradlew :mobile:bundleRelease :wear:bundleRelease
 
     - name: 🛜 Upload Android Release to Play Store
       uses: r0adkll/upload-google-play@v1.1.3
       with:
         serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-        packageName: com.drspaceboo.transtracks
+        packageName: com.shelbeely.opentransition
         releaseFiles: ${{ vars.RELEASE_BUNDLE_PATH }}
         track: alpha
         mappingFile: ${{ vars.RELEASE_MAPPING_PATH }}
+
+    - name: ⌚ Upload Wear Release to Play Store
+      uses: r0adkll/upload-google-play@v1.1.3
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+        packageName: com.shelbeely.opentransition.wear
+        releaseFiles: wear/build/outputs/bundle/release/wear-release.aab
+        track: alpha
 
     - name: 🔖 Tag release
       env:

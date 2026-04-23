@@ -1,12 +1,22 @@
 # Encrypted Database Features
 
-OpenTransition now includes advanced security features for protecting sensitive data:
+> **⚠️ Status: In development.** The end-to-end "Encrypt my database" flow is **not currently
+> shipped to users**. The user-facing toggle in Settings is hidden as of this release because the
+> Realm → Room migration is still in progress: enabling the toggle today would encrypt a Room
+> database that holds essentially nothing while the bulk of user-visible data (photos, milestones,
+> audio analyses) continues to live in the unencrypted Realm. Re-enabling this surface requires
+> finishing the migration described in `audit-report/07-issues-and-bugs.md` ISSUE-004.
+>
+> This document describes the **target architecture** once that migration is complete.
+
+OpenTransition includes the following advanced security features for protecting sensitive data:
 
 ## Features
 
-### 1. **Encrypted Database (Room + SQLCipher)**
-- **Full database encryption at rest** using SQLCipher
-- All sensitive data (photos, milestones, audio analyses) are encrypted on disk
+### 1. **Encrypted Database (Room + SQLCipher)** — *Not yet user-enabled*
+- **Target:** Full database encryption at rest using SQLCipher
+- All sensitive data (photos, milestones, audio analyses) will be encrypted on disk once the
+  Realm → Room migration is complete
 - Encryption keys stored securely in **Android Keystore**
 - Hardware-backed security when available
 - Zero plaintext data exposure
