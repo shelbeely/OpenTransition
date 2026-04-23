@@ -394,15 +394,30 @@ object SettingsManager {
     //endregion
     
     //region Encrypted Database Settings
-    fun isEncryptedDatabaseEnabled(): Boolean = PrefUtil.getBoolean(encryptedDatabaseEnabled, false)
-    
+    /**
+     * The user-facing "Encrypted Database" toggle is currently disabled because
+     * the migration from Realm to Room is incomplete: the SQLCipher-encrypted
+     * Room database holds essentially nothing while user-visible data still
+     * lives in the unencrypted Realm. Returning false unconditionally avoids
+     * making a misleading data-safety claim to the user (and to Google Play's
+     * Data Safety form).
+     *
+     * See audit-report/07-issues-and-bugs.md ISSUE-004 / ISSUE-013 and
+     * audit-report/10-security-review.md §8.
+     */
+    fun isEncryptedDatabaseEnabled(): Boolean = false
+
+    /**
+     * True iff the encrypted-database UI surface should be shown to the user.
+     * Today the feature is in development and the toggle is hidden everywhere
+     * to avoid making misleading encryption claims (see ISSUE-004).
+     */
+    fun isEncryptedDatabaseFeatureAvailable(): Boolean = false
+
     fun setEncryptedDatabaseEnabled(enabled: Boolean, context: Context?) {
-        PrefUtil.setBoolean(encryptedDatabaseEnabled, enabled)
-        userSettingsUpdatedRelay.accept(Unit)
-        
-        if (saveToFirebase()) {
-            FirebaseSettingUtil.setBool(encryptedDatabaseEnabled, enabled, context)
-        }
+        // No-op while the feature is under development. The persisted preference
+        // is intentionally left untouched so the user's prior choice is preserved
+        // for when the migration is completed.
     }
     
     fun isDecoyVaultEnabled(): Boolean = PrefUtil.getBoolean(decoyVaultEnabled, false)

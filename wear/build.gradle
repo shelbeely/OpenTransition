@@ -4,6 +4,13 @@ plugins {
     id 'org.jetbrains.kotlin.plugin.compose'
 }
 
+// Detect whether a release build task is on the requested task graph.
+// Used to fail-loud when the release keystore is missing instead of
+// silently signing a "release" artefact with the debug keystore.
+def isReleaseBuildRequested = gradle.startParameter.taskNames.any {
+    it.contains('Release') || it.endsWith(':bundleRelease') || it.endsWith(':assembleRelease')
+}
+
 android {
     compileSdk 36
     
@@ -11,8 +18,10 @@ android {
         applicationId "com.shelbeely.opentransition.wear"
         minSdk 30  // Wear OS 3.0 minimum
         targetSdk 36
-        versionCode 1
-        versionName "1.0"
+        // Share versionCode/versionName with :mobile so the two apps never drift.
+        // See audit-report/15-release-and-distribution.md §6.
+        versionCode rootProject.ext.getAppVersionCode()
+        versionName rootProject.ext.getAppVersionName()
     }
 
     signingConfigs {
@@ -25,10 +34,28 @@ android {
         }
         release {
             def releaseKey = file("${rootDir.getAbsolutePath()}/keys/release-keystore.jks")
+            def storePass = System.getenv("STORE_PASS")
+            def alias = System.getenv("KEY_ALIAS")
+            def keyPass = System.getenv("KEY_PASS")
+
+            if (isReleaseBuildRequested) {
+                if (!releaseKey.exists()) {
+                    throw new GradleException(
+                        "Release keystore missing at ${releaseKey.absolutePath}. " +
+                        "Provide keys/release-keystore.jks (CI injects it from KEYSTORE_64)."
+                    )
+                }
+                if (!storePass || !alias || !keyPass) {
+                    throw new GradleException(
+                        "Release signing requires STORE_PASS, KEY_ALIAS, and KEY_PASS env vars."
+                    )
+                }
+            }
+
             storeFile = releaseKey.exists() ? releaseKey : debugKey
-            storePassword = System.getenv("STORE_PASS") ?: "debugkey"
-            keyAlias = System.getenv("KEY_ALIAS") ?: "transtracks"
-            keyPassword = System.getenv("KEY_PASS") ?: "debugkey"
+            storePassword = storePass ?: "debugkey"
+            keyAlias = alias ?: "transtracks"
+            keyPassword = keyPass ?: "debugkey"
         }
     }
 

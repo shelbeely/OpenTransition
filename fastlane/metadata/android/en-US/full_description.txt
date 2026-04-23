@@ -1,0 +1,11 @@
+OpenTransition is a private, on-device photo journal for documenting your gender transition over time.
+
+Features:
+• Photo tracking — organise face and body photos by date so you can compare progress at a glance.
+• Milestones — record meaningful events alongside your photos.
+• Audio notes — capture voice samples to revisit later. (Voice analysis is currently a preview that displays typical estimated values rather than measurements of your recording; on-device analysis is planned for a future release.)
+• Privacy first — biometric / PIN app lock, optional decoy vault, "Quick Hide" with FLAG_SECURE to prevent screenshots, and an optional encrypted database (currently in development).
+• Local-only by default — your photos and audio recordings stay on your device. Only your settings are synced to your account when you choose to sign in.
+• Backup & restore — export and import a portable .ttbackup file so you control your data.
+
+OpenTransition is a free and open-source fork of TransTracks, modernised with Jetpack Compose, Room, and a Wear OS companion (in development).

@@ -17,8 +17,16 @@ import java.io.File
 
 /**
  * Utility for analyzing audio files to extract formants and voice characteristics.
- * Note: This is a simplified implementation that provides estimated formant values.
- * For production use with real formant analysis, consider integrating a proper DSP library.
+ *
+ * **Status: Preview / placeholder.** This implementation does **not** perform real
+ * formant extraction. It returns typical adult-speaker pitch and formant values
+ * regardless of the contents of [analyzeAudioFile]. Real on-device DSP (LPC /
+ * cepstrum analysis, e.g. via TarsosDSP) is planned but not yet integrated.
+ *
+ * Callers must surface this limitation to the user — see the preview disclaimer
+ * in `RecordAudioScreen` and the README feature list.
+ *
+ * See audit-report/07-issues-and-bugs.md ISSUE-005.
  */
 object AudioAnalysisUtil {
     
@@ -148,8 +156,12 @@ object AudioAnalysisUtil {
      */
     fun generateReport(analysis: AudioAnalysis): String {
         return buildString {
-            appendLine("Voice Analysis Report")
+            appendLine("Voice Analysis Report (Preview)")
             appendLine("=".repeat(40))
+            appendLine()
+            appendLine("⚠ The values below are typical estimates, not measurements")
+            appendLine("  of this recording. Real on-device DSP analysis is planned")
+            appendLine("  for a future release.")
             appendLine()
             
             appendLine("Pitch Analysis:")

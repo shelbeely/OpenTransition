@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright © 2025 OpenTransition. All rights reserved.
+  ~
+  ~ Wearable Data Layer capability declaration. See the matching file
+  ~ in mobile/src/main/res/values/wear.xml for the full explanation.
+  ~ See audit-report/07-issues-and-bugs.md ISSUE-001.
+  -->
+<resources>
+    <string-array name="android_wear_capabilities">
+        <item>opentransition_wear_app</item>
+    </string-array>
+</resources>

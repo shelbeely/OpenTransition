@@ -58,7 +58,7 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 - 📸 **Face-Detection Camera** - CameraX-powered camera with ML Kit face detection for perfectly framed face photos
 - 🎯 **Milestone Management** - Record and celebrate important events
 - 🖼️ **Gallery View** - Browse and compare your progress photos
-- 🎙️ **Audio Tracking** - Record voice samples and track vocal changes with pitch/formant analysis
+- 🎙️ **Audio Tracking** (preview) — Record voice samples and revisit them over time. Pitch and formant values displayed alongside recordings are currently typical estimates rather than measurements of your audio; on-device DSP analysis is planned for a future release. See [ISSUE-005](audit-report/07-issues-and-bugs.md#issue-005--correctness-mobile).
 - 🔒 **Privacy First** - App lock (PIN, pattern, or biometric), disguised mode, and local storage
 - 🔐 **Optional Encryption** - Encrypt your database with SQLCipher (optional)
 - 🎭 **Decoy Vault** - Create a separate vault with different passcode for added security

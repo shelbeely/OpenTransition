@@ -347,7 +347,7 @@
     <string name="encrypted_database">Encrypted Database</string>
     <string name="decoy_vault">Decoy Vault</string>
     <string name="quick_hide">Quick Hide</string>
-    <string name="encrypted_database_description">Encrypt all sensitive data at rest using SQLCipher</string>
+    <string name="encrypted_database_description">In development — disabled until the underlying database migration is complete.</string>
     <string name="decoy_vault_description">Create a separate vault that opens with a different passcode</string>
     <string name="quick_hide_description">Instantly hide app content when triggered</string>
     <string name="set_decoy_passcode">Set Decoy Passcode</string>
@@ -360,4 +360,6 @@
     <string name="import_failed">Import failed: %1$s</string>
     <string name="select_file">Select File</string>
     <string name="record_audio_instructions">Record a voice sample to track vocal changes over time. Try reading a consistent passage or sustaining a vowel sound.</string>
+    <string name="audio_analysis_preview_label">Preview</string>
+    <string name="audio_analysis_preview_disclaimer">Voice analysis is in preview. Pitch and formant values shown are typical estimates rather than measurements of your recording. Treat them as illustrative until on-device DSP analysis lands in a future release.</string>
 </resources>

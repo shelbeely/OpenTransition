@@ -3,6 +3,19 @@ buildscript {
     ext.realm_version = '2.3.0'
     ext.nav_version = "2.8.5"
 
+    // Versioning shared between :mobile and :wear so the two apps never drift.
+    // See audit-report/15-release-and-distribution.md §6.
+    ext.appMajor = 1
+    ext.appMinor = 3
+    ext.appBaseBuildNumber = 25
+    ext.getAppVersionCode = { ->
+        def envBuildNumber = System.getenv("BUILD_NUMBER")?.toInteger() ?: 0
+        return ext.appBaseBuildNumber + (ext.appMajor * 100) + ext.appMinor + envBuildNumber
+    }
+    ext.getAppVersionName = { ->
+        return "${ext.appMajor}.${ext.appMinor}.${ext.getAppVersionCode()}"
+    }
+
     repositories {
         google()
         mavenCentral()

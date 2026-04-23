@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright © 2025 OpenTransition. All rights reserved.
+  ~
+  ~ Wearable Data Layer capability declaration. The string-array name
+  ~ "android_wear_capabilities" is the contract Google Play services
+  ~ uses to discover which capabilities each app advertises so that the
+  ~ companion app can locate it via CapabilityClient.getCapability(...).
+  ~
+  ~ Without this resource, every getCapability(..., FILTER_REACHABLE)
+  ~ call returns zero nodes and all wearable features silently no-op.
+  ~ See audit-report/07-issues-and-bugs.md ISSUE-001.
+  -->
+<resources>
+    <string-array name="android_wear_capabilities">
+        <item>opentransition_mobile_app</item>
+    </string-array>
+</resources>

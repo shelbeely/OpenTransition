@@ -329,32 +329,41 @@ private fun SecuritySection(
 ) {
     SectionHeader(text = stringResource(R.string.security))
 
-    SwitchRow(
-        label = stringResource(R.string.encrypted_database),
-        description = stringResource(R.string.encrypted_database_description),
-        checked = content.encryptedDatabaseEnabled,
-        onCheckedChange = { onToggleEncryptedDatabase() }
-    )
+    // The "Encrypted Database" toggle and decoy-vault flow are gated by
+    // SettingsManager.isEncryptedDatabaseFeatureAvailable() because the
+    // underlying Realm→Room migration is still in progress. Showing the
+    // toggle today would advertise an encryption capability that does not
+    // protect the bulk of user-visible data (photos, milestones, audio).
+    // See audit-report/07-issues-and-bugs.md ISSUE-004 / ISSUE-013.
+    if (com.shelbeely.opentransition.util.settings.SettingsManager
+            .isEncryptedDatabaseFeatureAvailable()) {
+        SwitchRow(
+            label = stringResource(R.string.encrypted_database),
+            description = stringResource(R.string.encrypted_database_description),
+            checked = content.encryptedDatabaseEnabled,
+            onCheckedChange = { onToggleEncryptedDatabase() }
+        )
 
-    SwitchRow(
-        label = stringResource(R.string.decoy_vault),
-        description = stringResource(R.string.decoy_vault_description),
-        checked = content.decoyVaultEnabled,
-        enabled = content.encryptedDatabaseEnabled,
-        onCheckedChange = { onToggleDecoyVault() }
-    )
+        SwitchRow(
+            label = stringResource(R.string.decoy_vault),
+            description = stringResource(R.string.decoy_vault_description),
+            checked = content.decoyVaultEnabled,
+            enabled = content.encryptedDatabaseEnabled,
+            onCheckedChange = { onToggleDecoyVault() }
+        )
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Button(
-            onClick = onSetDecoyPasscode,
-            enabled = content.encryptedDatabaseEnabled && content.decoyVaultEnabled
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = stringResource(R.string.set_decoy_passcode))
+            Button(
+                onClick = onSetDecoyPasscode,
+                enabled = content.encryptedDatabaseEnabled && content.decoyVaultEnabled
+            ) {
+                Text(text = stringResource(R.string.set_decoy_passcode))
+            }
         }
     }
 
