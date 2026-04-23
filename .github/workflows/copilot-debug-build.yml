@@ -19,6 +19,8 @@ jobs:
         with:
           secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
           google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON }}
+          # This workflow only builds an APK; the custom Android CLI is not needed.
+          init-android-cli: 'false'
 
       - name: Build Debug APK
         run: ./gradlew --stacktrace :mobile:assembleDebug
