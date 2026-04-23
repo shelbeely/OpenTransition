@@ -1,7 +1,5 @@
 name: "Copilot Setup Steps"
 
-# Run automatically when this file changes (for easy validation), and allow
-# manual runs from the Actions tab.
 on:
   workflow_dispatch:
   push:
@@ -14,86 +12,65 @@ on:
       - .github/actions/android-setup/action.yml
 
 jobs:
-  # Job MUST be named `copilot-setup-steps` to be picked up by Copilot cloud agent.
+  # Job MUST be named `copilot-setup-steps` or Copilot cloud agent will not use it.
   copilot-setup-steps:
     runs-on: ubuntu-latest
-
-    # Cap session boot time. Without this, a hung step can block the agent for
-    # up to 6 hours (the default Actions timeout).
     timeout-minutes: 15
 
     permissions:
       contents: read
 
-    # ---------------------------------------------------------------------------
-    # Snapshot: after setup steps complete, Copilot captures the runner state so
-    # subsequent sessions can restore from it instead of re-running every step.
-    # Paths listed here are the heaviest parts of the environment to warm.
-    # ---------------------------------------------------------------------------
-    snapshot:
-      paths:
-        - ~/.gradle
-        - ~/.android
-        - ~/.cache/android-cli
-
-    # ---------------------------------------------------------------------------
-    # Fast-path vs optional heavy-path behaviour
-    #
-    # By default every session gets only the base Android build environment
-    # (JDK 17, SDK, secrets, local.properties) – startup is fast.
-    #
-    # To opt in to the heavy paths, set the corresponding variable to "true" in
-    # the repository's `copilot` Actions environment
-    # (Settings → Environments → copilot → Variables):
-    #
-    #   ENABLE_ANDROID_EMULATOR  – KVM, emulator system deps, AVD setup
-    #   PREWARM_GRADLE           – `./gradlew :mobile:dependencies` pre-warm
-    #   INIT_ANDROID_CLI         – custom Android CLI download + `android init`
-    # ---------------------------------------------------------------------------
-    env:
-      ENABLE_ANDROID_EMULATOR: ${{ vars.ENABLE_ANDROID_EMULATOR || 'false' }}
-      PREWARM_GRADLE: ${{ vars.PREWARM_GRADLE || 'false' }}
-      INIT_ANDROID_CLI: ${{ vars.INIT_ANDROID_CLI || 'false' }}
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      # ── Fast path ─────────────────────────────────────────────────────────────
-      # Common Android build environment: JDK 17, SDK, CLI (cached), secrets, etc.
-      # `init-android-cli` is forwarded so heavy CLI download/init is skipped
-      # unless INIT_ANDROID_CLI is explicitly enabled.
+      # JDK 17 is the safe default for AGP 8+ projects.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      # Gradle action restores and saves important Gradle caches automatically.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Cache your custom Android CLI download directory.
+      - name: Cache Android CLI
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/android-cli
+          key: android-cli-${{ runner.os }}-v1
+          restore-keys: |
+            android-cli-${{ runner.os }}-
+
+      # Common Android setup path.
+      # Your local composite action can decide whether to do the heavy CLI init.
       - name: Android setup
         uses: ./.github/actions/android-setup
         with:
           secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
           google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON }}
-          init-android-cli: ${{ env.INIT_ANDROID_CLI }}
+          init-android-cli: ${{ vars.INIT_ANDROID_CLI || 'false' }}
 
-      # ── Optional: emulator path ───────────────────────────────────────────────
-      # All steps below are skipped unless ENABLE_ANDROID_EMULATOR == 'true'.
-
-      # KVM acceleration is required for the Android emulator to run at usable
-      # speed on GitHub-hosted ubuntu runners.
+      # Optional emulator path. Enable by setting this repository environment variable:
+      # Settings -> Environments -> copilot -> Variables -> ENABLE_ANDROID_EMULATOR=true
       - name: Enable KVM group perms
-        if: env.ENABLE_ANDROID_EMULATOR == 'true'
+        if: ${{ vars.ENABLE_ANDROID_EMULATOR == 'true' }}
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      # libpulse0: required by the QEMU binary (emulator dies without it).
-      # libxcb-cursor0: required by Qt ≥6.5 xcb platform plugin.
-      # Xvfb: virtual framebuffer for headless emulator initialisation.
       - name: Install emulator system dependencies
-        if: env.ENABLE_ANDROID_EMULATOR == 'true'
-        run: sudo apt-get update && sudo apt-get install -y libpulse0 libxcb-cursor0 xvfb
+        if: ${{ vars.ENABLE_ANDROID_EMULATOR == 'true' }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpulse0 libxcb-cursor0 xvfb
 
-      # Cache the emulator system image and AVD so the large image download is
-      # skipped on warm runs (~3–5 min saved per session).
       - name: Cache Android emulator system image and AVD
         id: cache-emulator
-        if: env.ENABLE_ANDROID_EMULATOR == 'true'
+        if: ${{ vars.ENABLE_ANDROID_EMULATOR == 'true' }}
         uses: actions/cache@v4
         with:
           path: |
@@ -101,18 +78,15 @@ jobs:
             ~/.android/avd/medium_phone.avd
             ~/.android/avd/medium_phone.ini
           key: emulator-medium_phone-${{ runner.os }}-v1
-          # Fall back to any prior emulator cache on a key miss so we only have
-          # to download changed files rather than the full system image again.
-          restore-keys: emulator-medium_phone-${{ runner.os }}-
+          restore-keys: |
+            emulator-medium_phone-${{ runner.os }}-
 
-      # Create the AVD only when the cache doesn't already have it.
       - name: Create Android emulator
-        if: env.ENABLE_ANDROID_EMULATOR == 'true' && steps.cache-emulator.outputs.cache-hit != 'true'
+        if: ${{ vars.ENABLE_ANDROID_EMULATOR == 'true' && steps.cache-emulator.outputs.cache-hit != 'true' }}
         run: android emulator create --profile=medium_phone
 
-      # ── Optional: Gradle prewarm ──────────────────────────────────────────────
-      # Resolves all :mobile dependencies into ~/.gradle so the agent's first
-      # real build hits no network. Skipped by default (~2–4 min saved).
+      # Optional Gradle dependency warmup.
+      # Enable with PREWARM_GRADLE=true in the `copilot` environment variables.
       - name: Pre-warm Gradle dependency cache
-        if: env.PREWARM_GRADLE == 'true'
+        if: ${{ vars.PREWARM_GRADLE == 'true' }}
         run: ./gradlew :mobile:dependencies --quiet
