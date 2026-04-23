@@ -9,4 +9,37 @@
     <string name="connected">Connected</string>
     <string name="disconnected">Phone disconnected</string>
     <string name="photo_triggered">Photo triggered on phone</string>
+
+    <!-- MainActivity -->
+    <string name="milestones_count">Milestones: %1$d</string>
+    <string name="milestone_latest">Latest: %1$s\n%2$s</string>
+    <string name="syncing">Syncing…</string>
+
+    <!-- CameraControlActivity -->
+    <string name="camera_ready">Camera Ready</string>
+    <string name="phone_disconnected">Phone Disconnected</string>
+    <string name="shutter_triggered">Shutter triggered</string>
+    <string name="phone_not_connected">Phone not connected</string>
+    <string name="camera_switched">Camera switched</string>
+    <string name="flash_auto">Flash: Auto</string>
+    <string name="flash_on">Flash: On</string>
+    <string name="flash_off">Flash: Off</string>
+
+    <!-- AudioRecordActivity -->
+    <string name="record_label">🎤 Record</string>
+    <string name="stop_label">⏹️ Stop</string>
+    <string name="recording_in_progress">Recording…</string>
+    <string name="sending_to_phone">Sending to phone…</string>
+    <string name="sent_to_phone">Sent to phone</string>
+    <string name="audio_saved_to_day">Audio saved to current day</string>
+    <string name="send_failed">Send failed</string>
+    <string name="failed_to_send">Failed to send: %1$s</string>
+    <string name="error_sending_audio">Error sending audio: %1$s</string>
+    <string name="recording_failed">Recording failed: %1$s</string>
+    <string name="stop_failed">Stop failed: %1$s</string>
+    <string name="no_audio_file">No audio file to send</string>
+    <string name="error_file_not_found">Error: File not found</string>
+    <string name="microphone_permission_required">Microphone permission required</string>
+    <string name="duration_zero">00:00</string>
 </resources>
+

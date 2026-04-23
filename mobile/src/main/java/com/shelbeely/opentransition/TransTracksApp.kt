@@ -25,6 +25,10 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentInformation.ConsentStatus
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 
 class TransTracksApp : Application() {
     val domainManager = DomainManager()
@@ -35,17 +39,30 @@ class TransTracksApp : Application() {
         FirebaseSettingUtil()
     }
 
+    /**
+     * Application-level coroutine scope for fire-and-forget background work.
+     * Supervised so a failure in one child does not cancel siblings.
+     */
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun onCreate() {
         super.onCreate()
         instance = this
-
-        MobileAds.initialize(this)
 
         appVersionUpdateIfNecessary()
 
         FileUtil.clearTempFolder()
 
-        SettingsManager.startFirbaseSyncIfLoggedIn(this)
+        // ISSUE-023: MobileAds.initialize() and Firebase sync are moved off the
+        // main thread. Both can block for several hundred milliseconds and are
+        // not needed synchronously on the first frame.
+        appScope.launch {
+            MobileAds.initialize(this@TransTracksApp)
+        }
+
+        appScope.launch(Dispatchers.Main) {
+            SettingsManager.startFirbaseSyncIfLoggedIn(this@TransTracksApp)
+        }
 
         //Clearing these, as we don't want to maintain this state across launches
         PrefUtil.setSelectPhotoFirstVisible("")

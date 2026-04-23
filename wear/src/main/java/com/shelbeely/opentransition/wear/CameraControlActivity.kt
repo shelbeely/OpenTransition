@@ -59,7 +59,7 @@ class CameraControlActivity : Activity() {
         // Shutter button - take photo
         shutterButton.setOnClickListener {
             sendCameraCommand(WearableConstants.PATH_CAMERA_SHUTTER, ByteArray(0))
-            Toast.makeText(this, "Shutter triggered", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.shutter_triggered, Toast.LENGTH_SHORT).show()
         }
 
         // Flash button - cycle through modes
@@ -76,7 +76,7 @@ class CameraControlActivity : Activity() {
         // Switch camera button - toggle front/back
         switchCameraButton.setOnClickListener {
             sendCameraCommand(WearableConstants.PATH_CAMERA_SWITCH, ByteArray(0))
-            Toast.makeText(this, "Camera switched", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.camera_switched, Toast.LENGTH_SHORT).show()
         }
 
         // Zoom control
@@ -100,9 +100,9 @@ class CameraControlActivity : Activity() {
 
     private fun updateFlashButton() {
         flashButton.text = when (currentFlashMode) {
-            WearableConstants.FLASH_MODE_AUTO -> "Flash: Auto"
-            WearableConstants.FLASH_MODE_ON -> "Flash: On"
-            else -> "Flash: Off"
+            WearableConstants.FLASH_MODE_AUTO -> getString(R.string.flash_auto)
+            WearableConstants.FLASH_MODE_ON -> getString(R.string.flash_on)
+            else -> getString(R.string.flash_off)
         }
     }
 
@@ -116,7 +116,7 @@ class CameraControlActivity : Activity() {
                     messageClient.sendMessage(nodeId, path, data)
                 } else {
                     runOnUiThread {
-                        Toast.makeText(this, "Phone not connected", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this, R.string.phone_not_connected, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -129,10 +129,10 @@ class CameraControlActivity : Activity() {
                 val nodes = capabilityInfo.nodes
                 runOnUiThread {
                     if (nodes.isNotEmpty()) {
-                        statusText.text = "Camera Ready"
+                        statusText.text = getString(R.string.camera_ready)
                         enableControls(true)
                     } else {
-                        statusText.text = "Phone Disconnected"
+                        statusText.text = getString(R.string.phone_disconnected)
                         enableControls(false)
                     }
                 }

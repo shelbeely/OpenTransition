@@ -132,6 +132,13 @@ android {
         viewBinding true
         compose true
     }
+    lint {
+        // Fail CI on lint errors rather than silently producing a report.
+        // See audit-report/07-issues-and-bugs.md ISSUE-026.
+        abortOnError true
+        // Disable checks that are noisy / not actionable in this project.
+        disable 'GradleDependency', 'NewerVersionAvailable'
+    }
     namespace 'com.shelbeely.opentransition'
 }
 
@@ -192,7 +199,9 @@ dependencies {
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
-    implementation "androidx.navigation:navigation-compose:$nav_version"
+    // navigation-compose is unused in this project — the app uses Navigation Component
+    // with Fragments, not Compose destinations.  Removing saves ~200 KB from the AAB.
+    // See audit-report/07-issues-and-bugs.md ISSUE-015.
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
     implementation 'com.google.android.gms:play-services-ads:22.4.0'
