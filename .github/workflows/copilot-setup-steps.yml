@@ -7,14 +7,20 @@ on:
   push:
     paths:
       - .github/workflows/copilot-setup-steps.yml
+      - .github/actions/android-setup/action.yml
   pull_request:
     paths:
       - .github/workflows/copilot-setup-steps.yml
+      - .github/actions/android-setup/action.yml
 
 jobs:
   # Job MUST be named `copilot-setup-steps` to be picked up by Copilot cloud agent.
   copilot-setup-steps:
     runs-on: ubuntu-latest
+
+    # Cap session boot time. Without this, a hung step can block the agent for
+    # up to 6 hours (the default Actions timeout).
+    timeout-minutes: 15
 
     permissions:
       contents: read
@@ -95,6 +101,9 @@ jobs:
             ~/.android/avd/medium_phone.avd
             ~/.android/avd/medium_phone.ini
           key: emulator-medium_phone-${{ runner.os }}-v1
+          # Fall back to any prior emulator cache on a key miss so we only have
+          # to download changed files rather than the full system image again.
+          restore-keys: emulator-medium_phone-${{ runner.os }}-
 
       # Create the AVD only when the cache doesn't already have it.
       - name: Create Android emulator

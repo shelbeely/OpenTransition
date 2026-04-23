@@ -57,6 +57,9 @@ runs:
       with:
         path: ~/.cache/android-cli
         key: android-cli-linux-${{ inputs.cli-version }}
+        # Fall back to any previous CLI version on a miss so a full re-download
+        # is only triggered when the binary actually changes.
+        restore-keys: android-cli-linux-
 
     # Download the CLI only when the cache misses; always symlink to /usr/local/bin.
     - name: Install Android CLI
