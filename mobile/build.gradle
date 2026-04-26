@@ -193,8 +193,8 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
     
-    // SQLCipher for database encryption
-    implementation "net.zetetic:android-database-sqlcipher:4.5.4"
+    // SQLCipher for database encryption (bumped from 4.5.4 → 4.6.1 for 16 KB page alignment)
+    implementation "net.zetetic:android-database-sqlcipher:4.6.1"
     implementation "androidx.sqlite:sqlite:2.4.0"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
@@ -205,6 +205,10 @@ dependencies {
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
     implementation 'com.google.android.gms:play-services-ads:22.4.0'
+
+    // In-app review (ITEM-50)
+    implementation 'com.google.android.play:review:2.0.1'
+    implementation 'com.google.android.play:review-ktx:2.0.1'
     implementation("com.google.android.gms:play-services-auth:20.7.0")
     
     // Wearable Data Layer for communication with Wear OS
@@ -242,9 +246,6 @@ dependencies {
     implementation "com.jakewharton.rxbinding3:rxbinding-appcompat:$rx_binding_version"
 
     implementation 'com.jakewharton.rxrelay3:rxrelay:3.0.1'
-
-    //noinspection GradleDependency 2.8 is newer than 2.71828 but the Maven is messed up
-    implementation 'com.squareup.picasso:picasso:2.8'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.12'
 

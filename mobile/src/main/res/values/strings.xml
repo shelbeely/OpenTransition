@@ -362,4 +362,12 @@
     <string name="record_audio_instructions">Record a voice sample to track vocal changes over time. Try reading a consistent passage or sustaining a vowel sound.</string>
     <string name="audio_analysis_preview_label">Preview</string>
     <string name="audio_analysis_preview_disclaimer">Voice analysis is in preview. Pitch and formant values shown are typical estimates rather than measurements of your recording. Treat them as illustrative until on-device DSP analysis lands in a future release.</string>
+
+    <!-- Database migration status (ITEM-60) -->
+    <string name="db_migration_status_label">Database migration</string>
+    <string name="db_migration_complete">Complete ✓</string>
+    <string name="db_migration_pending">Pending (Realm → Room)</string>
+
+    <!-- Audio recording (ITEM-53) -->
+    <string name="audio_attached_to_today">Date set to today — photos found for this day</string>
 </resources>

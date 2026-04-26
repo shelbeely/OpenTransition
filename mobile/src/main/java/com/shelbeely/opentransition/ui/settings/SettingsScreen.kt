@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -48,6 +49,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.database.migration.RealmToRoomMigration
 import com.shelbeely.opentransition.ui.settings.SettingsUiState.Content
 import com.shelbeely.opentransition.ui.settings.SettingsUiState.Loading
 
@@ -328,6 +330,30 @@ private fun SecuritySection(
     onImportRealmBackup: () -> Unit,
 ) {
     SectionHeader(text = stringResource(R.string.security))
+
+    // ITEM-60: Surface Room migration status so users know where they stand.
+    val context = LocalContext.current
+    val migrationComplete = remember { RealmToRoomMigration.isMigrationComplete(context) }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(R.string.db_migration_status_label),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+        Text(
+            text = if (migrationComplete) stringResource(R.string.db_migration_complete)
+                   else stringResource(R.string.db_migration_pending),
+            style = MaterialTheme.typography.bodyMedium,
+            color = if (migrationComplete) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
 
     // The "Encrypted Database" toggle and decoy-vault flow are gated by
     // SettingsManager.isEncryptedDatabaseFeatureAvailable() because the

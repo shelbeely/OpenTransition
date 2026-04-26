@@ -12,6 +12,7 @@ package com.shelbeely.opentransition
 
 import android.annotation.SuppressLint
 import android.app.Application
+import android.util.Log
 import com.shelbeely.opentransition.domain.DomainManager
 import com.shelbeely.opentransition.util.FileUtil
 import com.shelbeely.opentransition.util.settings.FirebaseSettingUtil
@@ -25,6 +26,7 @@ import com.google.android.gms.ads.MobileAds
 import com.google.android.ump.ConsentInformation.ConsentStatus
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.reactivex.rxjava3.subjects.BehaviorSubject
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -40,10 +42,27 @@ class TransTracksApp : Application() {
     }
 
     /**
+     * Project-wide coroutine exception handler. Logs all uncaught coroutine
+     * exceptions at ERROR and forwards them to Crashlytics in release builds.
+     * Wired into [appScope] so all fire-and-forget background work is covered.
+     */
+    private val appExceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        Log.e("TransTracksApp", "Uncaught coroutine exception", throwable)
+        if (!BuildConfig.DEBUG) {
+            try {
+                com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+                    .recordException(throwable)
+            } catch (_: Exception) {
+                // Crashlytics may not be initialised yet; swallow to avoid recursion.
+            }
+        }
+    }
+
+    /**
      * Application-level coroutine scope for fire-and-forget background work.
      * Supervised so a failure in one child does not cancel siblings.
      */
-    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val appScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + appExceptionHandler)
 
     override fun onCreate() {
         super.onCreate()

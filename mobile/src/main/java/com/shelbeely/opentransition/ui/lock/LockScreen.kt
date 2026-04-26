@@ -10,7 +10,6 @@
 
 package com.shelbeely.opentransition.ui.lock
 
-import android.widget.ImageView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,15 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
+import coil3.compose.AsyncImage
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.settings.LockType
-import com.squareup.picasso.Picasso
 
 @Composable
 fun LockScreen(
@@ -52,21 +51,10 @@ fun LockScreen(
 
     Box(modifier = Modifier.fillMaxSize()) {
         if (hasBackground) {
-            AndroidView(
-                factory = { context ->
-                    ImageView(context).apply {
-                        scaleType = ImageView.ScaleType.CENTER_CROP
-                        importantForAccessibility = android.view.View.IMPORTANT_FOR_ACCESSIBILITY_NO
-                    }
-                },
-                update = { imageView ->
-                    Picasso.get()
-                        .load(R.drawable.train_track_background)
-                        .placeholder(android.R.color.black)
-                        .fit()
-                        .centerCrop()
-                        .into(imageView)
-                },
+            AsyncImage(
+                model = R.drawable.train_track_background,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
         }

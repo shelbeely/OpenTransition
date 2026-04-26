@@ -37,7 +37,6 @@ _sandbox
 
 # Important files
 /secrets.properties
-/app/google-services.json
 /mobile/google-services.json
 release-keystore.jks
 

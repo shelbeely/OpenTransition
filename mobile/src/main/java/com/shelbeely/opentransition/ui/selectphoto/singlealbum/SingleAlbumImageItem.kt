@@ -11,7 +11,6 @@
 package com.shelbeely.opentransition.ui.selectphoto.singlealbum
 
 import android.net.Uri
-import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -22,12 +21,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
+import coil3.compose.AsyncImage
+import coil3.compose.AsyncImagePainter
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import com.shelbeely.opentransition.R
-import com.squareup.picasso.Callback
-import com.squareup.picasso.Picasso
 import java.io.FileNotFoundException
 
 /**
@@ -64,29 +65,21 @@ fun SingleAlbumImageItem(
             .fillMaxSize()
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
     ) {
-        AndroidView(
-            factory = { ctx ->
-                ImageView(ctx).apply {
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                }
-            },
-            update = { imageView ->
-                Picasso.get()
-                    .load(uri)
-                    .fit()
-                    .centerCrop()
-                    .into(imageView, object : Callback {
-                        override fun onSuccess() {}
-
-                        override fun onError(e: Exception?) {
-                            if (e is FileNotFoundException) {
-                                onFileNotFound()
-                            }
-                        }
-                    })
-            },
+        SubcomposeAsyncImage(
+            model = uri,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
-        )
+        ) {
+            when (val s = painter.state) {
+                is AsyncImagePainter.State.Error -> {
+                    if (s.result.throwable is FileNotFoundException) {
+                        onFileNotFound()
+                    }
+                }
+                else -> SubcomposeAsyncImageContent()
+            }
+        }
 
         if (selectionMode) {
             Image(

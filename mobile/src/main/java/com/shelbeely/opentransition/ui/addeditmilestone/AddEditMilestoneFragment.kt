@@ -38,6 +38,7 @@ import com.shelbeely.opentransition.util.ofType
 import com.shelbeely.opentransition.util.openDefault
 import com.shelbeely.opentransition.util.plusAssign
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.play.core.review.ReviewManagerFactory
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -179,6 +180,7 @@ class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
                         milestone.description = event.description
                         copyToRealm(milestone, UpdatePolicy.ALL)
                     }
+                    realm.close()
                 } else {
                     val milestone: Milestone? =
                         realm.query(
@@ -220,6 +222,12 @@ class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
                 }
 
                 Snackbar.make(view, messageRes, Snackbar.LENGTH_LONG).show()
+
+                // ITEM-50: Prompt for in-app review after the user's 5th milestone.
+                if (args.milestoneId == null) {
+                    maybeRequestInAppReview()
+                }
+
                 findNavController().popBackStack()
             }
     }
@@ -227,6 +235,32 @@ class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
     override fun onDetach() {
         viewDisposables.clear()
         super.onDetach()
+    }
+
+    /**
+     * ITEM-50: Request an in-app review from Play Store after the user has saved at
+     * least 5 milestones. A SharedPreferences flag ensures the prompt is shown at
+     * most once per installation.
+     */
+    private fun maybeRequestInAppReview() {
+        val context = context ?: return
+        val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        if (prefs.getBoolean("in_app_review_requested", false)) return
+
+        val realm = Realm.openDefault()
+        val count = realm.query(Milestone::class).count().find()
+        realm.close()
+        if (count < 5) return
+
+        prefs.edit().putBoolean("in_app_review_requested", true).apply()
+
+        val manager = ReviewManagerFactory.create(context)
+        manager.requestReviewFlow().addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val activity = activity ?: return@addOnCompleteListener
+                manager.launchReviewFlow(activity, task.result)
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -92,10 +92,11 @@ dependencies {
     
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     
-    // Wear OS libraries
+    // Wear OS libraries — using play-services-wearable (replaces the deprecated
+    // com.google.android.support:wearable and compileOnly wearable:wearable artifacts).
+    // ITEM-59: Removed com.google.android.support:wearable:2.9.0 and
+    //          compileOnly com.google.android.wearable:wearable:2.9.0.
     implementation 'androidx.wear:wear:1.3.0'
-    implementation 'com.google.android.support:wearable:2.9.0'
-    compileOnly 'com.google.android.wearable:wearable:2.9.0'
     
     // Material Design for Wear OS (Compose)
     implementation 'androidx.wear.compose:compose-material:1.4.1'

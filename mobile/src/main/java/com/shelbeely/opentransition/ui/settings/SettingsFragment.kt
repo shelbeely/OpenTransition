@@ -52,7 +52,9 @@ import com.google.firebase.auth.*
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.util.*
 
@@ -897,27 +899,25 @@ class SettingsFragment : Fragment(R.layout.settings) {
         progressDialog.show()
         
         // Launch import in coroutine using viewLifecycleOwner
-        viewLifecycleOwner.lifecycleScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+        viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val result = com.shelbeely.opentransition.database.migration.RealmBackupImporter.importFromBackup(requireContext(), uri)
-                
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    progressDialog.dismiss()
-                    
-                    if (result.success) {
-                        val message = getString(R.string.import_complete, result.totalSuccess)
-                        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
-                    } else {
-                        val message = getString(R.string.import_failed, result.error ?: "Unknown error")
-                        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
-                    }
+                val result = withContext(Dispatchers.IO) {
+                    com.shelbeely.opentransition.database.migration.RealmBackupImporter.importFromBackup(requireContext(), uri)
                 }
-            } catch (e: Exception) {
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    progressDialog.dismiss()
-                    val message = getString(R.string.import_failed, e.message ?: "Unknown error")
+                
+                progressDialog.dismiss()
+                
+                if (result.success) {
+                    val message = getString(R.string.import_complete, result.totalSuccess)
+                    Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
+                } else {
+                    val message = getString(R.string.import_failed, result.error ?: "Unknown error")
                     Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
                 }
+            } catch (e: Exception) {
+                progressDialog.dismiss()
+                val message = getString(R.string.import_failed, e.message ?: "Unknown error")
+                Snackbar.make(view, message, Snackbar.LENGTH_LONG).show()
             }
         }
     }
