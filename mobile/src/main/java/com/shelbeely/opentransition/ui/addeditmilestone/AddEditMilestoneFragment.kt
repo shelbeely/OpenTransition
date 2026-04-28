@@ -37,8 +37,10 @@ import com.shelbeely.opentransition.util.isNotDisposed
 import com.shelbeely.opentransition.util.ofType
 import com.shelbeely.opentransition.util.openDefault
 import com.shelbeely.opentransition.util.plusAssign
+import com.google.android.gms.wearable.Wearable
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.play.core.review.ReviewManagerFactory
+import com.shelbeely.opentransition.shared.WearableConstants
 import io.reactivex.rxjava3.core.ObservableTransformer
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.disposables.Disposable
@@ -223,6 +225,9 @@ class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
 
                 Snackbar.make(view, messageRes, Snackbar.LENGTH_LONG).show()
 
+                // ITEM-57: Notify Wear companion that a milestone was added or edited.
+                notifyWearMilestoneUpdate()
+
                 // ITEM-50: Prompt for in-app review after the user's 5th milestone.
                 if (args.milestoneId == null) {
                     maybeRequestInAppReview()
@@ -235,6 +240,29 @@ class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
     override fun onDetach() {
         viewDisposables.clear()
         super.onDetach()
+    }
+
+    /**
+     * ITEM-57: Send a `PATH_MILESTONE_UPDATE` message to every connected Wear node so
+     * the watch refreshes its cached milestone list. Failures are non-fatal.
+     */
+    private fun notifyWearMilestoneUpdate() {
+        val context = context ?: return
+        try {
+            val nodeClient = Wearable.getNodeClient(context)
+            val messageClient = Wearable.getMessageClient(context)
+            nodeClient.connectedNodes.addOnSuccessListener { nodes ->
+                nodes.forEach { node ->
+                    messageClient.sendMessage(
+                        node.id,
+                        WearableConstants.PATH_MILESTONE_UPDATE,
+                        ByteArray(0)
+                    )
+                }
+            }
+        } catch (_: Exception) {
+            // Wearable APIs may not be available (e.g. F-Droid build); fail silently.
+        }
     }
 
     /**

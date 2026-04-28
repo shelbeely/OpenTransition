@@ -123,9 +123,11 @@ class MobileWearableListenerService : WearableListenerService() {
                         val audioDir = File(filesDir, "audio").also { it.mkdirs() }
 
                         // Sanitise the filename to prevent path-traversal.
+                        // Use String comparison (works on minSdk 21) instead of Path/toPath (API 26+).
                         val safeFilename = File(filename).name
-                        val audioFile = File(audioDir, safeFilename).canonicalFile
-                        if (!audioFile.toPath().startsWith(audioDir.canonicalFile.toPath())) {
+                        val canonicalDir = audioDir.canonicalFile
+                        val audioFile = File(canonicalDir, safeFilename).canonicalFile
+                        if (audioFile.parentFile?.canonicalPath != canonicalDir.canonicalPath) {
                             Log.e(TAG, "Path traversal rejected for filename: $filename")
                             channelClient.close(channel)
                             return@Thread
