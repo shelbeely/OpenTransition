@@ -193,8 +193,12 @@ dependencies {
     implementation "androidx.room:room-ktx:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
     
-    // SQLCipher for database encryption (bumped from 4.5.4 → 4.6.1 for 16 KB page alignment)
-    implementation "net.zetetic:android-database-sqlcipher:4.6.1"
+    // SQLCipher for database encryption
+    // NOTE: 4.5.4 is the last release on the legacy `android-database-sqlcipher` artifact.
+    // 4.6.x and later moved to `net.zetetic:sqlcipher-android`, which requires Room
+    // integration changes (different SupportFactory class). Stay on 4.5.4 until that
+    // migration is done — a naive version bump will break the build.
+    implementation "net.zetetic:android-database-sqlcipher:4.5.4"
     implementation "androidx.sqlite:sqlite:2.4.0"
 
     implementation "androidx.navigation:navigation-fragment-ktx:$nav_version"
