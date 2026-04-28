@@ -12,7 +12,6 @@ package com.shelbeely.opentransition.util
 
 import android.app.Activity
 import android.content.Context
-import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -26,14 +25,7 @@ import androidx.core.view.updatePadding
 import com.shelbeely.opentransition.R
 
 @ColorInt
-fun View.getColor(@ColorRes colorRes: Int): Int = when {
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> context.getColor(colorRes)
-
-    else -> {
-        @Suppress("DEPRECATION") //We are correctly handling this deprecation
-        resources.getColor(colorRes)
-    }
-}
+fun View.getColor(@ColorRes colorRes: Int): Int = context.getColor(colorRes)
 
 fun View.getIdName() = resources.getResourceEntryName(id)
 

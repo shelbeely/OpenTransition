@@ -10,25 +10,18 @@
 
 package com.shelbeely.opentransition.util
 
-import android.os.Build
 import java.io.File
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 
 /**
- * We only have access to the date created after API 26, otherwise we will need to just look at last modified
+ * Returns the creation time of the file, falling back to last modified on error.
  */
-fun File.dateCreated(): Long = when {
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.O -> {
-        try {
-            val attr = Files.readAttributes(toPath(), BasicFileAttributes::class.java)
-            attr.creationTime().toMillis()
-        } catch (e: IOException) {
-            e.printStackTrace()
-            lastModified()
-        }
-    }
-
-    else -> lastModified()
+fun File.dateCreated(): Long = try {
+    val attr = Files.readAttributes(toPath(), BasicFileAttributes::class.java)
+    attr.creationTime().toMillis()
+} catch (e: IOException) {
+    e.printStackTrace()
+    lastModified()
 }

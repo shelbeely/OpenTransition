@@ -47,7 +47,7 @@ import java.util.UUID
 
 class RecordAudioFragment : Fragment(R.layout.record_audio) {
     
-    private val audioRecorder = AudioRecorderUtil()
+    private val audioRecorder by lazy { AudioRecorderUtil(requireContext()) }
     private val handler = Handler(Looper.getMainLooper())
     private var recordingStartTime = 0L
     private var timerRunnable: Runnable? = null
