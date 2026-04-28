@@ -278,6 +278,7 @@
     <!-- Gallery -->
     <string name="add">Add</string>
     <string name="gallery_empty">It doesn\'t look like there are any photos yet. Why not add some?</string>
+    <string name="audio_gallery_empty">No recordings yet. Tap the + button to record your first voice sample.</string>
     <string name="selected">Selected</string>
     <string name="not_selected">Not Selected</string>
     <string name="select_photos_to_share">Select photos to share</string>

@@ -197,6 +197,11 @@ class HomeGalleryAdapter(
         else -> if (type == Photo.TYPE_AUDIO) TYPE_AUDIO else TYPE_PHOTO
     }
 
+    override fun onViewRecycled(holder: BaseViewHolder) {
+        super.onViewRecycled(holder)
+        if (holder is AudioViewHolder) holder.onRecycled()
+    }
+
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
     class AddViewHolder(
@@ -281,11 +286,25 @@ class HomeGalleryAdapter(
         private val isPlayingState = mutableStateOf(false)
         private var currentPhotoId = ""
         private var currentFilePath = ""
+        private var playbackDisposable: Disposable? = null
 
         fun bind(photo: Photo) {
+            playbackDisposable?.dispose()
+
             currentPhotoId = photo.id
             currentFilePath = photo.filePath
             isPlayingState.value = AudioPlayerManager.isPlaying(photo.id)
+
+            val photoId = currentPhotoId
+
+            // Subscribe to playback broadcast so state updates when audio completes
+            playbackDisposable = AudioPlayerManager.playbackEvents
+                .observeOn(RxSchedulers.main())
+                .subscribe { (audioId, playing) ->
+                    if (audioId == photoId) {
+                        isPlayingState.value = playing
+                    }
+                }
 
             composeView.setContent {
                 OpenTransitionTheme(
@@ -307,6 +326,10 @@ class HomeGalleryAdapter(
                     )
                 }
             }
+        }
+
+        fun onRecycled() {
+            playbackDisposable?.dispose()
         }
     }
 

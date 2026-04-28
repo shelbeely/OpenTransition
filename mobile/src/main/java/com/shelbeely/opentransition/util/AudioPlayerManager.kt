@@ -11,6 +11,8 @@
 package com.shelbeely.opentransition.util
 
 import android.media.MediaPlayer
+import com.jakewharton.rxrelay3.PublishRelay
+import io.reactivex.rxjava3.core.Observable
 import java.io.File
 
 /**
@@ -22,6 +24,13 @@ object AudioPlayerManager {
     private var mediaPlayer: MediaPlayer? = null
     private var currentPlayingId: String? = null
     private var playbackListener: PlaybackListener? = null
+
+    /**
+     * Broadcasts (audioId, isPlaying) whenever playback state changes.
+     * Subscribe to this to keep UI in sync without relying on the single [playbackListener].
+     */
+    private val _playbackEvents = PublishRelay.create<Pair<String, Boolean>>()
+    val playbackEvents: Observable<Pair<String, Boolean>> = _playbackEvents
     
     interface PlaybackListener {
         fun onPlaybackStateChanged(audioId: String, isPlaying: Boolean)
@@ -79,12 +88,14 @@ object AudioPlayerManager {
                 setOnCompletionListener {
                     playbackListener?.onPlaybackCompleted(audioId)
                     playbackListener?.onPlaybackStateChanged(audioId, false)
+                    _playbackEvents.accept(audioId to false)
                     currentPlayingId = null
                 }
-                setOnErrorListener { _, what, extra ->
+                setOnErrorListener { _, _, _ ->
                     releaseMediaPlayer()
                     currentPlayingId = null
                     playbackListener?.onPlaybackStateChanged(audioId, false)
+                    _playbackEvents.accept(audioId to false)
                     true
                 }
                 prepare()
@@ -93,6 +104,7 @@ object AudioPlayerManager {
             
             currentPlayingId = audioId
             playbackListener?.onPlaybackStateChanged(audioId, true)
+            _playbackEvents.accept(audioId to true)
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -109,6 +121,7 @@ object AudioPlayerManager {
             mediaPlayer?.pause()
             currentPlayingId?.let { id ->
                 playbackListener?.onPlaybackStateChanged(id, false)
+                _playbackEvents.accept(id to false)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -124,6 +137,7 @@ object AudioPlayerManager {
         currentPlayingId = null
         wasPlayingId?.let { id ->
             playbackListener?.onPlaybackStateChanged(id, false)
+            _playbackEvents.accept(id to false)
         }
     }
     

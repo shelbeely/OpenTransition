@@ -129,6 +129,8 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
         (view as? RecordAudioView)?.apply {
             setRecordingState(false)
             enableSaveButton(true)
+            // Show waveform preview for the recorded file
+            audioRecorder.getOutputFile()?.let { setAudioFile(it) }
             // ITEM-53: Auto-attach to today's date when photos exist for that day.
             autoAttachToTodayIfPhotosExist()
         }

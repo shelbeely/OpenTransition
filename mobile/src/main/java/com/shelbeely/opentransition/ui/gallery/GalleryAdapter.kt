@@ -30,6 +30,8 @@ import com.shelbeely.opentransition.util.openDefault
 import com.shelbeely.opentransition.util.settings.SettingsManager
 import com.shelbeely.opentransition.util.toFullDateString
 import com.jakewharton.rxrelay3.PublishRelay
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.Disposable
 import io.realm.kotlin.Realm
 import io.realm.kotlin.ext.isValid
 import io.realm.kotlin.query.Sort.DESCENDING
@@ -159,7 +161,7 @@ class GalleryAdapter(
 
     override fun getSpanSize(position: Int): Int = when (getItemViewType(position)) {
         TYPE_TITLE -> GalleryView.GRID_SPAN
-        TYPE_PHOTO -> 1
+        TYPE_PHOTO -> if (type == Photo.TYPE_AUDIO) GalleryView.GRID_SPAN else 1
         else -> throw IllegalArgumentException("Unhandled item type")
     }
 
@@ -362,10 +364,17 @@ class GalleryAdapter(
         private val composeView: ComposeView = composeView
         private val adapterRef = WeakReference(creatingAdapter)
         private val isPlayingState = mutableStateOf(false)
+        private val pitchState = mutableStateOf("")
+        private val formantsState = mutableStateOf("")
         private var currentPhotoId = ""
         private var currentFilePath = ""
+        private var analysisDisposable: Disposable? = null
+        private var playbackDisposable: Disposable? = null
 
         fun bind(item: GalleryAdapterItem, selectionMode: Boolean) {
+            analysisDisposable?.dispose()
+            playbackDisposable?.dispose()
+
             currentPhotoId = item.photo!!.id
             currentFilePath = item.photo.filePath
             isPlayingState.value = AudioPlayerManager.isPlaying(currentPhotoId)
@@ -376,27 +385,52 @@ class GalleryAdapter(
             val dateText = LocalDate.ofEpochDay(item.photo.epochDay)
                 .toFullDateString(composeView.context)
 
-            val realm = Realm.openDefault()
-            val analysis = realm.query(AudioAnalysis::class, "photoId == '$photoId'")
-                .first().find()
-            val pitchText = if (analysis != null) {
-                composeView.context.getString(
-                    R.string.pitch_format,
-                    String.format(java.util.Locale.US, "%.0f", analysis.f0Mean)
-                )
-            } else {
-                composeView.context.getString(R.string.pitch_format, "N/A")
+            // Show placeholder while analysis loads
+            pitchState.value = composeView.context.getString(R.string.pitch_format, "…")
+            formantsState.value = composeView.context.getString(R.string.formants_format, "…", "…")
+
+            // Fetch analysis data off the main thread
+            analysisDisposable = Single.fromCallable {
+                val realm = Realm.openDefault()
+                val analysis = realm.query(AudioAnalysis::class, "photoId == '$photoId'")
+                    .first().find()
+                val pitch = if (analysis != null) {
+                    composeView.context.getString(
+                        R.string.pitch_format,
+                        String.format(java.util.Locale.US, "%.0f", analysis.f0Mean)
+                    )
+                } else {
+                    composeView.context.getString(R.string.pitch_format, "N/A")
+                }
+                val formants = if (analysis != null) {
+                    composeView.context.getString(
+                        R.string.formants_format,
+                        String.format(java.util.Locale.US, "%.0f", analysis.f1Mean),
+                        String.format(java.util.Locale.US, "%.0f", analysis.f2Mean)
+                    )
+                } else {
+                    composeView.context.getString(R.string.formants_format, "N/A", "N/A")
+                }
+                realm.close()
+                pitch to formants
             }
-            val formantsText = if (analysis != null) {
-                composeView.context.getString(
-                    R.string.formants_format,
-                    String.format(java.util.Locale.US, "%.0f", analysis.f1Mean),
-                    String.format(java.util.Locale.US, "%.0f", analysis.f2Mean)
-                )
-            } else {
-                composeView.context.getString(R.string.formants_format, "N/A", "N/A")
-            }
-            realm.close()
+                .subscribeOn(RxSchedulers.io())
+                .observeOn(RxSchedulers.main())
+                .subscribe({ (pitch, formants) ->
+                    if (currentPhotoId == photoId) {
+                        pitchState.value = pitch
+                        formantsState.value = formants
+                    }
+                }, { /* keep placeholder on error */ })
+
+            // Subscribe to playback broadcast so state updates when audio completes
+            playbackDisposable = AudioPlayerManager.playbackEvents
+                .observeOn(RxSchedulers.main())
+                .subscribe { (audioId, playing) ->
+                    if (audioId == photoId) {
+                        isPlayingState.value = playing
+                    }
+                }
 
             composeView.setContent {
                 OpenTransitionTheme(
@@ -406,8 +440,8 @@ class GalleryAdapter(
                         photoId = photoId,
                         audioFilePath = filePath,
                         dateText = dateText,
-                        pitchText = pitchText,
-                        formantsText = formantsText,
+                        pitchText = pitchState.value,
+                        formantsText = formantsState.value,
                         isPlaying = isPlayingState.value,
                         isSelected = isSelected,
                         selectionMode = selectionMode,
@@ -455,6 +489,16 @@ class GalleryAdapter(
                 }
             }
         }
+
+        fun onRecycled() {
+            analysisDisposable?.dispose()
+            playbackDisposable?.dispose()
+        }
+    }
+
+    override fun onViewRecycled(holder: BaseViewHolder) {
+        super.onViewRecycled(holder)
+        if (holder is AudioViewHolder) holder.onRecycled()
     }
 
     @Suppress("MayBeConstant")

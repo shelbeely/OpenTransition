@@ -91,6 +91,11 @@ fun GalleryScreen(
                 modifier = Modifier.fillMaxSize()
             )
             if (isEmpty) {
+                val emptyTextRes = if (type == Photo.TYPE_AUDIO) {
+                    R.string.audio_gallery_empty
+                } else {
+                    R.string.gallery_empty
+                }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
@@ -99,7 +104,7 @@ fun GalleryScreen(
                         .align(Alignment.Center)
                 ) {
                     Text(
-                        text = stringResource(R.string.gallery_empty),
+                        text = stringResource(emptyTextRes),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(16.dp)
