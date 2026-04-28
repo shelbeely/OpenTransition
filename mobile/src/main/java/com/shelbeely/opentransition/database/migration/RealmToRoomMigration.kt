@@ -129,7 +129,15 @@ object RealmToRoomMigration {
                         f4Mean = realmAudio.f4Mean,
                         f0StdDev = realmAudio.f0StdDev,
                         durationSeconds = realmAudio.durationSeconds,
-                        analysisTimestamp = realmAudio.analysisTimestamp
+                        analysisTimestamp = realmAudio.analysisTimestamp,
+                        pitchConfidenceMean = realmAudio.pitchConfidenceMean,
+                        voicedRatio = realmAudio.voicedRatio,
+                        intensityMeanDb = realmAudio.intensityMeanDb,
+                        intensityMaxDb = realmAudio.intensityMaxDb,
+                        pitchRangeHz = realmAudio.pitchRangeHz,
+                        pitchStabilityScore = realmAudio.pitchStabilityScore,
+                        intonationMovement = realmAudio.intonationMovement,
+                        sessionSummaryText = realmAudio.sessionSummaryText
                     )
                     roomDb.audioAnalysisDao().insertAudioAnalysis(roomAudio)
                     result.audioAnalysesSuccess++

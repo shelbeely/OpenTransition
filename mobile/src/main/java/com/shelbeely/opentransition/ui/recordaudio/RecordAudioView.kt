@@ -32,6 +32,7 @@ class RecordAudioView(context: Context, attributeSet: AttributeSet?) :
     private val isAnalyzingState = mutableStateOf(false)
     private val selectedDateState = mutableStateOf(LocalDate.now())
     private val audioFileState = mutableStateOf<File?>(null)
+    private val transcriptState = mutableStateOf("")
 
     private var onRecordClick: (() -> Unit)? = null
     private var onSaveClick: (() -> Unit)? = null
@@ -57,6 +58,7 @@ class RecordAudioView(context: Context, attributeSet: AttributeSet?) :
                     isAnalyzing = isAnalyzingState.value,
                     selectedDate = selectedDateState.value,
                     audioFile = audioFileState.value,
+                    transcript = transcriptState.value,
                     onRecordClick = { onRecordClick?.invoke() },
                     onSaveClick = { onSaveClick?.invoke() },
                     onCancelClick = { onCancelClick?.invoke() },
@@ -106,5 +108,9 @@ class RecordAudioView(context: Context, attributeSet: AttributeSet?) :
 
     fun setAudioFile(file: File) {
         audioFileState.value = file
+    }
+
+    fun updateTranscript(text: String) {
+        transcriptState.value = text
     }
 }

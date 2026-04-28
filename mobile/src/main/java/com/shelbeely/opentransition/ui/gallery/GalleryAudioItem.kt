@@ -10,47 +10,55 @@
 
 package com.shelbeely.opentransition.ui.gallery
 
-import android.widget.ImageButton
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.ui.widget.WaveformView
+import com.shelbeely.opentransition.ui.widget.SpectrogramView
 import java.io.File
 
 /**
  * Gallery grid cell for an audio item.
  *
- * Migrated from `res/layout/gallery_adapter_audio_item.xml`:
- * - Root was `ConstraintLayout` with `@drawable/rounded_transparent_button` background and 16dp padding
- *   → reproduced as a [Row] with `Modifier.background(Color(0x40FFFFFF), RoundedCornerShape(24dp))`
- * - `ImageButton` play/pause (56×56dp, left side) → `AndroidView { ImageButton }`
- * - `TextView` date, pitch, formants (right of play button) → `Text` composables
- * - `WaveformView` (0dp × 80dp, below formants) → `AndroidView { WaveformView }`
- * - `CheckBox` selection (end, visibility=gone in non-selection mode) → `Checkbox` composable
+ * Shows the recording date, a spectrogram of the actual audio content (the
+ * primary ear-training visual), an optional transcript, and a play/pause
+ * button.  Numeric pitch/formant values are intentionally omitted — the
+ * spectrogram is a neutral representation that helps users correlate what
+ * they hear with what they see, without providing "targets" to fixate on.
  *
  * @param photoId          Unique ID for this audio item (used for playback tracking).
  * @param audioFilePath    Absolute path to the audio file.
  * @param dateText         Formatted date string.
- * @param pitchText        Formatted pitch string (e.g. "Pitch: 180 Hz").
- * @param formantsText     Formatted formants string (e.g. "F1: 700 Hz | F2: 1800 Hz").
+ * @param transcriptText   Speech transcript captured during recording, or empty.
  * @param isPlaying        Whether this audio is currently playing.
  * @param isSelected       Whether this item is currently selected.
  * @param selectionMode    Whether the gallery is in multi-select mode.
@@ -65,8 +73,7 @@ fun GalleryAudioItem(
     photoId: String,
     audioFilePath: String,
     dateText: String,
-    pitchText: String,
-    formantsText: String,
+    transcriptText: String = "",
     isPlaying: Boolean,
     isSelected: Boolean,
     selectionMode: Boolean,
@@ -84,22 +91,19 @@ fun GalleryAudioItem(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AndroidView(
-            factory = { ctx ->
-                ImageButton(ctx).apply {
-                    setBackgroundResource(R.drawable.rounded_transparent_button)
-                    contentDescription = ctx.getString(R.string.play_audio)
-                    setOnClickListener { onPlayPause() }
-                }
-            },
-            update = { button ->
-                button.setImageResource(
-                    if (isPlaying) android.R.drawable.ic_media_pause
-                    else android.R.drawable.ic_media_play
-                )
-            },
+        IconButton(
+            onClick = onPlayPause,
             modifier = Modifier.size(56.dp)
-        )
+        ) {
+            Icon(
+                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                contentDescription = if (isPlaying)
+                    stringResource(R.string.stop_recording)
+                else
+                    stringResource(R.string.play_audio),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -110,28 +114,32 @@ fun GalleryAudioItem(
                 text = dateText,
                 style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = pitchText,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            Text(
-                text = formantsText,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 2.dp)
-            )
+            if (transcriptText.isNotBlank()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = transcriptText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            // Guard: only call setAudioFile when the path actually changes so the
+            // spectrogram does not re-decode on every recomposition (e.g. play state toggle).
+            var lastLoadedPath by remember { mutableStateOf("") }
             AndroidView(
-                factory = { ctx -> WaveformView(ctx) },
-                update = { waveformView ->
-                    val file = File(audioFilePath)
-                    if (file.exists()) {
-                        waveformView.setAudioFile(file)
+                factory = { ctx -> SpectrogramView(ctx) },
+                update = { sv ->
+                    if (audioFilePath != lastLoadedPath) {
+                        lastLoadedPath = audioFilePath
+                        val file = File(audioFilePath)
+                        if (file.exists()) sv.setAudioFile(file)
                     }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                    .height(100.dp)
+                    .padding(top = 8.dp, end = 8.dp)
             )
         }
 

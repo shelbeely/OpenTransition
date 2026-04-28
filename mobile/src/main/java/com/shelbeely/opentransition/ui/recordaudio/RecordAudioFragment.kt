@@ -25,15 +25,25 @@ import com.google.android.material.snackbar.Snackbar
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.data.AudioAnalysis
 import com.shelbeely.opentransition.data.Photo
+import com.shelbeely.opentransition.database.DatabaseManager
+import com.shelbeely.opentransition.database.room.entities.AudioAnalysisEntity
+import com.shelbeely.opentransition.database.room.entities.PhotoEntity
 import com.shelbeely.opentransition.util.AudioAnalysisUtil
 import com.shelbeely.opentransition.util.AudioRecorderUtil
 import com.shelbeely.opentransition.util.FileUtil
+import com.shelbeely.opentransition.util.SessionSummaryBuilder
+import com.shelbeely.opentransition.util.SpeechTranscriptionManager
 import com.shelbeely.opentransition.util.openDefault
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
 import io.realm.kotlin.ext.query
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.ZoneId
+import java.util.UUID
 
 class RecordAudioFragment : Fragment(R.layout.record_audio) {
     
@@ -41,6 +51,8 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
     private val handler = Handler(Looper.getMainLooper())
     private var recordingStartTime = 0L
     private var timerRunnable: Runnable? = null
+    /** Accumulated live transcript; updated by SpeechTranscriptionManager callbacks. */
+    private var liveTranscript = ""
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -118,6 +130,12 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
             recordingStartTime = System.currentTimeMillis()
             startTimer()
             (view as? RecordAudioView)?.setRecordingState(true)
+            // Start concurrent speech transcription. Gracefully ignored if unavailable.
+            liveTranscript = ""
+            SpeechTranscriptionManager.start(requireContext()) { transcript ->
+                liveTranscript = transcript
+                (view as? RecordAudioView)?.updateTranscript(transcript)
+            }
         } else {
             Snackbar.make(requireView(), R.string.audio_record_error, Snackbar.LENGTH_LONG).show()
         }
@@ -126,9 +144,15 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
     private fun stopRecording() {
         audioRecorder.stopRecording()
         stopTimer()
+        // Collect whatever transcript was accumulated; the manager releases the recognizer.
+        liveTranscript = SpeechTranscriptionManager.stop().ifEmpty { liveTranscript }
         (view as? RecordAudioView)?.apply {
             setRecordingState(false)
             enableSaveButton(true)
+            // Show waveform preview for the recorded file
+            audioRecorder.getOutputFile()?.let { setAudioFile(it) }
+            // Show final transcript
+            updateTranscript(liveTranscript)
             // ITEM-53: Auto-attach to today's date when photos exist for that day.
             autoAttachToTodayIfPhotosExist()
         }
@@ -201,44 +225,107 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
     }
     
     private fun saveToDatabase(audioFile: java.io.File, analysis: AudioAnalysis) {
-        try {
-            val date = (view as? RecordAudioView)?.getSelectedDate() ?: LocalDate.now()
-            val epochDay = date.toEpochDay()
-            val timestamp = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-            
-            // Move file to permanent location
-            val permanentFile = FileUtil.getNewAudioFile(date)
-            audioFile.copyTo(permanentFile, overwrite = true)
-            audioFile.delete()
-            
-            // Save to database
-            val realm = Realm.openDefault()
-            realm.writeBlocking {
-                val photo = Photo().apply {
-                    this.epochDay = epochDay
-                    this.timestamp = timestamp
-                    this.filePath = permanentFile.absolutePath
-                    this.type = Photo.TYPE_AUDIO
+        val date = (view as? RecordAudioView)?.getSelectedDate() ?: LocalDate.now()
+        val epochDay = date.toEpochDay()
+        val timestamp = date.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                // Move file to permanent location
+                val permanentFile = FileUtil.getNewAudioFile(date)
+                audioFile.copyTo(permanentFile, overwrite = true)
+                audioFile.delete()
+
+                val photoId = UUID.randomUUID().toString()
+
+                // Build human-readable session summary
+                val summaryText = SessionSummaryBuilder.build(
+                    f0Mean              = analysis.f0Mean,
+                    f0Min               = analysis.f0Min,
+                    f0Max               = analysis.f0Max,
+                    pitchRangeHz        = analysis.pitchRangeHz,
+                    voicedRatio         = analysis.voicedRatio,
+                    pitchStabilityScore = analysis.pitchStabilityScore,
+                    intonationMovement  = analysis.intonationMovement,
+                    intensityMeanDb     = analysis.intensityMeanDb,
+                    durationSeconds     = analysis.durationSeconds
+                )
+
+                // Persist photo to Realm (legacy path kept for backwards compat)
+                val realm = Realm.openDefault()
+                realm.writeBlocking {
+                    val photo = Photo().apply {
+                        this.id        = photoId
+                        this.epochDay  = epochDay
+                        this.timestamp = timestamp
+                        this.filePath  = permanentFile.absolutePath
+                        this.type      = Photo.TYPE_AUDIO
+                    }
+                    copyToRealm(photo, UpdatePolicy.ALL)
+
+                    analysis.photoId   = photoId
+                    analysis.transcript = liveTranscript
+                    analysis.sessionSummaryText = summaryText
+                    copyToRealm(analysis, UpdatePolicy.ALL)
                 }
-                
-                val savedPhoto = copyToRealm(photo, UpdatePolicy.ALL)
-                
-                // Link analysis to photo
-                analysis.photoId = savedPhoto.id
-                copyToRealm(analysis, UpdatePolicy.ALL)
+                realm.close()
+
+                // Persist to Room (primary database)
+                val db = DatabaseManager.getDatabase(requireContext())
+                db.photoDao().insertPhoto(
+                    PhotoEntity(
+                        id        = photoId,
+                        epochDay  = epochDay,
+                        timestamp = timestamp,
+                        filePath  = permanentFile.absolutePath,
+                        type      = Photo.TYPE_AUDIO
+                    )
+                )
+                db.audioAnalysisDao().insertAudioAnalysis(
+                    AudioAnalysisEntity(
+                        id                   = analysis.id,
+                        photoId              = photoId,
+                        f0Mean               = analysis.f0Mean,
+                        f0Min                = analysis.f0Min,
+                        f0Max                = analysis.f0Max,
+                        f1Mean               = analysis.f1Mean,
+                        f2Mean               = analysis.f2Mean,
+                        f3Mean               = analysis.f3Mean,
+                        f4Mean               = analysis.f4Mean,
+                        f0StdDev             = analysis.f0StdDev,
+                        durationSeconds      = analysis.durationSeconds,
+                        analysisTimestamp    = analysis.analysisTimestamp,
+                        pitchConfidenceMean  = analysis.pitchConfidenceMean,
+                        voicedRatio          = analysis.voicedRatio,
+                        intensityMeanDb      = analysis.intensityMeanDb,
+                        intensityMaxDb       = analysis.intensityMaxDb,
+                        pitchRangeHz         = analysis.pitchRangeHz,
+                        pitchStabilityScore  = analysis.pitchStabilityScore,
+                        intonationMovement   = analysis.intonationMovement,
+                        sessionSummaryText   = summaryText
+                    )
+                )
+
+                withContext(Dispatchers.Main) {
+                    if (isAdded) {
+                        Snackbar.make(requireView(), R.string.audio_analysis_complete, Snackbar.LENGTH_SHORT).show()
+                        findNavController().popBackStack()
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    if (isAdded) {
+                        Snackbar.make(requireView(), R.string.error_saving_photo, Snackbar.LENGTH_LONG).show()
+                    }
+                }
             }
-            realm.close()
-            
-            Snackbar.make(requireView(), R.string.audio_analysis_complete, Snackbar.LENGTH_SHORT).show()
-            findNavController().popBackStack()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Snackbar.make(requireView(), R.string.error_saving_photo, Snackbar.LENGTH_LONG).show()
         }
     }
     
     override fun onDestroyView() {
         stopTimer()
+        SpeechTranscriptionManager.stop()
         audioRecorder.release()
         super.onDestroyView()
     }

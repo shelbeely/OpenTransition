@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.ui.widget.SpectrogramView
 import com.shelbeely.opentransition.ui.widget.WaveformView
 import com.shelbeely.opentransition.util.toFullDateString
 import java.io.File
@@ -59,6 +60,7 @@ fun RecordAudioScreen(
     isAnalyzing: Boolean,
     selectedDate: LocalDate,
     audioFile: File?,
+    transcript: String,
     onRecordClick: () -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -182,6 +184,50 @@ fun RecordAudioScreen(
                         .height(80.dp)
                         .padding(horizontal = 16.dp)
                 )
+                // Spectrogram: the primary ear-training visual. Shows the full
+                // frequency content of the recording — listen and look at the
+                // same time. No targets, no reference lines; just your voice.
+                Spacer(modifier = Modifier.height(8.dp))
+                AndroidView(
+                    factory = { ctx -> SpectrogramView(ctx) },
+                    update = { spectrogramView -> spectrogramView.setAudioFile(audioFile) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
+                        .padding(horizontal = 16.dp)
+                )
+            }
+
+            // Transcript card — shown while recording (live) and after stopping (final).
+            if (transcript.isNotBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                ) {
+                    androidx.compose.foundation.layout.Column {
+                        Text(
+                            text = stringResource(
+                                if (isRecording) R.string.transcript_live_label
+                                else R.string.transcript_label
+                            ),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = transcript,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))

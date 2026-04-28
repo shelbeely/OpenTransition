@@ -24,6 +24,7 @@ import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.TransTracksApp
 import com.shelbeely.opentransition.background.CameraHandler
 import com.shelbeely.opentransition.background.StoragePermissionHandler
+import com.shelbeely.opentransition.data.AudioAnalysis
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.ui.MainActivity
 import com.shelbeely.opentransition.ui.PickMediaHandlingData
@@ -170,6 +171,20 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                 )
             }
 
+        viewDisposables += sharedEvents.ofType<GalleryUiEvent.AudioSessionDetail>()
+            .subscribe { event ->
+                findNavController().navigate(
+                    GalleryFragmentDirections.actionGalleryToVoiceSessionDetail(event.photoId)
+                )
+            }
+
+        viewDisposables += sharedEvents.ofType<GalleryUiEvent.ViewVoiceProgress>()
+            .subscribe {
+                findNavController().navigate(
+                    GalleryFragmentDirections.actionGalleryToVoiceProgress()
+                )
+            }
+
         viewDisposables += sharedEvents.ofType<GalleryUiEvent.Share>()
             .subscribe { event ->
                 if (event.selectedIds.isEmpty()) {
@@ -245,8 +260,18 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                                 }
 
                                 realm.writeBlocking {
-                                    findLatest(photoToDelete)?.let { delete(it) }
-                                    success = true
+                                    findLatest(photoToDelete)?.let {
+                                        // Also delete linked audio analysis for audio items
+                                        if (photoToDelete.type == Photo.TYPE_AUDIO) {
+                                            val analyses = query(
+                                                AudioAnalysis::class,
+                                                "photoId == '${photoToDelete.id}'"
+                                            ).find()
+                                            delete(analyses)
+                                        }
+                                        delete(it)
+                                        success = true
+                                    }
                                 }
                             }
                         }

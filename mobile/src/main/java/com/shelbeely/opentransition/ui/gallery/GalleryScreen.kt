@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,6 +44,7 @@ fun GalleryScreen(
     isEmpty: Boolean,
     onBack: () -> Unit,
     onAddPhoto: () -> Unit,
+    onViewProgress: (() -> Unit)? = null,
     recyclerView: RecyclerView,
 ) {
     val type = GalleryUiState.getType(state)
@@ -71,6 +73,15 @@ fun GalleryScreen(
                     }
                 },
                 actions = {
+                    // Progress chart button — only visible in the audio gallery
+                    if (type == Photo.TYPE_AUDIO && onViewProgress != null) {
+                        IconButton(onClick = onViewProgress) {
+                            Icon(
+                                imageVector = Icons.Default.ShowChart,
+                                contentDescription = stringResource(R.string.voice_progress_title)
+                            )
+                        }
+                    }
                     IconButton(onClick = onAddPhoto) {
                         Icon(
                             painter = painterResource(R.drawable.ic_add_white_24dp),
@@ -91,6 +102,11 @@ fun GalleryScreen(
                 modifier = Modifier.fillMaxSize()
             )
             if (isEmpty) {
+                val emptyTextRes = if (type == Photo.TYPE_AUDIO) {
+                    R.string.audio_gallery_empty
+                } else {
+                    R.string.gallery_empty
+                }
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
@@ -99,7 +115,7 @@ fun GalleryScreen(
                         .align(Alignment.Center)
                 ) {
                     Text(
-                        text = stringResource(R.string.gallery_empty),
+                        text = stringResource(emptyTextRes),
                         style = MaterialTheme.typography.bodyLarge,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(16.dp)

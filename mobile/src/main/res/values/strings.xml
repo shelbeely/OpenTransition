@@ -278,6 +278,7 @@
     <!-- Gallery -->
     <string name="add">Add</string>
     <string name="gallery_empty">It doesn\'t look like there are any photos yet. Why not add some?</string>
+    <string name="audio_gallery_empty">No recordings yet. Tap the + button to record your first voice sample.</string>
     <string name="selected">Selected</string>
     <string name="not_selected">Not Selected</string>
     <string name="select_photos_to_share">Select photos to share</string>
@@ -370,4 +371,33 @@
 
     <!-- Audio recording (ITEM-53) -->
     <string name="audio_attached_to_today">Date set to today — photos found for this day</string>
+
+    <!-- Speech transcription -->
+    <string name="transcript_label">Transcript</string>
+    <string name="transcript_live_label">Transcribing…</string>
+    <string name="transcript_unavailable">Transcription not available on this device</string>
+
+    <!-- Voice session detail screen -->
+    <string name="voice_session_detail_title">Session Detail</string>
+    <string name="voice_session_metrics_title">Measurements</string>
+    <string name="voice_session_summary_title">Session Notes</string>
+    <string name="voice_session_goals_title">Goals met this session</string>
+    <string name="metric_duration">Duration</string>
+    <string name="metric_voiced_pct">Voiced</string>
+    <string name="metric_intensity">Volume (mean)</string>
+    <string name="metric_pitch_range">Pitch range</string>
+    <string name="metric_pitch_avg">Pitch average</string>
+
+    <!-- Goal creation sheet -->
+    <string name="goal_creation_title">New goal</string>
+    <string name="goal_name_hint">Goal name (free text)</string>
+    <string name="goal_metric_label">Metric</string>
+    <string name="goal_target_min_label">Min: %s</string>
+    <string name="goal_target_max_label">Max: %s</string>
+    <string name="save">Save</string>
+    <!-- Voice progress screen -->
+    <string name="voice_progress_title">Voice Progress</string>
+    <string name="voice_progress_metric_label">Show metric</string>
+    <string name="voice_progress_add_goal">New goal</string>
+    <string name="voice_progress_empty">Record some sessions to track your progress here.</string>
 </resources>

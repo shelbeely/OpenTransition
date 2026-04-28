@@ -58,17 +58,23 @@ class WaveformView @JvmOverloads constructor(
 
     private var amplitudes = FloatArray(0)
     private var progress = 0f // 0.0 to 1.0
+    @Volatile private var extractionGeneration = 0
 
     /**
      * Sets the audio file to visualize.
      * Extracts amplitude data from the file.
+     * Any in-flight extraction for a previous file is abandoned.
      */
     fun setAudioFile(audioFile: File) {
+        val generation = ++extractionGeneration
         Thread {
             val extractedAmplitudes = extractAmplitudesFromFile(audioFile)
-            post {
-                amplitudes = extractedAmplitudes
-                invalidate()
+            // Only apply the result if no newer call has been made since this thread started
+            if (generation == extractionGeneration) {
+                post {
+                    amplitudes = extractedAmplitudes
+                    invalidate()
+                }
             }
         }.start()
     }

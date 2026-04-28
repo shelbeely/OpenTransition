@@ -14,13 +14,16 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.shelbeely.opentransition.database.room.dao.AudioAnalysisDao
 import com.shelbeely.opentransition.database.room.dao.MilestoneDao
 import com.shelbeely.opentransition.database.room.dao.PhotoDao
+import com.shelbeely.opentransition.database.room.dao.VoiceGoalDao
 import com.shelbeely.opentransition.database.room.entities.AudioAnalysisEntity
 import com.shelbeely.opentransition.database.room.entities.MilestoneEntity
 import com.shelbeely.opentransition.database.room.entities.PhotoEntity
+import com.shelbeely.opentransition.database.room.entities.VoiceGoalEntity
 import com.shelbeely.opentransition.util.settings.SettingsManager
 import net.sqlcipher.database.SupportFactory
 
@@ -28,19 +31,64 @@ import net.sqlcipher.database.SupportFactory
     entities = [
         MilestoneEntity::class,
         PhotoEntity::class,
-        AudioAnalysisEntity::class
+        AudioAnalysisEntity::class,
+        VoiceGoalEntity::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun milestoneDao(): MilestoneDao
     abstract fun photoDao(): PhotoDao
     abstract fun audioAnalysisDao(): AudioAnalysisDao
+    abstract fun voiceGoalDao(): VoiceGoalDao
     
     companion object {
         private const val DATABASE_NAME = "opentransition.db"
         private const val DECOY_DATABASE_NAME = "opentransition_decoy.db"
+
+        // ── Migrations ────────────────────────────────────────────────────
+
+        /**
+         * 1 → 2: Add extended voice-analysis columns and session summary text
+         * to the audio_analysis table.  All new columns have sensible defaults
+         * so existing rows stay valid.
+         */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN pitchConfidenceMean REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN voicedRatio REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN intensityMeanDb REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN intensityMaxDb REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN pitchRangeHz REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN pitchStabilityScore REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN intonationMovement REAL NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE audio_analysis ADD COLUMN sessionSummaryText TEXT NOT NULL DEFAULT ''")
+            }
+        }
+
+        /**
+         * 2 → 3: Add the voice_goals table for target-range tracking.
+         * No existing tables are modified.
+         */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS voice_goals (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        metricKey TEXT NOT NULL,
+                        targetMin REAL NOT NULL,
+                        targetMax REAL NOT NULL,
+                        createdAt INTEGER NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
+        // ── Singleton ─────────────────────────────────────────────────────
         
         @Volatile
         private var INSTANCE: AppDatabase? = null
@@ -86,15 +134,10 @@ abstract class AppDatabase : RoomDatabase() {
             }
             
             return builder
-                // No migrations are required at version 1. Future schema bumps
-                // MUST add an explicit `Migration` here; the previous
-                // `fallbackToDestructiveMigration()` call would have silently
-                // wiped user data on any version bump.
-                // See audit-report/07-issues-and-bugs.md ISSUE-006.
+                .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                 .addCallback(object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         super.onCreate(db)
-                        // Database created - can initialize with default data if needed
                     }
                 })
                 .build()

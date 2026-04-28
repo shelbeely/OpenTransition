@@ -47,6 +47,10 @@ sealed class GalleryUiEvent {
     object EndActionMode : GalleryUiEvent()
     data class Share(val selectedIds: ArrayList<String>) : GalleryUiEvent()
     data class Delete(val selectedIds: ArrayList<String>) : GalleryUiEvent()
+    /** Long-tap on an audio gallery item when not in selection mode → open session detail. */
+    data class AudioSessionDetail(val photoId: String) : GalleryUiEvent()
+    /** Tap on the "progress" button in the audio gallery toolbar → open voice progress screen. */
+    object ViewVoiceProgress : GalleryUiEvent()
 }
 
 sealed class GalleryUiState {
@@ -243,6 +247,9 @@ class GalleryView(
                     isEmpty = isEmpty,
                     onBack = { eventRelay.accept(GalleryUiEvent.Back) },
                     onAddPhoto = { showPhotoSourceMenu() },
+                    onViewProgress = if (GalleryUiState.getType(state) == Photo.TYPE_AUDIO) {
+                        { eventRelay.accept(GalleryUiEvent.ViewVoiceProgress) }
+                    } else null,
                     recyclerView = recyclerView,
                 )
             }
