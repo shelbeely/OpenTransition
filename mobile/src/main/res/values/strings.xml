@@ -394,4 +394,5 @@
     <string name="goal_metric_label">Metric</string>
     <string name="goal_target_min_label">Min: %s</string>
     <string name="goal_target_max_label">Max: %s</string>
+    <string name="save">Save</string>
 </resources>
