@@ -6,7 +6,18 @@ on:
       - 'copilot/**'
 
 jobs:
+  check-gradle-wrapper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Gradle Wrapper Validation
+        uses: gradle/wrapper-validation-action@v3
+
   debug:
+    needs: check-gradle-wrapper
     runs-on: ubuntu-latest
 
     steps:

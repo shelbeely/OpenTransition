@@ -6,13 +6,10 @@ env:
 on:
   push:
     branches: [ "production" ]
-  pull_request:
-    branches-ignore:
-      - 'copilot/**'
 
 concurrency:
   group: build-android-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 jobs:
 
