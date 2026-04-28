@@ -366,6 +366,7 @@ class GalleryAdapter(
         private val isPlayingState = mutableStateOf(false)
         private val pitchState = mutableStateOf("")
         private val formantsState = mutableStateOf("")
+        private val transcriptState = mutableStateOf("")
         private var currentPhotoId = ""
         private var currentFilePath = ""
         private var analysisDisposable: Disposable? = null
@@ -388,6 +389,7 @@ class GalleryAdapter(
             // Show placeholder while analysis loads
             pitchState.value = composeView.context.getString(R.string.pitch_format, "…")
             formantsState.value = composeView.context.getString(R.string.formants_format, "…", "…")
+            transcriptState.value = ""
 
             // Fetch analysis data off the main thread
             analysisDisposable = Single.fromCallable {
@@ -411,15 +413,17 @@ class GalleryAdapter(
                 } else {
                     composeView.context.getString(R.string.formants_format, "N/A", "N/A")
                 }
+                val transcript = analysis?.transcript.orEmpty()
                 realm.close()
-                pitch to formants
+                Triple(pitch, formants, transcript)
             }
                 .subscribeOn(RxSchedulers.io())
                 .observeOn(RxSchedulers.main())
-                .subscribe({ (pitch, formants) ->
+                .subscribe({ (pitch, formants, transcript) ->
                     if (currentPhotoId == photoId) {
                         pitchState.value = pitch
                         formantsState.value = formants
+                        transcriptState.value = transcript
                     }
                 }, { /* keep placeholder on error */ })
 
@@ -442,6 +446,7 @@ class GalleryAdapter(
                         dateText = dateText,
                         pitchText = pitchState.value,
                         formantsText = formantsState.value,
+                        transcriptText = transcriptState.value,
                         isPlaying = isPlayingState.value,
                         isSelected = isSelected,
                         selectionMode = selectionMode,

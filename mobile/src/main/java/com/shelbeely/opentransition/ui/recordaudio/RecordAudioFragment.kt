@@ -28,6 +28,7 @@ import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.util.AudioAnalysisUtil
 import com.shelbeely.opentransition.util.AudioRecorderUtil
 import com.shelbeely.opentransition.util.FileUtil
+import com.shelbeely.opentransition.util.SpeechTranscriptionManager
 import com.shelbeely.opentransition.util.openDefault
 import io.realm.kotlin.Realm
 import io.realm.kotlin.UpdatePolicy
@@ -41,6 +42,8 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
     private val handler = Handler(Looper.getMainLooper())
     private var recordingStartTime = 0L
     private var timerRunnable: Runnable? = null
+    /** Accumulated live transcript; updated by SpeechTranscriptionManager callbacks. */
+    private var liveTranscript = ""
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -118,6 +121,12 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
             recordingStartTime = System.currentTimeMillis()
             startTimer()
             (view as? RecordAudioView)?.setRecordingState(true)
+            // Start concurrent speech transcription. Gracefully ignored if unavailable.
+            liveTranscript = ""
+            SpeechTranscriptionManager.start(requireContext()) { transcript ->
+                liveTranscript = transcript
+                (view as? RecordAudioView)?.updateTranscript(transcript)
+            }
         } else {
             Snackbar.make(requireView(), R.string.audio_record_error, Snackbar.LENGTH_LONG).show()
         }
@@ -126,11 +135,15 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
     private fun stopRecording() {
         audioRecorder.stopRecording()
         stopTimer()
+        // Collect whatever transcript was accumulated; the manager releases the recognizer.
+        liveTranscript = SpeechTranscriptionManager.stop().ifEmpty { liveTranscript }
         (view as? RecordAudioView)?.apply {
             setRecordingState(false)
             enableSaveButton(true)
             // Show waveform preview for the recorded file
             audioRecorder.getOutputFile()?.let { setAudioFile(it) }
+            // Show final transcript
+            updateTranscript(liveTranscript)
             // ITEM-53: Auto-attach to today's date when photos exist for that day.
             autoAttachToTodayIfPhotosExist()
         }
@@ -227,6 +240,7 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
                 
                 // Link analysis to photo
                 analysis.photoId = savedPhoto.id
+                analysis.transcript = liveTranscript
                 copyToRealm(analysis, UpdatePolicy.ALL)
             }
             realm.close()
@@ -241,6 +255,7 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
     
     override fun onDestroyView() {
         stopTimer()
+        SpeechTranscriptionManager.stop()
         audioRecorder.release()
         super.onDestroyView()
     }

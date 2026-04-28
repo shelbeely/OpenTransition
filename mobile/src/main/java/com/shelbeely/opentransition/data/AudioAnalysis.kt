@@ -55,6 +55,9 @@ class AudioAnalysis : RealmObject {
     
     // Analysis timestamp
     var analysisTimestamp: Long = 0
+
+    // Speech transcript captured while recording (may be empty if recognition was unavailable)
+    var transcript: String = ""
     
     fun toJson(): JsonObject? {
         return try {
@@ -71,6 +74,7 @@ class AudioAnalysis : RealmObject {
                 addProperty(FIELD_F0_STD_DEV, f0StdDev)
                 addProperty(FIELD_DURATION_SECONDS, durationSeconds)
                 addProperty(FIELD_ANALYSIS_TIMESTAMP, analysisTimestamp)
+                addProperty(FIELD_TRANSCRIPT, transcript)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -91,6 +95,7 @@ class AudioAnalysis : RealmObject {
         const val FIELD_F0_STD_DEV = "f0StdDev"
         const val FIELD_DURATION_SECONDS = "durationSeconds"
         const val FIELD_ANALYSIS_TIMESTAMP = "analysisTimestamp"
+        const val FIELD_TRANSCRIPT = "transcript"
         
         fun fromJson(jsonReader: JsonReader): AudioAnalysis? {
             return try {
@@ -116,6 +121,7 @@ class AudioAnalysis : RealmObject {
                             FIELD_F0_STD_DEV -> f0StdDev = jsonReader.nextDouble().toFloat()
                             FIELD_DURATION_SECONDS -> durationSeconds = jsonReader.nextDouble().toFloat()
                             FIELD_ANALYSIS_TIMESTAMP -> analysisTimestamp = jsonReader.nextLong()
+                            FIELD_TRANSCRIPT -> transcript = jsonReader.nextString()
                             else -> jsonReader.skipValue()
                         }
                     }

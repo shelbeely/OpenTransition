@@ -59,6 +59,7 @@ fun RecordAudioScreen(
     isAnalyzing: Boolean,
     selectedDate: LocalDate,
     audioFile: File?,
+    transcript: String,
     onRecordClick: () -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -182,6 +183,38 @@ fun RecordAudioScreen(
                         .height(80.dp)
                         .padding(horizontal = 16.dp)
                 )
+            }
+
+            // Transcript card — shown while recording (live) and after stopping (final).
+            if (transcript.isNotBlank()) {
+                Spacer(modifier = Modifier.height(12.dp))
+                androidx.compose.foundation.layout.Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 16.dp, vertical = 10.dp)
+                ) {
+                    androidx.compose.foundation.layout.Column {
+                        Text(
+                            text = stringResource(
+                                if (isRecording) R.string.transcript_live_label
+                                else R.string.transcript_label
+                            ),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = transcript,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))

@@ -10,12 +10,12 @@
 
 package com.shelbeely.opentransition.ui.gallery
 
-import android.widget.ImageButton
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.shelbeely.opentransition.R
@@ -51,6 +52,7 @@ import java.io.File
  * @param dateText         Formatted date string.
  * @param pitchText        Formatted pitch string (e.g. "Pitch: 180 Hz").
  * @param formantsText     Formatted formants string (e.g. "F1: 700 Hz | F2: 1800 Hz").
+ * @param transcriptText   Speech transcript captured during recording, or empty.
  * @param isPlaying        Whether this audio is currently playing.
  * @param isSelected       Whether this item is currently selected.
  * @param selectionMode    Whether the gallery is in multi-select mode.
@@ -67,6 +69,7 @@ fun GalleryAudioItem(
     dateText: String,
     pitchText: String,
     formantsText: String,
+    transcriptText: String = "",
     isPlaying: Boolean,
     isSelected: Boolean,
     selectionMode: Boolean,
@@ -84,22 +87,21 @@ fun GalleryAudioItem(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        AndroidView(
-            factory = { ctx ->
-                ImageButton(ctx).apply {
-                    setBackgroundResource(R.drawable.rounded_transparent_button)
-                    contentDescription = ctx.getString(R.string.play_audio)
-                    setOnClickListener { onPlayPause() }
-                }
-            },
-            update = { button ->
-                button.setImageResource(
+        androidx.compose.material3.IconButton(
+            onClick = onPlayPause,
+            modifier = Modifier.size(56.dp)
+        ) {
+            androidx.compose.material3.Icon(
+                painter = androidx.compose.ui.res.painterResource(
                     if (isPlaying) android.R.drawable.ic_media_pause
                     else android.R.drawable.ic_media_play
-                )
-            },
-            modifier = Modifier.size(56.dp)
-        )
+                ),
+                contentDescription = if (isPlaying)
+                    androidx.compose.ui.res.stringResource(R.string.stop_recording)
+                else
+                    androidx.compose.ui.res.stringResource(R.string.play_audio),
+            )
+        }
 
         Column(
             modifier = Modifier
@@ -120,6 +122,16 @@ fun GalleryAudioItem(
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier.padding(top = 2.dp)
             )
+            if (transcriptText.isNotBlank()) {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = transcriptText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             AndroidView(
                 factory = { ctx -> WaveformView(ctx) },
                 update = { waveformView ->
