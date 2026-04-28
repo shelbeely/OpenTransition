@@ -45,6 +45,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.shelbeely.opentransition.R
+import com.shelbeely.opentransition.ui.widget.SpectrogramView
 import com.shelbeely.opentransition.ui.widget.WaveformView
 import com.shelbeely.opentransition.util.toFullDateString
 import java.io.File
@@ -181,6 +182,18 @@ fun RecordAudioScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(80.dp)
+                        .padding(horizontal = 16.dp)
+                )
+                // Spectrogram: the primary ear-training visual. Shows the full
+                // frequency content of the recording — listen and look at the
+                // same time. No targets, no reference lines; just your voice.
+                Spacer(modifier = Modifier.height(8.dp))
+                AndroidView(
+                    factory = { ctx -> SpectrogramView(ctx) },
+                    update = { spectrogramView -> spectrogramView.setAudioFile(audioFile) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(140.dp)
                         .padding(horizontal = 16.dp)
                 )
             }

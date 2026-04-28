@@ -33,25 +33,21 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.ui.widget.WaveformView
+import com.shelbeely.opentransition.ui.widget.SpectrogramView
 import java.io.File
 
 /**
  * Gallery grid cell for an audio item.
  *
- * Migrated from `res/layout/gallery_adapter_audio_item.xml`:
- * - Root was `ConstraintLayout` with `@drawable/rounded_transparent_button` background and 16dp padding
- *   → reproduced as a [Row] with `Modifier.background(Color(0x40FFFFFF), RoundedCornerShape(24dp))`
- * - `ImageButton` play/pause (56×56dp, left side) → `AndroidView { ImageButton }`
- * - `TextView` date, pitch, formants (right of play button) → `Text` composables
- * - `WaveformView` (0dp × 80dp, below formants) → `AndroidView { WaveformView }`
- * - `CheckBox` selection (end, visibility=gone in non-selection mode) → `Checkbox` composable
+ * Shows the recording date, a spectrogram of the actual audio content (the
+ * primary ear-training visual), an optional transcript, and a play/pause
+ * button.  Numeric pitch/formant values are intentionally omitted — the
+ * spectrogram is a neutral representation that helps users correlate what
+ * they hear with what they see, without providing "targets" to fixate on.
  *
  * @param photoId          Unique ID for this audio item (used for playback tracking).
  * @param audioFilePath    Absolute path to the audio file.
  * @param dateText         Formatted date string.
- * @param pitchText        Formatted pitch string (e.g. "Pitch: 180 Hz").
- * @param formantsText     Formatted formants string (e.g. "F1: 700 Hz | F2: 1800 Hz").
  * @param transcriptText   Speech transcript captured during recording, or empty.
  * @param isPlaying        Whether this audio is currently playing.
  * @param isSelected       Whether this item is currently selected.
@@ -67,8 +63,6 @@ fun GalleryAudioItem(
     photoId: String,
     audioFilePath: String,
     dateText: String,
-    pitchText: String,
-    formantsText: String,
     transcriptText: String = "",
     isPlaying: Boolean,
     isSelected: Boolean,
@@ -112,38 +106,29 @@ fun GalleryAudioItem(
                 text = dateText,
                 style = MaterialTheme.typography.bodyMedium
             )
-            Text(
-                text = pitchText,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 4.dp)
-            )
-            Text(
-                text = formantsText,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(top = 2.dp)
-            )
             if (transcriptText.isNotBlank()) {
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = transcriptText,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
-                    maxLines = 3,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
+            // Spectrogram: shows actual frequency content over time. Paired with
+            // playback this is the primary ear-training tool — users correlate
+            // what they hear with what they see, across recordings over time.
             AndroidView(
-                factory = { ctx -> WaveformView(ctx) },
-                update = { waveformView ->
+                factory = { ctx -> SpectrogramView(ctx) },
+                update = { spectrogramView ->
                     val file = File(audioFilePath)
-                    if (file.exists()) {
-                        waveformView.setAudioFile(file)
-                    }
+                    if (file.exists()) spectrogramView.setAudioFile(file)
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
-                    .padding(top = 8.dp, bottom = 8.dp, end = 8.dp)
+                    .height(100.dp)
+                    .padding(top = 8.dp, end = 8.dp)
             )
         }
 

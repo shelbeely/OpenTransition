@@ -364,8 +364,6 @@ class GalleryAdapter(
         private val composeView: ComposeView = composeView
         private val adapterRef = WeakReference(creatingAdapter)
         private val isPlayingState = mutableStateOf(false)
-        private val pitchState = mutableStateOf("")
-        private val formantsState = mutableStateOf("")
         private val transcriptState = mutableStateOf("")
         private var currentPhotoId = ""
         private var currentFilePath = ""
@@ -386,46 +384,24 @@ class GalleryAdapter(
             val dateText = LocalDate.ofEpochDay(item.photo.epochDay)
                 .toFullDateString(composeView.context)
 
-            // Show placeholder while analysis loads
-            pitchState.value = composeView.context.getString(R.string.pitch_format, "…")
-            formantsState.value = composeView.context.getString(R.string.formants_format, "…", "…")
             transcriptState.value = ""
 
-            // Fetch analysis data off the main thread
+            // Fetch transcript off the main thread
             analysisDisposable = Single.fromCallable {
                 val realm = Realm.openDefault()
                 val analysis = realm.query(AudioAnalysis::class, "photoId == '$photoId'")
                     .first().find()
-                val pitch = if (analysis != null) {
-                    composeView.context.getString(
-                        R.string.pitch_format,
-                        String.format(java.util.Locale.US, "%.0f", analysis.f0Mean)
-                    )
-                } else {
-                    composeView.context.getString(R.string.pitch_format, "N/A")
-                }
-                val formants = if (analysis != null) {
-                    composeView.context.getString(
-                        R.string.formants_format,
-                        String.format(java.util.Locale.US, "%.0f", analysis.f1Mean),
-                        String.format(java.util.Locale.US, "%.0f", analysis.f2Mean)
-                    )
-                } else {
-                    composeView.context.getString(R.string.formants_format, "N/A", "N/A")
-                }
                 val transcript = analysis?.transcript.orEmpty()
                 realm.close()
-                Triple(pitch, formants, transcript)
+                transcript
             }
                 .subscribeOn(RxSchedulers.io())
                 .observeOn(RxSchedulers.main())
-                .subscribe({ (pitch, formants, transcript) ->
+                .subscribe({ transcript ->
                     if (currentPhotoId == photoId) {
-                        pitchState.value = pitch
-                        formantsState.value = formants
                         transcriptState.value = transcript
                     }
-                }, { /* keep placeholder on error */ })
+                }, { /* keep empty on error */ })
 
             // Subscribe to playback broadcast so state updates when audio completes
             playbackDisposable = AudioPlayerManager.playbackEvents
@@ -444,8 +420,6 @@ class GalleryAdapter(
                         photoId = photoId,
                         audioFilePath = filePath,
                         dateText = dateText,
-                        pitchText = pitchState.value,
-                        formantsText = formantsState.value,
                         transcriptText = transcriptState.value,
                         isPlaying = isPlayingState.value,
                         isSelected = isSelected,

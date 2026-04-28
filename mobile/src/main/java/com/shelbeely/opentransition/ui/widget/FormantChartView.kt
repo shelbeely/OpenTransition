@@ -148,9 +148,6 @@ class FormantChartView @JvmOverloads constructor(
 
         textPaint.textSize = 28f // Reset text size
 
-        // Draw reference regions first (so points appear on top)
-        drawReferenceRegions(canvas, padding, chartWidth, chartHeight)
-
         // Plot data points with color gradient (oldest = blue, newest = green)
         data.forEachIndexed { index, analysis ->
             val x = mapF2ToX(analysis.f2Mean, padding, chartWidth)
@@ -200,47 +197,6 @@ class FormantChartView @JvmOverloads constructor(
         // Invert Y axis so lower F1 (higher tongue) is at top
         val normalized = (f1 - f1Min) / (f1Max - f1Min)
         return padding + chartHeight - (normalized * chartHeight)
-    }
-
-    private fun drawReferenceRegions(canvas: Canvas, padding: Float, chartWidth: Float, chartHeight: Float) {
-        val referencePaint = Paint().apply {
-            color = Color.WHITE
-            alpha = 40
-            isAntiAlias = true
-            style = Paint.Style.FILL
-        }
-
-        val labelPaint = Paint().apply {
-            color = Color.WHITE
-            alpha = 180
-            textSize = 32f
-            isAntiAlias = true
-            textAlign = Paint.Align.CENTER
-        }
-
-        // Higher pitch range (higher F1, higher F2)
-        val femX1 = mapF2ToX(1500f, padding, chartWidth)
-        val femX2 = mapF2ToX(2500f, padding, chartWidth)
-        val femY1 = mapF1ToY(850f, padding, chartHeight)
-        val femY2 = mapF1ToY(600f, padding, chartHeight)
-        
-        canvas.drawRect(femX1, femY2, femX2, femY1, referencePaint.apply { 
-            color = Color.parseColor("#E91E63") // Pink
-            alpha = 30
-        })
-        canvas.drawText("High", (femX1 + femX2) / 2, (femY1 + femY2) / 2, labelPaint)
-
-        // Lower pitch range (lower F1, lower F2)
-        val mascX1 = mapF2ToX(1000f, padding, chartWidth)
-        val mascX2 = mapF2ToX(1600f, padding, chartWidth)
-        val mascY1 = mapF1ToY(650f, padding, chartHeight)
-        val mascY2 = mapF1ToY(400f, padding, chartHeight)
-        
-        canvas.drawRect(mascX1, mascY2, mascX2, mascY1, referencePaint.apply {
-            color = Color.parseColor("#2196F3") // Blue
-            alpha = 30
-        })
-        canvas.drawText("Low", (mascX1 + mascX2) / 2, (mascY1 + mascY2) / 2, labelPaint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
