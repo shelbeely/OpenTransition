@@ -10,7 +10,6 @@
 
 package com.shelbeely.opentransition.util
 
-import android.os.Build
 import androidx.exifinterface.media.ExifInterface
 import androidx.exifinterface.media.ExifInterface.TAG_DATETIME
 import androidx.exifinterface.media.ExifInterface.TAG_SUBSEC_TIME
@@ -45,18 +44,16 @@ fun ExifInterface.compatGetDateTime(): Long {
         val datetime = sFormatter.parse(dateTimeString, pos) ?: return -1
         var msecs = datetime.time
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val subSecs = getAttribute(TAG_SUBSEC_TIME)
-            if (subSecs != null) {
-                try {
-                    var sub = java.lang.Long.parseLong(subSecs)
-                    while (sub > 1000) {
-                        sub /= 10
-                    }
-                    msecs += sub
-                } catch (e: NumberFormatException) {
-                    // Ignored
+        val subSecs = getAttribute(TAG_SUBSEC_TIME)
+        if (subSecs != null) {
+            try {
+                var sub = java.lang.Long.parseLong(subSecs)
+                while (sub > 1000) {
+                    sub /= 10
                 }
+                msecs += sub
+            } catch (e: NumberFormatException) {
+                // Ignored
             }
         }
 

@@ -26,15 +26,12 @@ import com.jakewharton.rxrelay3.PublishRelay
 import io.reactivex.rxjava3.core.Observable
 
 class StoragePermissionHandler : Fragment() {
-    init {
-        retainInstance = true
-    }
-
     override fun onResume() {
         super.onResume()
         checkPermissionGranted()
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {

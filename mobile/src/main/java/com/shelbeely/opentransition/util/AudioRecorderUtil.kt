@@ -10,14 +10,16 @@
 
 package com.shelbeely.opentransition.util
 
+import android.content.Context
 import android.media.MediaRecorder
+import android.os.Build
 import java.io.File
 import java.io.IOException
 
 /**
  * Utility class for recording audio using MediaRecorder.
  */
-class AudioRecorderUtil {
+class AudioRecorderUtil(private val context: Context) {
     
     private var mediaRecorder: MediaRecorder? = null
     private var outputFile: File? = null
@@ -33,7 +35,12 @@ class AudioRecorderUtil {
         return try {
             outputFile = file
             
-            mediaRecorder = MediaRecorder().apply {
+            mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                MediaRecorder(context)
+            } else {
+                @Suppress("DEPRECATION")
+                MediaRecorder()
+            }.apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)

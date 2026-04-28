@@ -11,8 +11,8 @@
 package com.shelbeely.opentransition.util
 
 import android.content.Context
+import android.os.Build
 import android.util.DisplayMetrics
-import android.view.Display
 import android.view.View
 import android.view.WindowManager
 import com.google.android.gms.ads.AdListener
@@ -39,14 +39,22 @@ fun AdView.loadAd(context: Context) {
 private fun getAdaptiveAdSize(context: Context): AdSize {
     val windowManager: WindowManager =
         context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-    val display: Display = windowManager.defaultDisplay
 
-    val outMetrics = DisplayMetrics()
-    display.getMetrics(outMetrics)
+    val widthPixels: Float
+    val density: Float
 
-    val widthPixels = outMetrics.widthPixels.toFloat()
-    val density = outMetrics.density
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        val metrics = windowManager.currentWindowMetrics
+        widthPixels = metrics.bounds.width().toFloat()
+        density = context.resources.displayMetrics.density
+    } else {
+        val outMetrics = DisplayMetrics()
+        @Suppress("DEPRECATION")
+        windowManager.defaultDisplay.getMetrics(outMetrics)
+        widthPixels = outMetrics.widthPixels.toFloat()
+        density = outMetrics.density
+    }
+
     val adWidth = (widthPixels / density).toInt()
-
     return AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize(context, adWidth)
 }
