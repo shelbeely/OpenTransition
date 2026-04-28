@@ -89,6 +89,9 @@ class PitchProgressionView @JvmOverloads constructor(
 
     private val data = mutableListOf<DataPoint>()
 
+    // Reusable Path to avoid per-frame allocation in onDraw (fixes DrawAllocation lint warning).
+    private val linePath = Path()
+
     fun setData(analyses: List<Pair<LocalDate, AudioAnalysis>>) {
         data.clear()
         analyses.sortedBy { it.first }.forEach { (date, analysis) ->
@@ -144,8 +147,8 @@ class PitchProgressionView @JvmOverloads constructor(
             val y = mapPitchToY(data[0].f0Mean, yMin, yMax, padding, chartHeight)
             canvas.drawCircle(x, y, 8f, pointPaint)
         } else {
-            // Draw line connecting mean values
-            val path = Path()
+            // Draw line connecting mean values (reuses pre-allocated linePath)
+            val path = linePath.apply { reset() }
             data.forEachIndexed { index, point ->
                 val x = padding + (chartWidth * index / (data.size - 1))
                 val y = mapPitchToY(point.f0Mean, yMin, yMax, padding, chartHeight)

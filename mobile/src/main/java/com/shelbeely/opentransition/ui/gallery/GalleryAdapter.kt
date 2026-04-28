@@ -382,7 +382,7 @@ class GalleryAdapter(
             val pitchText = if (analysis != null) {
                 composeView.context.getString(
                     R.string.pitch_format,
-                    String.format("%.0f", analysis.f0Mean)
+                    String.format(java.util.Locale.US, "%.0f", analysis.f0Mean)
                 )
             } else {
                 composeView.context.getString(R.string.pitch_format, "N/A")
@@ -390,8 +390,8 @@ class GalleryAdapter(
             val formantsText = if (analysis != null) {
                 composeView.context.getString(
                     R.string.formants_format,
-                    String.format("%.0f", analysis.f1Mean),
-                    String.format("%.0f", analysis.f2Mean)
+                    String.format(java.util.Locale.US, "%.0f", analysis.f1Mean),
+                    String.format(java.util.Locale.US, "%.0f", analysis.f2Mean)
                 )
             } else {
                 composeView.context.getString(R.string.formants_format, "N/A", "N/A")

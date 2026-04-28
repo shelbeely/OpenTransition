@@ -14,6 +14,7 @@ import android.media.MediaExtractor
 import android.media.MediaFormat
 import com.shelbeely.opentransition.data.AudioAnalysis
 import java.io.File
+import java.util.Locale
 
 /**
  * Utility for analyzing audio files to extract formants and voice characteristics.
@@ -165,19 +166,19 @@ object AudioAnalysisUtil {
             appendLine()
             
             appendLine("Pitch Analysis:")
-            appendLine("  Average Pitch (F0): ${String.format("%.1f", analysis.f0Mean)} Hz")
-            appendLine("  Pitch Range: ${String.format("%.1f", analysis.f0Min)} - ${String.format("%.1f", analysis.f0Max)} Hz")
-            appendLine("  Pitch Variability: ${String.format("%.1f", analysis.f0StdDev)} Hz")
+            appendLine("  Average Pitch (F0): ${String.format(Locale.US, "%.1f", analysis.f0Mean)} Hz")
+            appendLine("  Pitch Range: ${String.format(Locale.US, "%.1f", analysis.f0Min)} - ${String.format(Locale.US, "%.1f", analysis.f0Max)} Hz")
+            appendLine("  Pitch Variability: ${String.format(Locale.US, "%.1f", analysis.f0StdDev)} Hz")
             appendLine()
             
             appendLine("Formant Frequencies:")
-            appendLine("  F1 (Tongue Height): ${String.format("%.0f", analysis.f1Mean)} Hz")
-            appendLine("  F2 (Tongue Position): ${String.format("%.0f", analysis.f2Mean)} Hz")
-            appendLine("  F3: ${String.format("%.0f", analysis.f3Mean)} Hz")
-            appendLine("  F4: ${String.format("%.0f", analysis.f4Mean)} Hz")
+            appendLine("  F1 (Tongue Height): ${String.format(Locale.US, "%.0f", analysis.f1Mean)} Hz")
+            appendLine("  F2 (Tongue Position): ${String.format(Locale.US, "%.0f", analysis.f2Mean)} Hz")
+            appendLine("  F3: ${String.format(Locale.US, "%.0f", analysis.f3Mean)} Hz")
+            appendLine("  F4: ${String.format(Locale.US, "%.0f", analysis.f4Mean)} Hz")
             appendLine()
             
-            appendLine("Recording Duration: ${String.format("%.1f", analysis.durationSeconds)} seconds")
+            appendLine("Recording Duration: ${String.format(Locale.US, "%.1f", analysis.durationSeconds)} seconds")
             appendLine()
             
             appendLine("Note: Formant values are estimated. For accurate analysis,")

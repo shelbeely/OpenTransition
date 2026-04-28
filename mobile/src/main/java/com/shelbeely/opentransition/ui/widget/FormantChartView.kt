@@ -59,6 +59,13 @@ class FormantChartView @JvmOverloads constructor(
         isAntiAlias = true
     }
 
+    // Reusable Paints to avoid per-draw allocations (fixes DrawAllocation lint warning).
+    private val pointPaintColored = Paint(pointPaint)
+    private val labelPaint = Paint(textPaint).apply {
+        textSize = 18f
+        textAlign = Paint.Align.CENTER
+    }
+
     private val data = mutableListOf<AudioAnalysis>()
 
     // Formant chart typical ranges (in Hz)
@@ -157,17 +164,10 @@ class FormantChartView @JvmOverloads constructor(
                 progress
             )
             
-            val pointPaintColored = Paint(pointPaint).apply {
-                this.color = color
-            }
-            
+            pointPaintColored.color = color
             canvas.drawCircle(x, y, 12f, pointPaintColored)
             
-            // Draw small label with index
-            val labelPaint = Paint(textPaint).apply {
-                textSize = 18f
-                textAlign = Paint.Align.CENTER
-            }
+            // Draw small label with index (uses pre-allocated labelPaint)
             canvas.drawText("${index + 1}", x, y - 18f, labelPaint)
         }
     }

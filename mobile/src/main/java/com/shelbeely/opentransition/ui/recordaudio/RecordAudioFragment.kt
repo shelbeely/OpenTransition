@@ -167,7 +167,7 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
                 val elapsed = (System.currentTimeMillis() - recordingStartTime) / 1000
                 val minutes = elapsed / 60
                 val seconds = elapsed % 60
-                (view as? RecordAudioView)?.updateTimer(String.format("%02d:%02d", minutes, seconds))
+                (view as? RecordAudioView)?.updateTimer(String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds))
                 handler.postDelayed(this, 1000)
             }
         }
