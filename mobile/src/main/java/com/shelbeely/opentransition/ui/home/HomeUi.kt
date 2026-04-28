@@ -123,16 +123,26 @@ class HomeView(context: Context, attributeSet: AttributeSet) : FrameLayout(conte
         renderCompose()
     }
 
-    private fun showPhotoSourceMenu() {
+    private fun showPhotoSourceMenu(@Photo.Type type: Int) {
         val popup = PopupMenu(context, composeView)
         popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
         popup.setOnMenuItemClickListener { menuItem: MenuItem ->
             when (menuItem.itemId) {
                 R.id.media_source_camera ->
-                    eventRelay.accept(HomeUiEvent.AddPhotoCamera())
+                    eventRelay.accept(
+                        HomeUiEvent.AddPhotoCamera(
+                            currentDate = (currentState as? HomeUiState.Loaded)?.currentDate,
+                            type = type
+                        )
+                    )
 
                 R.id.media_source_gallery ->
-                    eventRelay.accept(HomeUiEvent.AddPhotoGallery())
+                    eventRelay.accept(
+                        HomeUiEvent.AddPhotoGallery(
+                            currentDate = (currentState as? HomeUiState.Loaded)?.currentDate,
+                            type = type
+                        )
+                    )
 
                 else -> return@setOnMenuItemClickListener false
             }
@@ -146,7 +156,15 @@ class HomeView(context: Context, attributeSet: AttributeSet) : FrameLayout(conte
             OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
                 HomeScreen(
                     state = currentState,
-                    onTakePhoto = { showPhotoSourceMenu() },
+                    onAddFacePhoto = { showPhotoSourceMenu(Photo.TYPE_FACE) },
+                    onAddBodyPhoto = { showPhotoSourceMenu(Photo.TYPE_BODY) },
+                    onAddAudio = {
+                        eventRelay.accept(
+                            HomeUiEvent.AddAudioRecording(
+                                currentDate = (currentState as? HomeUiState.Loaded)?.currentDate
+                            )
+                        )
+                    },
                     onSettings = { eventRelay.accept(HomeUiEvent.Settings) },
                     onPreviousDay = { eventRelay.accept(HomeUiEvent.PreviousRecord) },
                     onNextDay = { eventRelay.accept(HomeUiEvent.NextRecord) },

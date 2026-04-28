@@ -10,7 +10,13 @@
 
 package com.shelbeely.opentransition.ui.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,35 +27,57 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarExitDirection
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SmallFloatingActionButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.recyclerview.widget.RecyclerView
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.util.toFullDateString
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun HomeScreen(
     state: HomeUiState,
-    onTakePhoto: () -> Unit,
+    onAddFacePhoto: () -> Unit,
+    onAddBodyPhoto: () -> Unit,
+    onAddAudio: () -> Unit,
     onSettings: () -> Unit,
     onPreviousDay: () -> Unit,
     onNextDay: () -> Unit,
@@ -64,7 +92,13 @@ fun HomeScreen(
     val context = LocalContext.current
     val loaded = state as? HomeUiState.Loaded
 
-    Column(
+    var speedDialExpanded by remember { mutableStateOf(false) }
+    val scrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(
+        exitDirection = FloatingToolbarExitDirection.Top
+    )
+    val toolbarExpanded = scrollBehavior.state.offset == 0f
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
             .pointerInput(loaded?.showPreviousRecord, loaded?.showNextRecord) {
@@ -84,43 +118,73 @@ fun HomeScreen(
                 }
             }
     ) {
-        // Top bar: Take photo button (start) + Settings button (end)
-        Row(
+        // Main scrollable content
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 32.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior)
         ) {
-            IconButton(
-                onClick = onTakePhoto,
-                modifier = Modifier.padding(start = 4.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_photo_camera_white_24dp),
-                    contentDescription = stringResource(R.string.take_photo),
-                    tint = Color.White
+            // Reserve space so content starts below the floating toolbar
+            Spacer(modifier = Modifier.height(80.dp))
+
+            // Date summary (visible below toolbar)
+            if (loaded != null) {
+                HomeDateSummaryItem(
+                    startDate = context.getString(
+                        R.string.start_date,
+                        loaded.startDate.toFullDateString(context)
+                    ),
+                    currentDate = context.getString(
+                        R.string.current_date,
+                        loaded.currentDate.toFullDateString(context)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
+            } else {
+                Spacer(modifier = Modifier.height(56.dp))
             }
-            IconButton(
-                onClick = onSettings,
-                modifier = Modifier.padding(end = 4.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_settings_white_24dp),
-                    contentDescription = stringResource(R.string.edit_settings),
-                    tint = Color.White
-                )
-            }
+
+            // Gallery sections
+            GallerySection(
+                label = stringResource(R.string.face_gallery),
+                onGalleryClick = onFaceGallery,
+                recyclerView = faceRecyclerView,
+                modifier = Modifier.weight(1f)
+            )
+            GallerySection(
+                label = stringResource(R.string.body_gallery),
+                onGalleryClick = onBodyGallery,
+                recyclerView = bodyRecyclerView,
+                modifier = Modifier.weight(1f),
+                labelTopPadding = 0.dp
+            )
+            GallerySection(
+                label = stringResource(R.string.audio_gallery),
+                onGalleryClick = onAudioGallery,
+                recyclerView = audioRecyclerView,
+                modifier = Modifier.weight(1f),
+                labelTopPadding = 0.dp
+            )
         }
 
-        // Day navigation: Previous arrow + Day title + Next arrow
-        Row(
+        // Floating toolbar — sits on top of content at the top-center
+        HorizontalFloatingToolbar(
+            expanded = toolbarExpanded,
+            floatingActionButton = {
+                SmallFloatingActionButton(
+                    onClick = { scrollBehavior.state.offset = 0f }
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.CalendarToday,
+                        contentDescription = stringResource(R.string.navigate_days)
+                    )
+                }
+            },
+            scrollBehavior = scrollBehavior,
+            colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(),
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                .align(Alignment.TopCenter)
+                .padding(top = 8.dp, start = 16.dp, end = 16.dp)
         ) {
             IconButton(
                 onClick = onPreviousDay,
@@ -136,8 +200,7 @@ fun HomeScreen(
                 text = loaded?.dayString ?: "",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                color = Color.White,
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -151,115 +214,125 @@ fun HomeScreen(
                     tint = Color.Unspecified
                 )
             }
-        }
-
-        // Divider
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .padding(horizontal = 24.dp)
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(Color.Transparent, Color.White, Color.Transparent)
-                    )
-                )
-        )
-
-        // Date summary + Milestones button
-        if (loaded != null) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                HomeDateSummaryItem(
-                    startDate = context.getString(
-                        R.string.start_date,
-                        loaded.startDate.toFullDateString(context)
-                    ),
-                    currentDate = context.getString(
-                        R.string.current_date,
-                        loaded.currentDate.toFullDateString(context)
-                    ),
-                    modifier = Modifier.weight(1f, fill = false)
-                )
-                HomeMilestonesButton(
-                    hasMilestones = loaded.hasMilestones,
-                    onClick = onMilestonesClick,
-                    modifier = Modifier.padding(start = 8.dp)
+            HomeMilestonesButton(
+                hasMilestones = loaded?.hasMilestones == true,
+                onClick = onMilestonesClick
+            )
+            IconButton(onClick = onSettings) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = stringResource(R.string.edit_settings)
                 )
             }
-        } else {
-            Spacer(modifier = Modifier.height(56.dp))
         }
 
-        // Divider
-        Box(
+        // Speed-dial backdrop — dismisses the menu when tapping outside
+        if (speedDialExpanded) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.4f))
+                    .clickable { speedDialExpanded = false }
+            )
+        }
+
+        // Speed-dial FAB (bottom-end)
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(2.dp)
-                .padding(horizontal = 24.dp)
-                .background(
-                    Brush.horizontalGradient(
-                        listOf(Color.Transparent, Color.White, Color.Transparent)
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            AnimatedVisibility(
+                visible = speedDialExpanded,
+                enter = fadeIn() + slideInVertically { it },
+                exit = fadeOut() + slideOutVertically { it }
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SpeedDialItem(
+                        label = stringResource(R.string.add_audio_recording),
+                        icon = { Icon(Icons.Filled.Mic, contentDescription = null) },
+                        onClick = { speedDialExpanded = false; onAddAudio() }
                     )
+                    SpeedDialItem(
+                        label = stringResource(R.string.add_body_photo),
+                        icon = { Icon(Icons.Filled.Person, contentDescription = null) },
+                        onClick = { speedDialExpanded = false; onAddBodyPhoto() }
+                    )
+                    SpeedDialItem(
+                        label = stringResource(R.string.add_face_photo),
+                        icon = { Icon(Icons.Filled.Face, contentDescription = null) },
+                        onClick = { speedDialExpanded = false; onAddFacePhoto() }
+                    )
+                }
+            }
+            FloatingActionButton(
+                onClick = { speedDialExpanded = !speedDialExpanded }
+            ) {
+                Icon(
+                    imageVector = if (speedDialExpanded) Icons.Filled.Close else Icons.Filled.Add,
+                    contentDescription = if (speedDialExpanded) {
+                        stringResource(R.string.collapse_add_menu)
+                    } else {
+                        stringResource(R.string.add)
+                    }
                 )
-        )
-
-        // Face gallery section
-        GallerySection(
-            label = stringResource(R.string.face_gallery),
-            onGalleryClick = onFaceGallery,
-            recyclerView = faceRecyclerView,
-            modifier = Modifier.weight(1f)
-        )
-
-        // Body gallery section
-        GallerySection(
-            label = stringResource(R.string.body_gallery),
-            onGalleryClick = onBodyGallery,
-            recyclerView = bodyRecyclerView,
-            modifier = Modifier.weight(1f),
-            labelTopPadding = 0.dp
-        )
-
-        // Audio gallery section
-        GallerySection(
-            label = stringResource(R.string.audio_gallery),
-            onGalleryClick = onAudioGallery,
-            recyclerView = audioRecyclerView,
-            modifier = Modifier.weight(1f),
-            labelTopPadding = 0.dp
-        )
+            }
+        }
     }
 }
 
+@Composable
+private fun SpeedDialItem(
+    label: String,
+    icon: @Composable () -> Unit,
+    onClick: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Surface(
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 4.dp,
+            shadowElevation = 2.dp
+        ) {
+            Text(
+                text = label,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                style = MaterialTheme.typography.labelLarge
+            )
+        }
+        SmallFloatingActionButton(onClick = onClick) { icon() }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun GallerySection(
     label: String,
     onGalleryClick: () -> Unit,
     recyclerView: RecyclerView,
     modifier: Modifier = Modifier,
-    labelTopPadding: androidx.compose.ui.unit.Dp = 8.dp,
+    labelTopPadding: Dp = 8.dp,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Button(
+        AssistChip(
             onClick = onGalleryClick,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = labelTopPadding)
-                .height(40.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.White.copy(alpha = 0.25f),
-                contentColor = Color.White
-            ),
-            shape = RoundedCornerShape(24.dp)
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.titleLarge
-            )
-        }
+            label = { Text(label, style = MaterialTheme.typography.titleMedium) },
+            trailingIcon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = null
+                )
+            },
+            modifier = Modifier.padding(top = labelTopPadding, start = 8.dp)
+        )
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -273,3 +346,4 @@ private fun GallerySection(
         }
     }
 }
+

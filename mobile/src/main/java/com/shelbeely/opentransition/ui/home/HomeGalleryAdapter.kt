@@ -11,10 +11,8 @@
 package com.shelbeely.opentransition.ui.home
 
 import android.os.Handler
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.PopupMenu
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -78,48 +76,13 @@ class HomeGalleryAdapter(
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         when (holder) {
-            is AddViewHolder -> holder.bind(currentDate, type)
-            is PhotoViewHolder -> holder.bind(result[position - 1])
-            is AudioViewHolder -> holder.bind(result[position - 1])
+            is PhotoViewHolder -> holder.bind(result[position])
+            is AudioViewHolder -> holder.bind(result[position])
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-            TYPE_ADD -> {
-                val context = parent.context
-                val density = context.resources.displayMetrics.density
-                val margin = (4 * density).toInt()
-                val padding = (6 * density).toInt()
-
-                val composeView = ComposeView(context).apply {
-                    layoutParams = ConstraintLayout.LayoutParams(0, 0).apply {
-                        startToStart = ConstraintLayout.LayoutParams.PARENT_ID
-                        topToTop = ConstraintLayout.LayoutParams.PARENT_ID
-                        endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
-                        bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
-                    }
-                    setViewCompositionStrategy(
-                        ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool
-                    )
-                }
-
-                val itemView = SquareConstraintLayout(context).apply {
-                    layoutParams = RecyclerView.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT
-                    ).apply {
-                        marginStart = margin
-                        marginEnd = margin
-                    }
-                    orientation = 0
-                    setBackgroundResource(R.drawable.rounded_image_background)
-                    setPadding(padding, padding, padding, padding)
-                    addView(composeView)
-                }
-
-                AddViewHolder(itemView, composeView, eventRelayRef.get())
-            }
             TYPE_PHOTO -> {
                 val context = parent.context
                 val density = context.resources.displayMetrics.density
@@ -190,12 +153,10 @@ class HomeGalleryAdapter(
         }
     }
 
-    override fun getItemCount(): Int = result.count() + 1
+    override fun getItemCount(): Int = result.count()
 
-    override fun getItemViewType(position: Int): Int = when (position) {
-        0 -> TYPE_ADD
-        else -> if (type == Photo.TYPE_AUDIO) TYPE_AUDIO else TYPE_PHOTO
-    }
+    override fun getItemViewType(position: Int): Int =
+        if (type == Photo.TYPE_AUDIO) TYPE_AUDIO else TYPE_PHOTO
 
     override fun onViewRecycled(holder: BaseViewHolder) {
         super.onViewRecycled(holder)
@@ -203,58 +164,6 @@ class HomeGalleryAdapter(
     }
 
     abstract class BaseViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-
-    class AddViewHolder(
-        itemView: View,
-        private val composeView: ComposeView,
-        eventRelay: PublishRelay<HomeUiEvent>?
-    ) :
-        BaseViewHolder(itemView) {
-        private val eventRelayRef = WeakReference(eventRelay)
-
-        fun bind(currentDate: LocalDate, @Photo.Type type: Int) {
-            composeView.setContent {
-                OpenTransitionTheme(
-                    colorVariant = SettingsManager.getResolvedComposeColorVariant()
-                ) {
-                    HomeGalleryAddItem(
-                        contentDescription = itemView.context.getString(
-                            when (type) {
-                                Photo.TYPE_BODY -> R.string.add_body_photo
-                                Photo.TYPE_AUDIO -> R.string.add_audio_recording
-                                else -> R.string.add_face_photo
-                            }
-                        ),
-                        onClick = { onAddClick(currentDate, type) }
-                    )
-                }
-            }
-        }
-
-        private fun onAddClick(currentDate: LocalDate, @Photo.Type type: Int) {
-            if (type == Photo.TYPE_AUDIO) {
-                eventRelayRef.get()?.accept(HomeUiEvent.AddAudioRecording(currentDate))
-                return
-            }
-
-            val popup = PopupMenu(itemView.context, itemView)
-            popup.menuInflater.inflate(R.menu.popup_media_source, popup.menu)
-            popup.setOnMenuItemClickListener { menuItem: MenuItem ->
-                when (menuItem.itemId) {
-                    R.id.media_source_camera -> eventRelayRef.get()
-                        ?.accept(HomeUiEvent.AddPhotoCamera(currentDate, type))
-
-                    R.id.media_source_gallery -> eventRelayRef.get()
-                        ?.accept(HomeUiEvent.AddPhotoGallery(currentDate, type))
-
-                    else -> return@setOnMenuItemClickListener false
-                }
-
-                true
-            }
-            popup.show()
-        }
-    }
 
     class PhotoViewHolder(
         itemView: View,
@@ -335,7 +244,6 @@ class HomeGalleryAdapter(
 
     @Suppress("MayBeConstant")
     companion object {
-        private const val TYPE_ADD = 1
         private const val TYPE_PHOTO = 2
         private const val TYPE_AUDIO = 3
     }
