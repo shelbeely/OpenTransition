@@ -10,13 +10,12 @@
 
 package com.shelbeely.opentransition.ui.home
 
-import android.widget.ImageView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.viewinterop.AndroidView
-import com.squareup.picasso.Picasso
+import androidx.compose.ui.layout.ContentScale
+import coil3.compose.AsyncImage
 import java.io.File
 
 @Composable
@@ -25,19 +24,10 @@ fun HomeGalleryPhotoItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    AndroidView(
-        factory = { context ->
-            ImageView(context).apply {
-                scaleType = ImageView.ScaleType.CENTER_CROP
-            }
-        },
-        update = { imageView ->
-            Picasso.get()
-                .load(File(filePath))
-                .fit()
-                .centerCrop()
-                .into(imageView)
-        },
+    AsyncImage(
+        model = File(filePath),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
         modifier = modifier
             .fillMaxSize()
             .clickable(onClick = onClick)

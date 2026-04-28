@@ -10,7 +10,6 @@
 
 package com.shelbeely.opentransition.ui.assignphoto
 
-import android.widget.ImageView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,12 +34,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
+import coil3.compose.AsyncImage
 import com.shelbeely.opentransition.R
-import com.squareup.picasso.Picasso
 import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -81,18 +80,10 @@ fun AssignPhotoScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            AndroidView(
-                factory = { ctx ->
-                    ImageView(ctx).apply {
-                        scaleType = ImageView.ScaleType.CENTER_INSIDE
-                    }
-                },
-                update = { imageView ->
-                    val uri = loaded?.photoUri
-                    if (uri != null) {
-                        Picasso.get().load(uri).fit().centerInside().into(imageView)
-                    }
-                },
+            AsyncImage(
+                model = loaded?.photoUri,
+                contentDescription = null,
+                contentScale = ContentScale.Inside,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)

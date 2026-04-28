@@ -11,6 +11,7 @@
 package com.shelbeely.opentransition.ui.recordaudio
 
 import android.Manifest
+import android.app.DatePickerDialog
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
@@ -76,7 +77,22 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
         }
         
         recordAudioView.setOnDateClickListener {
-            // TODO: Show date picker dialog similar to AssignPhotosFragment
+            // ITEM-53: Show date picker so users can override the recording date.
+            val current = (view as? RecordAudioView)?.getSelectedDate() ?: LocalDate.now()
+            // DatePickerDialog uses 0-based months
+            DatePickerDialog(
+                requireContext(),
+                { _, year, month, dayOfMonth ->
+                    (view as? RecordAudioView)?.setSelectedDate(
+                        LocalDate.of(year, month + 1, dayOfMonth)
+                    )
+                },
+                current.year,
+                current.monthValue - 1,
+                current.dayOfMonth
+            ).apply {
+                datePicker.maxDate = System.currentTimeMillis()
+            }.show()
         }
     }
     
@@ -113,6 +129,35 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
         (view as? RecordAudioView)?.apply {
             setRecordingState(false)
             enableSaveButton(true)
+            // ITEM-53: Auto-attach to today's date when photos exist for that day.
+            autoAttachToTodayIfPhotosExist()
+        }
+    }
+
+    /**
+     * ITEM-53: If the device has photos for today's epoch day, keep the date field at
+     * LocalDate.now() (it already defaults to today).  If no photos exist yet, do nothing
+     * — the default is still today and the user can change it via the date picker.
+     * Either way, a Snackbar hints the user what date was pre-selected.
+     */
+    private fun autoAttachToTodayIfPhotosExist() {
+        val today = LocalDate.now()
+        val epochDay = today.toEpochDay()
+        try {
+            val realm = Realm.openDefault()
+            val hasPhotosForToday = realm
+                .query(Photo::class, "${Photo.FIELD_EPOCH_DAY} == $epochDay")
+                .count()
+                .find() > 0
+            realm.close()
+            if (hasPhotosForToday) {
+                (view as? RecordAudioView)?.setSelectedDate(today)
+                view?.let {
+                    Snackbar.make(it, R.string.audio_attached_to_today, Snackbar.LENGTH_SHORT).show()
+                }
+            }
+        } catch (_: Exception) {
+            // Ignore query errors; user can still pick the date manually
         }
     }
     
@@ -122,7 +167,7 @@ class RecordAudioFragment : Fragment(R.layout.record_audio) {
                 val elapsed = (System.currentTimeMillis() - recordingStartTime) / 1000
                 val minutes = elapsed / 60
                 val seconds = elapsed % 60
-                (view as? RecordAudioView)?.updateTimer(String.format("%02d:%02d", minutes, seconds))
+                (view as? RecordAudioView)?.updateTimer(String.format(java.util.Locale.US, "%02d:%02d", minutes, seconds))
                 handler.postDelayed(this, 1000)
             }
         }

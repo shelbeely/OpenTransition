@@ -10,7 +10,6 @@
 
 package com.shelbeely.opentransition.ui.selectphoto.selectalbum
 
-import android.widget.ImageView
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -22,15 +21,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
+import coil3.compose.AsyncImage
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.ui.selectphoto.selectalbum.SelectAlbumAdapter.Album
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
-import com.shelbeely.opentransition.ui.widget.SquareImageView
-import com.squareup.picasso.Picasso
 
 @Composable
 fun SelectAlbumRowItem(
@@ -48,20 +46,10 @@ fun SelectAlbumRowItem(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        AndroidView(
-            factory = { context ->
-                SquareImageView(context).apply {
-                    orientation = 1
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                }
-            },
-            update = { imageView ->
-                Picasso.get()
-                    .load(album.uri)
-                    .fit()
-                    .centerCrop()
-                    .into(imageView)
-            },
+        AsyncImage(
+            model = album.uri,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.size(64.dp)
         )
 

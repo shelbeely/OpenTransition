@@ -10,7 +10,6 @@
 
 package com.shelbeely.opentransition.ui.gallery
 
-import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -21,11 +20,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
+import coil3.compose.AsyncImage
 import com.shelbeely.opentransition.R
-import com.squareup.picasso.Picasso
 import java.io.File
 
 /**
@@ -58,19 +57,10 @@ fun GalleryPhotoItem(
             .fillMaxSize()
             .combinedClickable(onClick = onClick, onLongClick = onLongClick)
     ) {
-        AndroidView(
-            factory = { ctx ->
-                ImageView(ctx).apply {
-                    scaleType = ImageView.ScaleType.CENTER_CROP
-                }
-            },
-            update = { imageView ->
-                Picasso.get()
-                    .load(File(filePath))
-                    .fit()
-                    .centerCrop()
-                    .into(imageView)
-            },
+        AsyncImage(
+            model = File(filePath),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
 

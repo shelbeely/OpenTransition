@@ -17,6 +17,7 @@ import android.media.MediaRecorder
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
@@ -56,6 +57,10 @@ class AudioRecordActivity : Activity() {
     private var audioFile: File? = null
     private var isRecording = false
     private var recordingStartTime = 0L
+
+    // Wear PARTIAL_WAKE_LOCK: keep CPU running while audio is being captured so
+    // the recording isn't truncated when the screen turns off.
+    private var wakeLock: PowerManager.WakeLock? = null
 
     // ISSUE-009: keep a reference so we can cancel the runnable in onPause.
     private val handler = Handler(Looper.getMainLooper())
@@ -136,6 +141,10 @@ class AudioRecordActivity : Activity() {
                 start()
             }
 
+            // Wear PARTIAL_WAKE_LOCK: hold the CPU until the recording stops so the
+            // sample isn't truncated when the screen times out. Released in stopRecording().
+            acquireRecordingWakeLock()
+
             isRecording = true
             recordingStartTime = System.currentTimeMillis()
 
@@ -146,6 +155,8 @@ class AudioRecordActivity : Activity() {
             handler.post(durationRunnable)
 
         } catch (e: Exception) {
+            // Recording failed to start — make sure we don't leak the wake lock.
+            releaseRecordingWakeLock()
             Toast.makeText(this, getString(R.string.recording_failed, e.message), Toast.LENGTH_SHORT).show()
             e.printStackTrace()
         }
@@ -173,7 +184,28 @@ class AudioRecordActivity : Activity() {
         } catch (e: Exception) {
             Toast.makeText(this, getString(R.string.stop_failed, e.message), Toast.LENGTH_SHORT).show()
             e.printStackTrace()
+        } finally {
+            // Always release the wake lock paired with startRecording().
+            releaseRecordingWakeLock()
         }
+    }
+
+    private fun acquireRecordingWakeLock() {
+        if (wakeLock?.isHeld == true) return
+        val pm = getSystemService(POWER_SERVICE) as PowerManager
+        wakeLock = pm.newWakeLock(
+            PowerManager.PARTIAL_WAKE_LOCK,
+            "OpenTransition:AudioRecord"
+        ).apply {
+            setReferenceCounted(false)
+            // 10-minute safety timeout in case stopRecording() is never called.
+            acquire(10 * 60 * 1000L)
+        }
+    }
+
+    private fun releaseRecordingWakeLock() {
+        wakeLock?.takeIf { it.isHeld }?.release()
+        wakeLock = null
     }
 
     override fun onPause() {
@@ -264,6 +296,8 @@ class AudioRecordActivity : Activity() {
         if (isRecording) {
             stopRecording()
         }
+        // Defensive release in case stopRecording wasn't called (e.g. crash on stop()).
+        releaseRecordingWakeLock()
     }
 }
 
