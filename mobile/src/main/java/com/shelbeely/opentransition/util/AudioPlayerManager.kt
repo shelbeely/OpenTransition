@@ -182,6 +182,18 @@ object AudioPlayerManager {
     }
     
     /**
+     * Returns the playback progress of [audioId] as a 0–1 fraction.
+     * Returns 0 if [audioId] is not the current track or the duration is unknown.
+     */
+    fun getProgress(audioId: String): Float {
+        if (currentPlayingId != audioId) return 0f
+        val dur = try { mediaPlayer?.duration ?: 0 } catch (e: Exception) { 0 }
+        if (dur <= 0) return 0f
+        val pos = try { mediaPlayer?.currentPosition ?: 0 } catch (e: Exception) { 0 }
+        return (pos.toFloat() / dur).coerceIn(0f, 1f)
+    }
+
+    /**
      * Releases the MediaPlayer resources.
      */
     private fun releaseMediaPlayer() {

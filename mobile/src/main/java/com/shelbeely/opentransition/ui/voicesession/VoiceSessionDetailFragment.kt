@@ -11,13 +11,20 @@
 package com.shelbeely.opentransition.ui.voicesession
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
@@ -29,6 +36,7 @@ import com.shelbeely.opentransition.database.room.entities.AudioAnalysisEntity
 import com.shelbeely.opentransition.database.room.entities.VoiceGoalEntity
 import com.shelbeely.opentransition.ui.theme.OpenTransitionTheme
 import com.shelbeely.opentransition.util.AudioPlayerManager
+import com.shelbeely.opentransition.util.VoiceMetric
 import com.shelbeely.opentransition.util.settings.SettingsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -40,21 +48,48 @@ import java.io.File
  *
  * Receives the `photoId` of the audio item via SafeArgs, loads the
  * [AudioAnalysisEntity] + matched [VoiceGoalEntity] rows from Room, and passes
- * them to the Compose screen.  Playback progress is forwarded from
- * [AudioPlayerManager] so the cursor on the spectrogram stays in sync.
+ * them to the Compose screen.  Playback progress is polled at ~30 fps via a
+ * [Handler] runnable so the spectrogram cursor stays in sync.
  */
 class VoiceSessionDetailFragment : Fragment() {
 
     private val args: VoiceSessionDetailFragmentArgs by navArgs()
 
-    private var analysis by mutableStateOf<AudioAnalysisEntity?>(null)
-    private var audioFilePath by mutableStateOf("")
-    private var goalHits by mutableStateOf<List<VoiceGoalEntity>>(emptyList())
+    private var analysis         by mutableStateOf<AudioAnalysisEntity?>(null)
+    private var isLoading        by mutableStateOf(true)
+    private var audioFilePath    by mutableStateOf("")
+    private var goalHits         by mutableStateOf<List<VoiceGoalEntity>>(emptyList())
+    private var isPlaying        by mutableStateOf(false)
     private var playbackProgress by mutableFloatStateOf(0f)
 
-    private var playerManager: AudioPlayerManager? = null
-    private var progressRunnable: Runnable? = null
-    private val handler = android.os.Handler(android.os.Looper.getMainLooper())
+    private val handler = Handler(Looper.getMainLooper())
+    private val progressRunnable = object : Runnable {
+        override fun run() {
+            val audioId = args.photoId
+            val playing = AudioPlayerManager.isPlaying(audioId)
+            isPlaying = playing
+            if (playing) {
+                playbackProgress = AudioPlayerManager.getProgress(audioId)
+                handler.postDelayed(this, 33L)   // ~30 fps
+            }
+        }
+    }
+
+    private val playbackListener = object : AudioPlayerManager.PlaybackListener {
+        override fun onPlaybackStateChanged(audioId: String, playing: Boolean) {
+            if (audioId != args.photoId) return
+            isPlaying = playing
+            if (playing) handler.post(progressRunnable)
+            else handler.removeCallbacks(progressRunnable)
+        }
+        override fun onPlaybackProgress(audioId: String, position: Int, duration: Int) { /* polled */ }
+        override fun onPlaybackCompleted(audioId: String) {
+            if (audioId != args.photoId) return
+            isPlaying = false
+            playbackProgress = 0f
+            handler.removeCallbacks(progressRunnable)
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -65,21 +100,38 @@ class VoiceSessionDetailFragment : Fragment() {
         cv.setContent {
             OpenTransitionTheme(colorVariant = SettingsManager.getResolvedComposeColorVariant()) {
                 val a = analysis
-                if (a != null) {
-                    VoiceSessionDetailScreen(
-                        analysis         = a,
-                        audioFilePath    = audioFilePath,
-                        playbackProgress = playbackProgress,
-                        goalHits         = goalHits,
-                        onBack           = { findNavController().popBackStack() }
+                when {
+                    isLoading -> Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                    a != null -> VoiceSessionDetailScreen(
+                        analysis          = a,
+                        audioFilePath     = audioFilePath,
+                        playbackProgress  = playbackProgress,
+                        isPlaying         = isPlaying,
+                        goalHits          = goalHits,
+                        onPlayPause       = { togglePlayback() },
+                        onBack            = { findNavController().popBackStack() }
                     )
                 }
             }
         }
     }
 
+    private fun togglePlayback() {
+        val file = File(audioFilePath)
+        if (!file.exists()) return
+        AudioPlayerManager.togglePlayback(args.photoId, file)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        AudioPlayerManager.setPlaybackListener(playbackListener)
+        isPlaying = AudioPlayerManager.isPlaying(args.photoId)
+        if (isPlaying) handler.post(progressRunnable)
         loadData()
     }
 
@@ -90,8 +142,7 @@ class VoiceSessionDetailFragment : Fragment() {
         lifecycleScope.launch {
             val entity = withContext(Dispatchers.IO) {
                 db.audioAnalysisDao().getAudioAnalysisByPhotoId(photoId)
-            } ?: return@launch
-
+            }
             val photoEntity = withContext(Dispatchers.IO) {
                 db.photoDao().getPhotoById(photoId)
             }
@@ -101,33 +152,30 @@ class VoiceSessionDetailFragment : Fragment() {
 
             // Determine which goals this session hit across all metrics
             val hitGoals = mutableListOf<VoiceGoalEntity>()
-            withContext(Dispatchers.IO) {
-                val metrics = com.shelbeely.opentransition.util.VoiceMetric.values()
-                for (m in metrics) {
-                    val goals = db.voiceGoalDao().getGoalsForMetric(m.key)
-                    val value = when (m) {
-                        com.shelbeely.opentransition.util.VoiceMetric.F0_MEAN ->
-                            entity.f0Mean
-                        com.shelbeely.opentransition.util.VoiceMetric.PITCH_RANGE_HZ ->
-                            entity.pitchRangeHz
-                        com.shelbeely.opentransition.util.VoiceMetric.PITCH_STABILITY_SCORE ->
-                            entity.pitchStabilityScore
-                        com.shelbeely.opentransition.util.VoiceMetric.VOICED_RATIO ->
-                            entity.voicedRatio
-                        com.shelbeely.opentransition.util.VoiceMetric.INTONATION_MOVEMENT ->
-                            entity.intonationMovement
+            if (entity != null) {
+                withContext(Dispatchers.IO) {
+                    for (m in VoiceMetric.entries) {
+                        val goals = db.voiceGoalDao().getGoalsForMetric(m.key)
+                        val value = when (m) {
+                            VoiceMetric.F0_MEAN               -> entity.f0Mean
+                            VoiceMetric.PITCH_RANGE_HZ        -> entity.pitchRangeHz
+                            VoiceMetric.PITCH_STABILITY_SCORE -> entity.pitchStabilityScore
+                            VoiceMetric.VOICED_RATIO          -> entity.voicedRatio
+                            VoiceMetric.INTONATION_MOVEMENT   -> entity.intonationMovement
+                        }
+                        goals.filter { g -> value in g.targetMin..g.targetMax }
+                            .forEach { hitGoals.add(it) }
                     }
-                    goals.filter { g -> value in g.targetMin..g.targetMax }
-                        .forEach { hitGoals.add(it) }
                 }
             }
-            goalHits = hitGoals
+            goalHits  = hitGoals
+            isLoading = false
         }
     }
 
     override fun onDestroyView() {
-        progressRunnable?.let { handler.removeCallbacks(it) }
-        playerManager?.release()
+        handler.removeCallbacks(progressRunnable)
+        AudioPlayerManager.setPlaybackListener(null)
         super.onDestroyView()
     }
 }

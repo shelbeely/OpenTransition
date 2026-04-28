@@ -22,13 +22,23 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -81,19 +91,17 @@ fun GalleryAudioItem(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        androidx.compose.material3.IconButton(
+        IconButton(
             onClick = onPlayPause,
             modifier = Modifier.size(56.dp)
         ) {
-            androidx.compose.material3.Icon(
-                painter = androidx.compose.ui.res.painterResource(
-                    if (isPlaying) android.R.drawable.ic_media_pause
-                    else android.R.drawable.ic_media_play
-                ),
+            Icon(
+                imageVector = if (isPlaying) Icons.Default.Pause else Icons.Default.PlayArrow,
                 contentDescription = if (isPlaying)
-                    androidx.compose.ui.res.stringResource(R.string.stop_recording)
+                    stringResource(R.string.stop_recording)
                 else
-                    androidx.compose.ui.res.stringResource(R.string.play_audio),
+                    stringResource(R.string.play_audio),
+                tint = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -116,14 +124,17 @@ fun GalleryAudioItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            // Spectrogram: shows actual frequency content over time. Paired with
-            // playback this is the primary ear-training tool — users correlate
-            // what they hear with what they see, across recordings over time.
+            // Guard: only call setAudioFile when the path actually changes so the
+            // spectrogram does not re-decode on every recomposition (e.g. play state toggle).
+            var lastLoadedPath by remember { mutableStateOf("") }
             AndroidView(
                 factory = { ctx -> SpectrogramView(ctx) },
-                update = { spectrogramView ->
-                    val file = File(audioFilePath)
-                    if (file.exists()) spectrogramView.setAudioFile(file)
+                update = { sv ->
+                    if (audioFilePath != lastLoadedPath) {
+                        lastLoadedPath = audioFilePath
+                        val file = File(audioFilePath)
+                        if (file.exists()) sv.setAudioFile(file)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()

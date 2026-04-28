@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -74,6 +75,7 @@ fun GoalCreationSheet(
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .navigationBarsPadding()
             .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
         Text(
@@ -110,14 +112,14 @@ fun GoalCreationSheet(
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = metricMenuExpanded) },
                 modifier = Modifier
-                    .menuAnchor()
+                    .menuAnchor(androidx.compose.material3.MenuAnchorType.PrimaryNotEditable)
                     .fillMaxWidth()
             )
             ExposedDropdownMenu(
                 expanded = metricMenuExpanded,
                 onDismissRequest = { metricMenuExpanded = false }
             ) {
-                VoiceMetric.values().forEach { metric ->
+                VoiceMetric.entries.forEach { metric ->
                     DropdownMenuItem(
                         text = { Text(metric.label) },
                         onClick = {
@@ -199,7 +201,7 @@ private fun metricSliderRange(metric: VoiceMetric): Pair<Float, Float> = when (m
 }
 
 private fun formatValue(value: Float, metric: VoiceMetric): String = when (metric) {
-    VoiceMetric.PITCH_STABILITY_SCORE,
-    VoiceMetric.VOICED_RATIO -> String.format(Locale.US, "%.2f", value)
+    VoiceMetric.PITCH_STABILITY_SCORE -> String.format(Locale.US, "%.2f", value)
+    VoiceMetric.VOICED_RATIO -> "${(value * 100).toInt()}%"
     else -> "${value.toInt()} ${metric.unit}"
 }

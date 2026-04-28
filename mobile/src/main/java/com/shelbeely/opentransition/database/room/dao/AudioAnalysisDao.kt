@@ -19,6 +19,9 @@ interface AudioAnalysisDao {
     @Query("SELECT * FROM audio_analysis ORDER BY analysisTimestamp DESC")
     fun getAllAudioAnalyses(): Flow<List<AudioAnalysisEntity>>
 
+    @Query("SELECT * FROM audio_analysis ORDER BY analysisTimestamp DESC")
+    suspend fun getAllAudioAnalysesList(): List<AudioAnalysisEntity>
+
     @Query("SELECT * FROM audio_analysis WHERE id = :id")
     suspend fun getAudioAnalysisById(id: String): AudioAnalysisEntity?
 

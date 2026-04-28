@@ -206,6 +206,13 @@
             app:popEnterAnim="@anim/still"
             app:popExitAnim="@anim/slide_out_right" />
         <action
+            android:id="@+id/action_gallery_to_voiceProgress"
+            app:destination="@id/voiceProgressFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/still"
+            app:popEnterAnim="@anim/still"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
             android:id="@+id/action_gallery_to_voiceSessionDetail"
             app:destination="@id/voiceSessionDetailFragment"
             app:enterAnim="@anim/slide_in_right"
@@ -217,6 +224,10 @@
                 app:argType="string" />
         </action>
     </fragment>
+    <fragment
+        android:id="@+id/voiceProgressFragment"
+        android:name="com.shelbeely.opentransition.ui.voiceprogress.VoiceProgressFragment"
+        android:label="VoiceProgressFragment" />
     <fragment
         android:id="@+id/voiceSessionDetailFragment"
         android:name="com.shelbeely.opentransition.ui.voicesession.VoiceSessionDetailFragment"

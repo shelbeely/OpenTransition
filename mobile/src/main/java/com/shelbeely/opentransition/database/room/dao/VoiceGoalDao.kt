@@ -20,6 +20,9 @@ interface VoiceGoalDao {
     @Query("SELECT * FROM voice_goals ORDER BY createdAt DESC")
     fun getAllGoals(): Flow<List<VoiceGoalEntity>>
 
+    @Query("SELECT * FROM voice_goals ORDER BY createdAt DESC")
+    suspend fun getAllGoalsList(): List<VoiceGoalEntity>
+
     @Query("SELECT * FROM voice_goals WHERE id = :id")
     suspend fun getGoalById(id: String): VoiceGoalEntity?
 

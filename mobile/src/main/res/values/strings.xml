@@ -395,4 +395,9 @@
     <string name="goal_target_min_label">Min: %s</string>
     <string name="goal_target_max_label">Max: %s</string>
     <string name="save">Save</string>
+    <!-- Voice progress screen -->
+    <string name="voice_progress_title">Voice Progress</string>
+    <string name="voice_progress_metric_label">Show metric</string>
+    <string name="voice_progress_add_goal">New goal</string>
+    <string name="voice_progress_empty">Record some sessions to track your progress here.</string>
 </resources>

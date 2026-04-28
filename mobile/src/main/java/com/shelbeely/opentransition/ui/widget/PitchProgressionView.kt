@@ -16,6 +16,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import com.shelbeely.opentransition.database.room.entities.AudioAnalysisEntity
 import com.shelbeely.opentransition.database.room.entities.VoiceGoalEntity
@@ -83,10 +84,13 @@ class PitchProgressionView @JvmOverloads constructor(
         style = Paint.Style.STROKE
     }
 
+    /** Convert sp → px using the current display metrics. */
+    private fun sp(sp: Float) =
+        TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, sp, resources.displayMetrics)
+
     private val textPaint = Paint().apply {
         color = Color.WHITE
         alpha = 230
-        textSize = 24f
         isAntiAlias = true
     }
 
@@ -168,9 +172,9 @@ class PitchProgressionView @JvmOverloads constructor(
                 VoiceMetric.PITCH_STABILITY_SCORE -> String.format("%.2f", labelValue)
                 else -> "${labelValue.toInt()} ${activeMetric.unit}"
             }
-            canvas.drawText(label, 4f, y + 8f, textPaint.apply { textSize = 20f })
+            canvas.drawText(label, 4f, y + 8f, textPaint.apply { textSize = sp(11f) })
         }
-        textPaint.textSize = 24f
+        textPaint.textSize = sp(13f)
 
         // Data
         if (data.size == 1) {
@@ -207,14 +211,14 @@ class PitchProgressionView @JvmOverloads constructor(
             val dateStr = "${data[i].date.monthValue}/${data[i].date.dayOfMonth}"
             canvas.save()
             canvas.rotate(-45f, x, height - padding + 20f)
-            canvas.drawText(dateStr, x, height - padding + 30f, textPaint.apply { textSize = 20f })
+            canvas.drawText(dateStr, x, height - padding + 30f, textPaint.apply { textSize = sp(11f) })
             canvas.restore()
         }
-        textPaint.textSize = 24f
+        textPaint.textSize = sp(13f)
     }
 
     private fun drawEmptyState(canvas: Canvas) {
-        val p = Paint(textPaint).apply { textSize = 32f; textAlign = Paint.Align.CENTER }
+        val p = Paint(textPaint).apply { textSize = sp(16f); textAlign = Paint.Align.CENTER }
         canvas.drawText("No recordings to compare", width / 2f, height / 2f, p)
     }
 

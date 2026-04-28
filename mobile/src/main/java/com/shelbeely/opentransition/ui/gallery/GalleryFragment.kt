@@ -178,6 +178,13 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                 )
             }
 
+        viewDisposables += sharedEvents.ofType<GalleryUiEvent.ViewVoiceProgress>()
+            .subscribe {
+                findNavController().navigate(
+                    GalleryFragmentDirections.actionGalleryToVoiceProgress()
+                )
+            }
+
         viewDisposables += sharedEvents.ofType<GalleryUiEvent.Share>()
             .subscribe { event ->
                 if (event.selectedIds.isEmpty()) {
