@@ -10,198 +10,146 @@
 
 package com.shelbeely.opentransition.util
 
-import android.media.MediaExtractor
-import android.media.MediaFormat
 import com.shelbeely.opentransition.data.AudioAnalysis
 import java.io.File
 import java.util.Locale
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
- * Utility for analyzing audio files to extract formants and voice characteristics.
+ * Utility for analysing audio files to extract real on-device voice metrics.
  *
- * **Status: Preview / placeholder.** This implementation does **not** perform real
- * formant extraction. It returns typical adult-speaker pitch and formant values
- * regardless of the contents of [analyzeAudioFile]. Real on-device DSP (LPC /
- * cepstrum analysis, e.g. via TarsosDSP) is planned but not yet integrated.
+ * Metrics are derived by decoding the audio to PCM ([AudioDecoder]) then running
+ * the normalised-autocorrelation pitch tracker ([PitchTracker]) over overlapping
+ * frames.  All returned values are actual measurements of the provided file — no
+ * hardcoded constants or faked "typical" values.
  *
- * Callers must surface this limitation to the user — see the preview disclaimer
- * in `RecordAudioScreen` and the README feature list.
- *
- * See audit-report/07-issues-and-bugs.md ISSUE-005.
+ * The legacy formant fields (f1Mean … f4Mean) are retained in the data model for
+ * backwards-compatibility with backups, but are zeroed out here because LPC-based
+ * formant extraction is not yet implemented.
  */
 object AudioAnalysisUtil {
-    
+
     /**
-     * Analyzes an audio file and extracts estimated formant frequencies and pitch information.
-     * This is a simplified analysis - for production, consider using LPC (Linear Predictive Coding)
-     * for more accurate formant extraction with a DSP library.
-     * 
-     * @param audioFile The audio file to analyze
-     * @return AudioAnalysis object with estimated features, or null if analysis fails
+     * Analyses [audioFile] and returns an [AudioAnalysis] with the following
+     * real measurements:
+     *
+     * - `f0Mean`, `f0Min`, `f0Max`, `f0StdDev` — pitch statistics over voiced frames
+     * - `pitchConfidenceMean` — mean autocorrelation confidence of voiced frames
+     * - `voicedRatio` — fraction of frames classified as voiced (0–1)
+     * - `intensityMeanDb` / `intensityMaxDb` — RMS levels across all frames
+     * - `pitchRangeHz` — f0Max − f0Min
+     * - `pitchStabilityScore` — 1 − normalised std-dev; 1 = very steady
+     * - `intonationMovement` — mean abs frame-to-frame F0 delta (voiced frames)
+     * - `durationSeconds` — recording duration
+     *
+     * Returns `null` if the file cannot be decoded or yields no voiced frames.
      */
     fun analyzeAudioFile(audioFile: File): AudioAnalysis? {
-        if (!audioFile.exists() || audioFile.length() == 0L) {
-            return null
+        if (!audioFile.exists() || audioFile.length() == 0L) return null
+
+        val (samples, sampleRate) = AudioDecoder.decodeAudioToPcm(audioFile) ?: return null
+        val frames = PitchTracker.analyzeFrames(samples, sampleRate)
+        if (frames.isEmpty()) return null
+
+        val durationSeconds = samples.size.toFloat() / sampleRate
+
+        // ── Voiced frames ─────────────────────────────────────────────────
+        val voicedFrames = frames.filter { it.isVoiced && it.f0Hz > 0f }
+        val voicedRatio = frames.size.takeIf { it > 0 }
+            ?.let { voicedFrames.size.toFloat() / it } ?: 0f
+
+        // ── Pitch statistics (voiced only) ────────────────────────────────
+        val f0Mean: Float
+        val f0Min: Float
+        val f0Max: Float
+        val f0StdDev: Float
+        val pitchConfidenceMean: Float
+        val pitchRangeHz: Float
+        val pitchStabilityScore: Float
+        val intonationMovement: Float
+
+        if (voicedFrames.isEmpty()) {
+            f0Mean = 0f; f0Min = 0f; f0Max = 0f; f0StdDev = 0f
+            pitchConfidenceMean = 0f; pitchRangeHz = 0f
+            pitchStabilityScore = 0f; intonationMovement = 0f
+        } else {
+            f0Mean = voicedFrames.map { it.f0Hz }.average().toFloat()
+            f0Min  = voicedFrames.minOf { it.f0Hz }
+            f0Max  = voicedFrames.maxOf { it.f0Hz }
+
+            val variance = voicedFrames.map { (it.f0Hz - f0Mean) * (it.f0Hz - f0Mean) }.average()
+            f0StdDev = sqrt(variance).toFloat()
+
+            pitchConfidenceMean = voicedFrames.map { it.confidence }.average().toFloat()
+            pitchRangeHz = f0Max - f0Min
+
+            // Stability: 1 − (stdDev / mean); clamped to [0, 1].
+            // A perfectly steady voice has stdDev ≈ 0 → score ≈ 1.
+            pitchStabilityScore = if (f0Mean > 0f)
+                (1f - (f0StdDev / f0Mean)).coerceIn(0f, 1f) else 0f
+
+            // Intonation movement: mean |Δf0| between consecutive voiced frames
+            val voicedF0s = voicedFrames.map { it.f0Hz }
+            intonationMovement = if (voicedF0s.size >= 2) {
+                voicedF0s.zipWithNext { a, b -> abs(b - a) }.average().toFloat()
+            } else 0f
         }
-        
-        return try {
-            val extractor = MediaExtractor()
-            extractor.setDataSource(audioFile.absolutePath)
-            
-            // Get audio format information
-            var audioFormat: MediaFormat? = null
-            for (i in 0 until extractor.trackCount) {
-                val format = extractor.getTrackFormat(i)
-                val mime = format.getString(MediaFormat.KEY_MIME)
-                if (mime?.startsWith("audio/") == true) {
-                    audioFormat = format
-                    break
-                }
-            }
-            
-            if (audioFormat == null) {
-                extractor.release()
-                return null
-            }
-            
-            // Get duration
-            val durationUs = audioFormat.getLong(MediaFormat.KEY_DURATION)
-            val durationSeconds = durationUs / 1_000_000f
-            
-            // Estimate formants based on file metadata
-            // This is a simplified approach - real formant analysis requires DSP
-            // For now, we'll use typical average values
-            // TODO: Integrate proper DSP library for real formant extraction
-            val f0Mean = 150f // Typical average pitch
-            val f0Min = 120f
-            val f0Max = 180f
-            val f0StdDev = 20f
-            
-            // Typical formant values (these are averages, not actual analysis)
-            val f1Mean = estimateF1(f0Mean)
-            val f2Mean = estimateF2(f0Mean)
-            val f3Mean = estimateF3(f0Mean)
-            val f4Mean = estimateF4()
-            
-            extractor.release()
-            
-            AudioAnalysis().apply {
-                this.f0Mean = f0Mean
-                this.f0Min = f0Min
-                this.f0Max = f0Max
-                this.f1Mean = f1Mean
-                this.f2Mean = f2Mean
-                this.f3Mean = f3Mean
-                this.f4Mean = f4Mean
-                this.f0StdDev = f0StdDev
-                this.durationSeconds = durationSeconds
-                this.analysisTimestamp = System.currentTimeMillis()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    }
-    
-    /**
-     * Estimates first formant (F1) based on fundamental frequency.
-     * F1 is related to tongue height and typically ranges 200-1000 Hz.
-     * Lower F1 suggests higher tongue position.
-     */
-    private fun estimateF1(f0: Float): Float {
-        // Typical F1 for adult speakers
-        // This is a simplified estimation - real F1 extraction requires LPC
-        return when {
-            f0 < 150 -> 500f  // Lower pitch range
-            f0 > 200 -> 700f  // Higher pitch range
-            else -> 600f
+
+        // ── Intensity statistics (all frames) ─────────────────────────────
+        val intensityMeanDb = frames.map { it.rmsDb }.average().toFloat()
+        val intensityMaxDb  = frames.maxOf { it.rmsDb }
+
+        return AudioAnalysis().apply {
+            this.f0Mean               = f0Mean
+            this.f0Min                = f0Min
+            this.f0Max                = f0Max
+            this.f0StdDev             = f0StdDev
+            this.pitchConfidenceMean  = pitchConfidenceMean
+            this.voicedRatio          = voicedRatio
+            this.intensityMeanDb      = intensityMeanDb
+            this.intensityMaxDb       = intensityMaxDb
+            this.pitchRangeHz         = pitchRangeHz
+            this.pitchStabilityScore  = pitchStabilityScore
+            this.intonationMovement   = intonationMovement
+            this.durationSeconds      = durationSeconds
+            this.analysisTimestamp    = System.currentTimeMillis()
+            // Formant fields left at 0 — LPC extraction not yet implemented
         }
     }
-    
+
     /**
-     * Estimates second formant (F2) based on fundamental frequency.
-     * F2 is related to tongue frontness/backness and typically ranges 800-2500 Hz.
-     * Higher F2 suggests more forward tongue position.
-     */
-    private fun estimateF2(f0: Float): Float {
-        // Typical F2 for adult speakers
-        return when {
-            f0 < 150 -> 1200f  // Lower pitch
-            f0 > 200 -> 1800f  // Higher pitch
-            else -> 1500f
-        }
-    }
-    
-    /**
-     * Estimates third formant (F3).
-     * F3 typically ranges 2000-3500 Hz.
-     */
-    private fun estimateF3(f0: Float): Float {
-        return when {
-            f0 < 150 -> 2500f
-            f0 > 200 -> 3000f
-            else -> 2750f
-        }
-    }
-    
-    /**
-     * Estimates fourth formant (F4).
-     * F4 typically ranges 3000-4500 Hz.
-     */
-    private fun estimateF4(): Float {
-        return 3500f
-    }
-    
-    /**
-     * Generates a human-readable report from audio analysis.
+     * Generates a human-readable voice analysis report from real measurements.
      */
     fun generateReport(analysis: AudioAnalysis): String {
         return buildString {
-            appendLine("Voice Analysis Report (Preview)")
+            appendLine("Voice Analysis Report")
             appendLine("=".repeat(40))
             appendLine()
-            appendLine("⚠ The values below are typical estimates, not measurements")
-            appendLine("  of this recording. Real on-device DSP analysis is planned")
-            appendLine("  for a future release.")
+
+            appendLine("Pitch (F0):")
+            appendLine("  Average: ${String.format(Locale.US, "%.1f", analysis.f0Mean)} Hz")
+            appendLine(
+                "  Range: ${String.format(Locale.US, "%.1f", analysis.f0Min)}" +
+                "–${String.format(Locale.US, "%.1f", analysis.f0Max)} Hz" +
+                " (${String.format(Locale.US, "%.1f", analysis.pitchRangeHz)} Hz span)"
+            )
+            appendLine("  Variability (std dev): ${String.format(Locale.US, "%.1f", analysis.f0StdDev)} Hz")
+            appendLine("  Stability score: ${String.format(Locale.US, "%.2f", analysis.pitchStabilityScore)} (0–1)")
+            appendLine("  Intonation movement: ${String.format(Locale.US, "%.1f", analysis.intonationMovement)} Hz/frame")
+            appendLine("  Confidence: ${String.format(Locale.US, "%.2f", analysis.pitchConfidenceMean)}")
             appendLine()
-            
-            appendLine("Pitch Analysis:")
-            appendLine("  Average Pitch (F0): ${String.format(Locale.US, "%.1f", analysis.f0Mean)} Hz")
-            appendLine("  Pitch Range: ${String.format(Locale.US, "%.1f", analysis.f0Min)} - ${String.format(Locale.US, "%.1f", analysis.f0Max)} Hz")
-            appendLine("  Pitch Variability: ${String.format(Locale.US, "%.1f", analysis.f0StdDev)} Hz")
+
+            appendLine("Voice activity:")
+            appendLine("  Voiced: ${String.format(Locale.US, "%.0f", analysis.voicedRatio * 100f)}% of recording")
             appendLine()
-            
-            appendLine("Formant Frequencies:")
-            appendLine("  F1 (Tongue Height): ${String.format(Locale.US, "%.0f", analysis.f1Mean)} Hz")
-            appendLine("  F2 (Tongue Position): ${String.format(Locale.US, "%.0f", analysis.f2Mean)} Hz")
-            appendLine("  F3: ${String.format(Locale.US, "%.0f", analysis.f3Mean)} Hz")
-            appendLine("  F4: ${String.format(Locale.US, "%.0f", analysis.f4Mean)} Hz")
+
+            appendLine("Intensity:")
+            appendLine("  Mean: ${String.format(Locale.US, "%.1f", analysis.intensityMeanDb)} dBFS")
+            appendLine("  Peak: ${String.format(Locale.US, "%.1f", analysis.intensityMaxDb)} dBFS")
             appendLine()
-            
+
             appendLine("Recording Duration: ${String.format(Locale.US, "%.1f", analysis.durationSeconds)} seconds")
-            appendLine()
-            
-            appendLine("Note: Formant values are estimated. For accurate analysis,")
-            appendLine("consider using specialized voice analysis software.")
-            appendLine()
-            
-            // Provide interpretation
-            appendLine("Interpretation:")
-            when {
-                analysis.f0Mean < 130 -> appendLine("  - Pitch is in a lower range (below 130 Hz)")
-                analysis.f0Mean > 180 -> appendLine("  - Pitch is in a higher range (above 180 Hz)")
-                else -> appendLine("  - Pitch is in a mid range (130–180 Hz)")
-            }
-            
-            when {
-                analysis.f1Mean < 550 -> appendLine("  - F1 suggests higher tongue position")
-                analysis.f1Mean > 650 -> appendLine("  - F1 suggests lower tongue position")
-            }
-            
-            when {
-                analysis.f2Mean < 1400 -> appendLine("  - F2 suggests back tongue position")
-                analysis.f2Mean > 1600 -> appendLine("  - F2 suggests forward tongue position")
-            }
         }
     }
 }

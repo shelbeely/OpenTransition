@@ -205,6 +205,25 @@
             app:exitAnim="@anim/still"
             app:popEnterAnim="@anim/still"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_gallery_to_voiceSessionDetail"
+            app:destination="@id/voiceSessionDetailFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/still"
+            app:popEnterAnim="@anim/still"
+            app:popExitAnim="@anim/slide_out_right">
+            <argument
+                android:name="photoId"
+                app:argType="string" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/voiceSessionDetailFragment"
+        android:name="com.shelbeely.opentransition.ui.voicesession.VoiceSessionDetailFragment"
+        android:label="VoiceSessionDetailFragment">
+        <argument
+            android:name="photoId"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/selectPhotoFragment"

@@ -27,5 +27,14 @@ data class AudioAnalysisEntity(
     val f4Mean: Float,
     val f0StdDev: Float,
     val durationSeconds: Float,
-    val analysisTimestamp: Long
+    val analysisTimestamp: Long,
+    // Extended metrics — added in schema version 2
+    val pitchConfidenceMean: Float = 0f,
+    val voicedRatio: Float = 0f,
+    val intensityMeanDb: Float = 0f,
+    val intensityMaxDb: Float = 0f,
+    val pitchRangeHz: Float = 0f,
+    val pitchStabilityScore: Float = 0f,
+    val intonationMovement: Float = 0f,
+    val sessionSummaryText: String = ""
 )

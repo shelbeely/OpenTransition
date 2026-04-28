@@ -376,4 +376,22 @@
     <string name="transcript_label">Transcript</string>
     <string name="transcript_live_label">Transcribing…</string>
     <string name="transcript_unavailable">Transcription not available on this device</string>
+
+    <!-- Voice session detail screen -->
+    <string name="voice_session_detail_title">Session Detail</string>
+    <string name="voice_session_metrics_title">Measurements</string>
+    <string name="voice_session_summary_title">Session Notes</string>
+    <string name="voice_session_goals_title">Goals met this session</string>
+    <string name="metric_duration">Duration</string>
+    <string name="metric_voiced_pct">Voiced</string>
+    <string name="metric_intensity">Volume (mean)</string>
+    <string name="metric_pitch_range">Pitch range</string>
+    <string name="metric_pitch_avg">Pitch average</string>
+
+    <!-- Goal creation sheet -->
+    <string name="goal_creation_title">New goal</string>
+    <string name="goal_name_hint">Goal name (free text)</string>
+    <string name="goal_metric_label">Metric</string>
+    <string name="goal_target_min_label">Min: %s</string>
+    <string name="goal_target_max_label">Max: %s</string>
 </resources>

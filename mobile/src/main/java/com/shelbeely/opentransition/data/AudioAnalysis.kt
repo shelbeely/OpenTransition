@@ -49,6 +49,18 @@ class AudioAnalysis : RealmObject {
     
     // Statistical measures
     var f0StdDev: Float = 0f  // Pitch variability
+
+    // Extended metrics — added in schema version 2
+    var pitchConfidenceMean: Float = 0f   // Mean autocorrelation confidence (0–1)
+    var voicedRatio: Float = 0f           // Fraction of frames classified as voiced
+    var intensityMeanDb: Float = 0f       // Mean RMS level in dBFS
+    var intensityMaxDb: Float = 0f        // Peak RMS level in dBFS
+    var pitchRangeHz: Float = 0f          // f0Max − f0Min over voiced frames
+    var pitchStabilityScore: Float = 0f   // 1 − normalised stdDev; 1 = very steady
+    var intonationMovement: Float = 0f    // Mean |Δf0| between consecutive voiced frames (Hz/frame)
+
+    // Session summary text — added in schema version 2
+    var sessionSummaryText: String = ""
     
     // Duration
     var durationSeconds: Float = 0f
@@ -72,6 +84,14 @@ class AudioAnalysis : RealmObject {
                 addProperty(FIELD_F3_MEAN, f3Mean)
                 addProperty(FIELD_F4_MEAN, f4Mean)
                 addProperty(FIELD_F0_STD_DEV, f0StdDev)
+                addProperty(FIELD_PITCH_CONFIDENCE_MEAN, pitchConfidenceMean)
+                addProperty(FIELD_VOICED_RATIO, voicedRatio)
+                addProperty(FIELD_INTENSITY_MEAN_DB, intensityMeanDb)
+                addProperty(FIELD_INTENSITY_MAX_DB, intensityMaxDb)
+                addProperty(FIELD_PITCH_RANGE_HZ, pitchRangeHz)
+                addProperty(FIELD_PITCH_STABILITY_SCORE, pitchStabilityScore)
+                addProperty(FIELD_INTONATION_MOVEMENT, intonationMovement)
+                addProperty(FIELD_SESSION_SUMMARY_TEXT, sessionSummaryText)
                 addProperty(FIELD_DURATION_SECONDS, durationSeconds)
                 addProperty(FIELD_ANALYSIS_TIMESTAMP, analysisTimestamp)
                 addProperty(FIELD_TRANSCRIPT, transcript)
@@ -93,6 +113,14 @@ class AudioAnalysis : RealmObject {
         const val FIELD_F3_MEAN = "f3Mean"
         const val FIELD_F4_MEAN = "f4Mean"
         const val FIELD_F0_STD_DEV = "f0StdDev"
+        const val FIELD_PITCH_CONFIDENCE_MEAN = "pitchConfidenceMean"
+        const val FIELD_VOICED_RATIO = "voicedRatio"
+        const val FIELD_INTENSITY_MEAN_DB = "intensityMeanDb"
+        const val FIELD_INTENSITY_MAX_DB = "intensityMaxDb"
+        const val FIELD_PITCH_RANGE_HZ = "pitchRangeHz"
+        const val FIELD_PITCH_STABILITY_SCORE = "pitchStabilityScore"
+        const val FIELD_INTONATION_MOVEMENT = "intonationMovement"
+        const val FIELD_SESSION_SUMMARY_TEXT = "sessionSummaryText"
         const val FIELD_DURATION_SECONDS = "durationSeconds"
         const val FIELD_ANALYSIS_TIMESTAMP = "analysisTimestamp"
         const val FIELD_TRANSCRIPT = "transcript"
@@ -119,6 +147,14 @@ class AudioAnalysis : RealmObject {
                             FIELD_F3_MEAN -> f3Mean = jsonReader.nextDouble().toFloat()
                             FIELD_F4_MEAN -> f4Mean = jsonReader.nextDouble().toFloat()
                             FIELD_F0_STD_DEV -> f0StdDev = jsonReader.nextDouble().toFloat()
+                            FIELD_PITCH_CONFIDENCE_MEAN -> pitchConfidenceMean = jsonReader.nextDouble().toFloat()
+                            FIELD_VOICED_RATIO -> voicedRatio = jsonReader.nextDouble().toFloat()
+                            FIELD_INTENSITY_MEAN_DB -> intensityMeanDb = jsonReader.nextDouble().toFloat()
+                            FIELD_INTENSITY_MAX_DB -> intensityMaxDb = jsonReader.nextDouble().toFloat()
+                            FIELD_PITCH_RANGE_HZ -> pitchRangeHz = jsonReader.nextDouble().toFloat()
+                            FIELD_PITCH_STABILITY_SCORE -> pitchStabilityScore = jsonReader.nextDouble().toFloat()
+                            FIELD_INTONATION_MOVEMENT -> intonationMovement = jsonReader.nextDouble().toFloat()
+                            FIELD_SESSION_SUMMARY_TEXT -> sessionSummaryText = jsonReader.nextString()
                             FIELD_DURATION_SECONDS -> durationSeconds = jsonReader.nextDouble().toFloat()
                             FIELD_ANALYSIS_TIMESTAMP -> analysisTimestamp = jsonReader.nextLong()
                             FIELD_TRANSCRIPT -> transcript = jsonReader.nextString()

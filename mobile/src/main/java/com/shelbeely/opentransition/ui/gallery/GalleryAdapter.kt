@@ -450,8 +450,9 @@ class GalleryAdapter(
                         onLongClick = {
                             val adapter = adapterRef.get() ?: return@GalleryAudioItem
                             if (!adapter.selectionMode) {
+                                // Long-tap outside selection mode → open session detail
                                 adapter.eventRelayRef.get()
-                                    ?.accept(GalleryUiEvent.SelectionUpdated(arrayListOf(photoId)))
+                                    ?.accept(GalleryUiEvent.AudioSessionDetail(photoId))
                             } else {
                                 if (adapter.selectedIds.contains(photoId)) {
                                     adapter.selectedIds.remove(photoId)

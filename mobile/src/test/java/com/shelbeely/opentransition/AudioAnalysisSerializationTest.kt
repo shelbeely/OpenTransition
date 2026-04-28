@@ -92,6 +92,30 @@ class AudioAnalysisSerializationTest {
     }
 
     @Test
+    fun toJson_containsPitchConfidenceMean() {
+        val analysis = AudioAnalysis().apply { pitchConfidenceMean = 0.85f }
+        val json = analysis.toJson()
+        assertNotNull(json)
+        assertEquals(0.85f, json!!.get(AudioAnalysis.FIELD_PITCH_CONFIDENCE_MEAN).asFloat, 0.001f)
+    }
+
+    @Test
+    fun toJson_containsVoicedRatio() {
+        val analysis = AudioAnalysis().apply { voicedRatio = 0.72f }
+        val json = analysis.toJson()
+        assertNotNull(json)
+        assertEquals(0.72f, json!!.get(AudioAnalysis.FIELD_VOICED_RATIO).asFloat, 0.001f)
+    }
+
+    @Test
+    fun toJson_containsSessionSummaryText() {
+        val analysis = AudioAnalysis().apply { sessionSummaryText = "Test summary." }
+        val json = analysis.toJson()
+        assertNotNull(json)
+        assertEquals("Test summary.", json!!.get(AudioAnalysis.FIELD_SESSION_SUMMARY_TEXT).asString)
+    }
+
+    @Test
     fun toJson_containsDurationSeconds() {
         val analysis = AudioAnalysis().apply { durationSeconds = 5.75f }
         val json = analysis.toJson()
@@ -197,6 +221,14 @@ class AudioAnalysisSerializationTest {
             f3Mean = 2550.0f
             f4Mean = 3450.0f
             f0StdDev = 18.0f
+            pitchConfidenceMean = 0.78f
+            voicedRatio = 0.65f
+            intensityMeanDb = -28.5f
+            intensityMaxDb = -12.3f
+            pitchRangeHz = 210.0f
+            pitchStabilityScore = 0.82f
+            intonationMovement = 9.4f
+            sessionSummaryText = "Round-trip summary."
             durationSeconds = 6.0f
             analysisTimestamp = 1699999999000L
         }
@@ -216,6 +248,14 @@ class AudioAnalysisSerializationTest {
         assertEquals(original.f3Mean, restored?.f3Mean ?: 0f, 0.001f)
         assertEquals(original.f4Mean, restored?.f4Mean ?: 0f, 0.001f)
         assertEquals(original.f0StdDev, restored?.f0StdDev ?: 0f, 0.001f)
+        assertEquals(original.pitchConfidenceMean, restored?.pitchConfidenceMean ?: 0f, 0.001f)
+        assertEquals(original.voicedRatio, restored?.voicedRatio ?: 0f, 0.001f)
+        assertEquals(original.intensityMeanDb, restored?.intensityMeanDb ?: 0f, 0.001f)
+        assertEquals(original.intensityMaxDb, restored?.intensityMaxDb ?: 0f, 0.001f)
+        assertEquals(original.pitchRangeHz, restored?.pitchRangeHz ?: 0f, 0.001f)
+        assertEquals(original.pitchStabilityScore, restored?.pitchStabilityScore ?: 0f, 0.001f)
+        assertEquals(original.intonationMovement, restored?.intonationMovement ?: 0f, 0.001f)
+        assertEquals(original.sessionSummaryText, restored?.sessionSummaryText)
         assertEquals(original.durationSeconds, restored?.durationSeconds ?: 0f, 0.001f)
         assertEquals(original.analysisTimestamp, restored?.analysisTimestamp)
     }

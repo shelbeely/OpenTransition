@@ -17,14 +17,25 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
-import com.shelbeely.opentransition.data.AudioAnalysis
+import com.shelbeely.opentransition.database.room.entities.AudioAnalysisEntity
+import com.shelbeely.opentransition.database.room.entities.VoiceGoalEntity
+import com.shelbeely.opentransition.util.VoiceMetric
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import kotlin.math.max
 import kotlin.math.min
 
 /**
- * A custom view that displays pitch progression over time.
- * Shows F0 (fundamental frequency/pitch) changes across multiple recordings.
+ * A custom view that displays one voice metric over time.
+ *
+ * The currently displayed metric is selected via [setMetric].  Five metrics
+ * are supported — see [VoiceMetric].  If a list of [VoiceGoalEntity] rows is
+ * provided for the selected metric, data points that fall within the goal range
+ * are decorated with a ring to indicate the goal was met that session.
+ *
+ * No reference lines, zone backgrounds, or implied "correct" ranges are ever
+ * drawn.  The chart only reflects the actual measurements in [setData].
  */
 class PitchProgressionView @JvmOverloads constructor(
     context: Context,
@@ -49,7 +60,7 @@ class PitchProgressionView @JvmOverloads constructor(
     }
 
     private val linePaint = Paint().apply {
-        color = Color.parseColor("#4CAF50") // Material Green
+        color = Color.parseColor("#4CAF50")
         alpha = 255
         strokeWidth = 4f
         isAntiAlias = true
@@ -64,6 +75,14 @@ class PitchProgressionView @JvmOverloads constructor(
         style = Paint.Style.FILL
     }
 
+    private val goalRingPaint = Paint().apply {
+        color = Color.parseColor("#FFC107")  // amber — visible against green
+        alpha = 230
+        strokeWidth = 3f
+        isAntiAlias = true
+        style = Paint.Style.STROKE
+    }
+
     private val textPaint = Paint().apply {
         color = Color.WHITE
         alpha = 230
@@ -71,34 +90,49 @@ class PitchProgressionView @JvmOverloads constructor(
         isAntiAlias = true
     }
 
-    private val rangeLinePaint = Paint().apply {
-        color = Color.parseColor("#2196F3") // Material Blue
-        alpha = 100
-        strokeWidth = 2f
-        isAntiAlias = true
-        style = Paint.Style.STROKE
-        pathEffect = android.graphics.DashPathEffect(floatArrayOf(10f, 5f), 0f)
-    }
-
     private data class DataPoint(
         val date: LocalDate,
-        val f0Mean: Float,
-        val f0Min: Float,
-        val f0Max: Float
+        val value: Float,
+        val hitGoal: Boolean
     )
 
     private val data = mutableListOf<DataPoint>()
+    private var activeMetric: VoiceMetric = VoiceMetric.F0_MEAN
 
-    // Reusable Path to avoid per-frame allocation in onDraw (fixes DrawAllocation lint warning).
+    // Reusable Path
     private val linePath = Path()
 
-    fun setData(analyses: List<Pair<LocalDate, AudioAnalysis>>) {
+    // ── Public API ────────────────────────────────────────────────────────────
+
+    /**
+     * Set which metric to display.  Call [setData] again after changing the
+     * metric if you want to refresh from the same analysis list.
+     */
+    fun setMetric(metric: VoiceMetric) {
+        activeMetric = metric
+        invalidate()
+    }
+
+    /**
+     * Supply data to the chart.  [goals] is the list of user-defined goals whose
+     * [VoiceGoalEntity.metricKey] matches [activeMetric].  A goal-hit ring is
+     * drawn on data points whose value falls within any goal's targetMin…targetMax.
+     */
+    fun setData(
+        analyses: List<Pair<LocalDate, AudioAnalysisEntity>>,
+        goals: List<VoiceGoalEntity> = emptyList()
+    ) {
         data.clear()
+        val metricGoals = goals.filter { it.metricKey == activeMetric.key }
         analyses.sortedBy { it.first }.forEach { (date, analysis) ->
-            data.add(DataPoint(date, analysis.f0Mean, analysis.f0Min, analysis.f0Max))
+            val value = extractMetricValue(analysis, activeMetric)
+            val hitGoal = metricGoals.any { g -> value in g.targetMin..g.targetMax }
+            data.add(DataPoint(date, value, hitGoal))
         }
         invalidate()
     }
+
+    // ── Drawing ───────────────────────────────────────────────────────────────
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -112,130 +146,101 @@ class PitchProgressionView @JvmOverloads constructor(
         val chartWidth = width - 2 * padding
         val chartHeight = height - 2 * padding
 
-        // Calculate pitch range
-        val minPitch = data.minOfOrNull { it.f0Min } ?: 0f
-        val maxPitch = data.maxOfOrNull { it.f0Max } ?: 300f
-        val pitchRange = maxPitch - minPitch
-        val pitchPadding = pitchRange * 0.1f
+        val values = data.map { it.value }
+        val rawMin = values.min()
+        val rawMax = values.max()
+        val valueRange = rawMax - rawMin
+        val pad = if (valueRange > 0f) valueRange * 0.1f else 10f
+        val yMin = rawMin - pad
+        val yMax = rawMax + pad
 
-        val yMin = minPitch - pitchPadding
-        val yMax = maxPitch + pitchPadding
-
-        // Draw axes
+        // Axes
         canvas.drawLine(padding, padding, padding, height - padding, axisPaint)
         canvas.drawLine(padding, height - padding, width - padding, height - padding, axisPaint)
 
-        // Draw grid lines
+        // Grid lines + Y labels
         for (i in 0..4) {
             val y = padding + (chartHeight * i / 4)
             canvas.drawLine(padding, y, width - padding, y, gridPaint)
-
-            // Y-axis labels (pitch values)
-            val pitchValue = yMax - (yMax - yMin) * i / 4
-            canvas.drawText(
-                "${pitchValue.toInt()} Hz",
-                10f,
-                y + 8f,
-                textPaint
-            )
+            val labelValue = yMax - (yMax - yMin) * i / 4
+            val label = when (activeMetric) {
+                VoiceMetric.VOICED_RATIO -> "${(labelValue * 100).toInt()}%"
+                VoiceMetric.PITCH_STABILITY_SCORE -> String.format("%.2f", labelValue)
+                else -> "${labelValue.toInt()} ${activeMetric.unit}"
+            }
+            canvas.drawText(label, 4f, y + 8f, textPaint.apply { textSize = 20f })
         }
+        textPaint.textSize = 24f
 
-        // Draw data
+        // Data
         if (data.size == 1) {
-            // Single point
             val x = padding + chartWidth / 2
-            val y = mapPitchToY(data[0].f0Mean, yMin, yMax, padding, chartHeight)
+            val y = mapToY(data[0].value, yMin, yMax, padding, chartHeight)
             canvas.drawCircle(x, y, 8f, pointPaint)
+            if (data[0].hitGoal) canvas.drawCircle(x, y, 14f, goalRingPaint)
         } else {
-            // Draw line connecting mean values (reuses pre-allocated linePath)
             val path = linePath.apply { reset() }
             data.forEachIndexed { index, point ->
                 val x = padding + (chartWidth * index / (data.size - 1))
-                val y = mapPitchToY(point.f0Mean, yMin, yMax, padding, chartHeight)
-
-                if (index == 0) {
-                    path.moveTo(x, y)
-                } else {
-                    path.lineTo(x, y)
-                }
-
-                // Draw data point
+                val y = mapToY(point.value, yMin, yMax, padding, chartHeight)
+                if (index == 0) path.moveTo(x, y) else path.lineTo(x, y)
                 canvas.drawCircle(x, y, 6f, pointPaint)
-
-                // Draw min/max range as vertical line
-                val yMin = mapPitchToY(point.f0Min, yMin, yMax, padding, chartHeight)
-                val yMax = mapPitchToY(point.f0Max, yMin, yMax, padding, chartHeight)
-                canvas.drawLine(x, yMin, x, yMax, rangeLinePaint)
+                if (point.hitGoal) canvas.drawCircle(x, y, 12f, goalRingPaint)
             }
-
             canvas.drawPath(path, linePaint)
         }
 
-        // Draw X-axis labels (dates)
         drawDateLabels(canvas, padding, chartWidth)
     }
 
-    private fun mapPitchToY(pitch: Float, yMin: Float, yMax: Float, padding: Float, chartHeight: Float): Float {
-        val normalized = (pitch - yMin) / (yMax - yMin)
+    private fun mapToY(value: Float, yMin: Float, yMax: Float, padding: Float, chartHeight: Float): Float {
+        val range = yMax - yMin
+        val normalized = if (range > 0f) (value - yMin) / range else 0.5f
         return padding + chartHeight - (normalized * chartHeight)
     }
 
     private fun drawDateLabels(canvas: Canvas, padding: Float, chartWidth: Float) {
         val labelCount = min(data.size, 5)
         val step = max(1, data.size / labelCount)
-
         for (i in 0 until data.size step step) {
             val x = padding + (chartWidth * i / max(1, data.size - 1))
-            val dateStr = formatDate(data[i].date)
-
+            val dateStr = "${data[i].date.monthValue}/${data[i].date.dayOfMonth}"
             canvas.save()
             canvas.rotate(-45f, x, height - padding + 20f)
             canvas.drawText(dateStr, x, height - padding + 30f, textPaint.apply { textSize = 20f })
             canvas.restore()
         }
-
-        textPaint.textSize = 24f // Reset
-    }
-
-    private fun formatDate(date: LocalDate): String {
-        return "${date.monthValue}/${date.dayOfMonth}"
+        textPaint.textSize = 24f
     }
 
     private fun drawEmptyState(canvas: Canvas) {
-        val emptyTextPaint = Paint(textPaint).apply {
-            textSize = 32f
-            textAlign = Paint.Align.CENTER
-        }
-
-        canvas.drawText(
-            "No recordings to compare",
-            width / 2f,
-            height / 2f,
-            emptyTextPaint
-        )
+        val p = Paint(textPaint).apply { textSize = 32f; textAlign = Paint.Align.CENTER }
+        canvas.drawText("No recordings to compare", width / 2f, height / 2f, p)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val desiredWidth = 800
         val desiredHeight = 400
-
-        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-        val widthSize = MeasureSpec.getSize(widthMeasureSpec)
-        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
-        val heightSize = MeasureSpec.getSize(heightMeasureSpec)
-
-        val width = when (widthMode) {
-            MeasureSpec.EXACTLY -> widthSize
-            MeasureSpec.AT_MOST -> minOf(desiredWidth, widthSize)
+        val w = when (MeasureSpec.getMode(widthMeasureSpec)) {
+            MeasureSpec.EXACTLY -> MeasureSpec.getSize(widthMeasureSpec)
+            MeasureSpec.AT_MOST -> minOf(desiredWidth, MeasureSpec.getSize(widthMeasureSpec))
             else -> desiredWidth
         }
-
-        val height = when (heightMode) {
-            MeasureSpec.EXACTLY -> heightSize
-            MeasureSpec.AT_MOST -> minOf(desiredHeight, heightSize)
+        val h = when (MeasureSpec.getMode(heightMeasureSpec)) {
+            MeasureSpec.EXACTLY -> MeasureSpec.getSize(heightMeasureSpec)
+            MeasureSpec.AT_MOST -> minOf(desiredHeight, MeasureSpec.getSize(heightMeasureSpec))
             else -> desiredHeight
         }
+        setMeasuredDimension(w, h)
+    }
 
-        setMeasuredDimension(width, height)
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private fun extractMetricValue(a: AudioAnalysisEntity, metric: VoiceMetric): Float = when (metric) {
+        VoiceMetric.F0_MEAN               -> a.f0Mean
+        VoiceMetric.PITCH_RANGE_HZ        -> a.pitchRangeHz
+        VoiceMetric.PITCH_STABILITY_SCORE -> a.pitchStabilityScore
+        VoiceMetric.VOICED_RATIO          -> a.voicedRatio
+        VoiceMetric.INTONATION_MOVEMENT   -> a.intonationMovement
     }
 }

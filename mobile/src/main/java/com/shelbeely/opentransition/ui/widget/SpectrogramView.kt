@@ -15,12 +15,13 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.RectF
-import android.media.MediaCodec
-import android.media.MediaExtractor
-import android.media.MediaFormat
 import android.util.AttributeSet
 import android.view.View
+import com.shelbeely.opentransition.util.AudioDecoder
+import com.shelbeely.opentransition.util.PitchFrame
+import com.shelbeely.opentransition.util.PitchTracker
 import java.io.File
 import kotlin.math.PI
 import kotlin.math.cos
@@ -66,6 +67,13 @@ class SpectrogramView @JvmOverloads constructor(
     @Volatile private var renderGeneration = 0
     private var spectrogramBitmap: Bitmap? = null
 
+    /** Voiced pitch frames stored parallel to the spectrogram columns. */
+    @Volatile private var pitchFrames: List<PitchFrame> = emptyList()
+    /** Number of STFT frames that map to the bitmap width. */
+    @Volatile private var numSpectrogramFrames: Int = 0
+    /** Sample rate of the last decoded audio, needed for axis mapping. */
+    @Volatile private var lastSampleRate: Int = 44100
+
     /** Playback progress 0.0–1.0; draws a vertical cursor when > 0. */
     private var playbackProgress = 0f
 
@@ -90,6 +98,25 @@ class SpectrogramView @JvmOverloads constructor(
         textAlign = Paint.Align.CENTER
     }
 
+    private val pitchCurvePaint = Paint().apply {
+        color = Color.parseColor("#00E5FF")   // cyan — visible on inferno palette
+        alpha = 220
+        strokeWidth = 3f
+        style = Paint.Style.STROKE
+        isAntiAlias = true
+        strokeJoin = Paint.Join.ROUND
+        strokeCap = Paint.Cap.ROUND
+    }
+
+    private val unvoicedOverlayPaint = Paint().apply {
+        color = Color.BLACK
+        alpha = 80
+        style = Paint.Style.FILL
+    }
+
+    // Reusable path to avoid per-draw allocations
+    private val pitchPath = Path()
+
     // ── Public API ────────────────────────────────────────────────────────────
 
     /**
@@ -100,14 +127,24 @@ class SpectrogramView @JvmOverloads constructor(
         val gen = ++renderGeneration
         Thread {
             try {
-                val (samples, sampleRate) = decodeAudioToPcm(audioFile) ?: return@Thread
+                val (samples, sampleRate) = AudioDecoder.decodeAudioToPcm(audioFile) ?: return@Thread
                 if (gen != renderGeneration) return@Thread
-                val bitmap = buildSpectrogramBitmap(samples, sampleRate, gen) ?: return@Thread
+
+                // Run pitch tracker on the same PCM so the overlay is in sync
+                val frames = PitchTracker.analyzeFrames(samples, sampleRate,
+                    PitchTracker.DEFAULT_FRAME_SIZE, PitchTracker.DEFAULT_HOP_SIZE)
+                if (gen != renderGeneration) return@Thread
+
+                val numFrames = ((samples.size - fftSize) / hopSize).coerceAtLeast(1)
+                val bitmap = buildSpectrogramBitmap(samples, sampleRate, frames, gen) ?: return@Thread
                 if (gen != renderGeneration) { bitmap.recycle(); return@Thread }
                 post {
                     if (gen == renderGeneration) {
                         spectrogramBitmap?.recycle()
                         spectrogramBitmap = bitmap
+                        pitchFrames = frames
+                        numSpectrogramFrames = numFrames
+                        lastSampleRate = sampleRate
                         invalidate()
                     } else {
                         bitmap.recycle()
@@ -128,6 +165,8 @@ class SpectrogramView @JvmOverloads constructor(
         ++renderGeneration
         spectrogramBitmap?.recycle()
         spectrogramBitmap = null
+        pitchFrames = emptyList()
+        numSpectrogramFrames = 0
         invalidate()
     }
 
@@ -140,6 +179,14 @@ class SpectrogramView @JvmOverloads constructor(
         val bmp = spectrogramBitmap
         if (bmp != null && !bmp.isRecycled) {
             canvas.drawBitmap(bmp, null, RectF(0f, 0f, width.toFloat(), height.toFloat()), null)
+
+            val frames = pitchFrames
+            val nFrames = numSpectrogramFrames.takeIf { it > 0 } ?: frames.size
+            if (frames.isNotEmpty() && nFrames > 0) {
+                drawVoicedUnvoicedOverlay(canvas, frames, nFrames)
+                drawPitchCurve(canvas, frames, nFrames)
+            }
+
             if (playbackProgress > 0f) {
                 val cx = playbackProgress * width
                 canvas.drawLine(cx, 0f, cx, height.toFloat(), cursorPaint)
@@ -152,6 +199,58 @@ class SpectrogramView @JvmOverloads constructor(
                 emptyTextPaint
             )
         }
+    }
+
+    /**
+     * Draw a translucent black overlay on columns corresponding to unvoiced frames
+     * so users can visually identify when phonation stops.
+     */
+    private fun drawVoicedUnvoicedOverlay(canvas: Canvas, frames: List<PitchFrame>, nFrames: Int) {
+        val w = width.toFloat()
+        val h = height.toFloat()
+        for (i in frames.indices) {
+            if (!frames[i].isVoiced) {
+                val x0 = i.toLong() * w / nFrames
+                val x1 = (i + 1).toLong() * w / nFrames
+                canvas.drawRect(x0, 0f, x1, h, unvoicedOverlayPaint)
+            }
+        }
+    }
+
+    /**
+     * Draw a pitch curve on top of the spectrogram connecting consecutive voiced frames.
+     * The Y position maps the frequency logarithmically to match the spectrogram axes.
+     */
+    private fun drawPitchCurve(canvas: Canvas, frames: List<PitchFrame>, nFrames: Int) {
+        val w = width.toFloat()
+        val h = height.toFloat()
+        val logMin = ln(freqMin.toDouble())
+        val logMax = ln(freqMax.toDouble())
+
+        pitchPath.reset()
+        var pathStarted = false
+
+        for (i in frames.indices) {
+            val frame = frames[i]
+            if (!frame.isVoiced || frame.f0Hz <= 0f) {
+                pathStarted = false
+                continue
+            }
+            val f0 = frame.f0Hz.coerceIn(freqMin, freqMax)
+            val logF0 = ln(f0.toDouble())
+            val t = ((logF0 - logMin) / (logMax - logMin)).coerceIn(0.0, 1.0)
+            // Row 0 = top = high freq; so y = (1 − t) * height
+            val y = ((1.0 - t) * h).toFloat()
+            val x = (i.toLong() * w / nFrames + w / nFrames / 2f).toFloat()
+
+            if (!pathStarted) {
+                pitchPath.moveTo(x, y)
+                pathStarted = true
+            } else {
+                pitchPath.lineTo(x, y)
+            }
+        }
+        canvas.drawPath(pitchPath, pitchCurvePaint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -173,105 +272,7 @@ class SpectrogramView @JvmOverloads constructor(
 
     // ── Audio decoding ────────────────────────────────────────────────────────
 
-    /**
-     * Decode [file] to a mono 32-bit float PCM array using [MediaCodec].
-     * Returns a pair of (samples, sampleRate), or null on error.
-     */
-    private fun decodeAudioToPcm(file: File): Pair<FloatArray, Int>? {
-        val extractor = MediaExtractor()
-        extractor.setDataSource(file.absolutePath)
-
-        var trackIndex = -1
-        var mimeType = ""
-        var sampleRate = 44100
-        var channelCount = 1
-
-        for (i in 0 until extractor.trackCount) {
-            val fmt = extractor.getTrackFormat(i)
-            val mime = fmt.getString(MediaFormat.KEY_MIME) ?: continue
-            if (mime.startsWith("audio/")) {
-                trackIndex = i
-                mimeType = mime
-                sampleRate = fmt.getInteger(MediaFormat.KEY_SAMPLE_RATE)
-                channelCount = if (fmt.containsKey(MediaFormat.KEY_CHANNEL_COUNT))
-                    fmt.getInteger(MediaFormat.KEY_CHANNEL_COUNT) else 1
-                extractor.selectTrack(i)
-                break
-            }
-        }
-
-        if (trackIndex < 0) { extractor.release(); return null }
-
-        val codec: MediaCodec = try {
-            MediaCodec.createDecoderByType(mimeType)
-        } catch (_: Exception) { extractor.release(); return null }
-
-        try {
-            codec.configure(extractor.getTrackFormat(trackIndex), null, null, 0)
-            codec.start()
-        } catch (_: Exception) {
-            codec.release(); extractor.release(); return null
-        }
-
-        val bufferInfo = MediaCodec.BufferInfo()
-        val rawSamples = ArrayList<Float>(44100 * 30) // pre-allocate ~30 s
-        var inputDone = false
-        var outputDone = false
-        val timeoutUs = 10_000L
-
-        try {
-            while (!outputDone) {
-                if (!inputDone) {
-                    val inIdx = codec.dequeueInputBuffer(timeoutUs)
-                    if (inIdx >= 0) {
-                        val inBuf = codec.getInputBuffer(inIdx) ?: continue
-                        val size = extractor.readSampleData(inBuf, 0)
-                        if (size < 0) {
-                            codec.queueInputBuffer(inIdx, 0, 0, 0,
-                                MediaCodec.BUFFER_FLAG_END_OF_STREAM)
-                            inputDone = true
-                        } else {
-                            codec.queueInputBuffer(inIdx, 0, size, extractor.sampleTime, 0)
-                            extractor.advance()
-                        }
-                    }
-                }
-
-                when (val outIdx = codec.dequeueOutputBuffer(bufferInfo, timeoutUs)) {
-                    MediaCodec.INFO_TRY_AGAIN_LATER -> Unit // spin
-                    MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> Unit // ignore
-                    else -> if (outIdx >= 0) {
-                        val outBuf = codec.getOutputBuffer(outIdx)
-                        if (outBuf != null) {
-                            // AAC decoder output is always PCM_16BIT on Android
-                            val shortBuf = outBuf.asShortBuffer()
-                            while (shortBuf.hasRemaining()) {
-                                val s = shortBuf.get().toFloat() / 32768f
-                                rawSamples.add(s)
-                                // Discard extra channels (keep channel 0 only)
-                                repeat(channelCount - 1) {
-                                    if (shortBuf.hasRemaining()) shortBuf.get()
-                                }
-                            }
-                        }
-                        codec.releaseOutputBuffer(outIdx, false)
-                        if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                            outputDone = true
-                        }
-                    }
-                }
-            }
-        } catch (_: Exception) {
-            // Return whatever we decoded so far
-        } finally {
-            try { codec.stop() } catch (_: Exception) { }
-            try { codec.release() } catch (_: Exception) { }
-            try { extractor.release() } catch (_: Exception) { }
-        }
-
-        if (rawSamples.isEmpty()) return null
-        return rawSamples.toFloatArray() to sampleRate
-    }
+    // Delegated to the shared AudioDecoder utility — no duplication here.
 
     // ── STFT + colour mapping ─────────────────────────────────────────────────
 
@@ -283,10 +284,13 @@ class SpectrogramView @JvmOverloads constructor(
     /**
      * Compute an STFT over [samples] and render it into a [Bitmap].
      * [gen] is checked between frames so the render can be cancelled early.
+     * Column brightness is additionally scaled by the frame RMS so louder
+     * sections appear brighter — consistent with professional spectrogram tools.
      */
     private fun buildSpectrogramBitmap(
         samples: FloatArray,
         sampleRate: Int,
+        pitchFrameList: List<PitchFrame>,
         gen: Int
     ): Bitmap? {
         val numFrames = ((samples.size - fftSize) / hopSize).coerceAtLeast(1)
@@ -342,12 +346,16 @@ class SpectrogramView @JvmOverloads constructor(
             val nextX = ((frame.toLong() + 1) * bitmapW / numFrames).toInt()
                 .coerceIn(x + 1, bitmapW)
 
+            // Optional RMS brightness multiplier: louder frames are brighter
+            val rmsDb = pitchFrameList.getOrNull(frame)?.rmsDb ?: -40f
+            val rmsBrightness = ((rmsDb + 80f) / 80f).coerceIn(0.25f, 1f)
+
             for (row in 0 until bitmapH) {
                 val bin = rowBins[row]
                 val mag = allMags[frame][bin] / globalMax
                 // Convert to dB, normalise to [0, 1] over 80 dB dynamic range
                 val db = if (mag > 0f) (20.0 * log10(mag.toDouble())).toFloat() else -80f
-                val intensity = ((db + 80f) / 80f).coerceIn(0f, 1f)
+                val intensity = ((db + 80f) / 80f * rmsBrightness).coerceIn(0f, 1f)
                 val colour = infernoColour(intensity)
                 for (px in x until nextX) {
                     pixels[row * bitmapW + px] = colour

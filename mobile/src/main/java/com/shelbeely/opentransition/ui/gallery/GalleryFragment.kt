@@ -171,6 +171,13 @@ class GalleryFragment : Fragment(R.layout.gallery) {
                 )
             }
 
+        viewDisposables += sharedEvents.ofType<GalleryUiEvent.AudioSessionDetail>()
+            .subscribe { event ->
+                findNavController().navigate(
+                    GalleryFragmentDirections.actionGalleryToVoiceSessionDetail(event.photoId)
+                )
+            }
+
         viewDisposables += sharedEvents.ofType<GalleryUiEvent.Share>()
             .subscribe { event ->
                 if (event.selectedIds.isEmpty()) {

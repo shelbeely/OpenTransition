@@ -47,6 +47,8 @@ sealed class GalleryUiEvent {
     object EndActionMode : GalleryUiEvent()
     data class Share(val selectedIds: ArrayList<String>) : GalleryUiEvent()
     data class Delete(val selectedIds: ArrayList<String>) : GalleryUiEvent()
+    /** Long-tap on an audio gallery item when not in selection mode → open session detail. */
+    data class AudioSessionDetail(val photoId: String) : GalleryUiEvent()
 }
 
 sealed class GalleryUiState {
