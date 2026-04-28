@@ -218,7 +218,7 @@ class FormantChartView @JvmOverloads constructor(
             textAlign = Paint.Align.CENTER
         }
 
-        // Typical feminine range (higher F1, higher F2)
+        // Higher pitch range (higher F1, higher F2)
         val femX1 = mapF2ToX(1500f, padding, chartWidth)
         val femX2 = mapF2ToX(2500f, padding, chartWidth)
         val femY1 = mapF1ToY(850f, padding, chartHeight)
@@ -228,9 +228,9 @@ class FormantChartView @JvmOverloads constructor(
             color = Color.parseColor("#E91E63") // Pink
             alpha = 30
         })
-        canvas.drawText("Fem", (femX1 + femX2) / 2, (femY1 + femY2) / 2, labelPaint)
+        canvas.drawText("High", (femX1 + femX2) / 2, (femY1 + femY2) / 2, labelPaint)
 
-        // Typical masculine range (lower F1, lower F2)
+        // Lower pitch range (lower F1, lower F2)
         val mascX1 = mapF2ToX(1000f, padding, chartWidth)
         val mascX2 = mapF2ToX(1600f, padding, chartWidth)
         val mascY1 = mapF1ToY(650f, padding, chartHeight)
@@ -240,7 +240,7 @@ class FormantChartView @JvmOverloads constructor(
             color = Color.parseColor("#2196F3") // Blue
             alpha = 30
         })
-        canvas.drawText("Masc", (mascX1 + mascX2) / 2, (mascY1 + mascY2) / 2, labelPaint)
+        canvas.drawText("Low", (mascX1 + mascX2) / 2, (mascY1 + mascY2) / 2, labelPaint)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

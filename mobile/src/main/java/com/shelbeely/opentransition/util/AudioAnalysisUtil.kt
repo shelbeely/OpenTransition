@@ -112,8 +112,8 @@ object AudioAnalysisUtil {
         // Typical F1 for adult speakers
         // This is a simplified estimation - real F1 extraction requires LPC
         return when {
-            f0 < 150 -> 500f  // Lower pitch (typically masculine)
-            f0 > 200 -> 700f  // Higher pitch (typically feminine)
+            f0 < 150 -> 500f  // Lower pitch range
+            f0 > 200 -> 700f  // Higher pitch range
             else -> 600f
         }
     }
@@ -188,9 +188,9 @@ object AudioAnalysisUtil {
             // Provide interpretation
             appendLine("Interpretation:")
             when {
-                analysis.f0Mean < 130 -> appendLine("  - Pitch is in typical masculine range")
-                analysis.f0Mean > 180 -> appendLine("  - Pitch is in typical feminine range")
-                else -> appendLine("  - Pitch is in androgynous range")
+                analysis.f0Mean < 130 -> appendLine("  - Pitch is in a lower range (below 130 Hz)")
+                analysis.f0Mean > 180 -> appendLine("  - Pitch is in a higher range (above 180 Hz)")
+                else -> appendLine("  - Pitch is in a mid range (130–180 Hz)")
             }
             
             when {
