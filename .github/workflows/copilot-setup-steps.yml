@@ -15,7 +15,6 @@ jobs:
   # Job MUST be named `copilot-setup-steps` or Copilot cloud agent will not use it.
   copilot-setup-steps:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
 
     permissions:
       contents: read
