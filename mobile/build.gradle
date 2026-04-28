@@ -154,13 +154,13 @@ dependencies {
     def composeBom = platform('androidx.compose:compose-bom:2025.11.01')
     implementation composeBom
     androidTestImplementation composeBom
-    // Override BOM to use M3 1.4.0-alpha18 which contains HorizontalFloatingToolbar
+    // Override BOM to use M3 1.5.0-alpha18 which contains HorizontalFloatingToolbar
     // (the alpha requires a strictly constraint since 1.4.0-stable is newer in version ordering)
     implementation('androidx.compose.material3:material3') {
-        version { strictly '1.4.0-alpha18' }
+        version { strictly '1.5.0-alpha18' }
     }
     implementation('androidx.compose.material3:material3-android') {
-        version { strictly '1.4.0-alpha18' }
+        version { strictly '1.5.0-alpha18' }
     }
     implementation 'androidx.compose.material:material-icons-extended'
     implementation 'androidx.compose.foundation:foundation'
