@@ -36,8 +36,8 @@ android {
     
     defaultConfig {
         applicationId "com.shelbeely.opentransition"
-        minSdkVersion 21
-        targetSdkVersion 36
+        minSdkVersion 26
+        targetSdkVersion 35
         versionCode getVersionCode()
         versionName getVersionName()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
