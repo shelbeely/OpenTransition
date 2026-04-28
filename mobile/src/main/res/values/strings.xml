@@ -277,6 +277,8 @@
 
     <!-- Gallery -->
     <string name="add">Add</string>
+    <string name="navigate_days">Navigate days</string>
+    <string name="collapse_add_menu">Collapse add menu</string>
     <string name="gallery_empty">It doesn\'t look like there are any photos yet. Why not add some?</string>
     <string name="audio_gallery_empty">No recordings yet. Tap the + button to record your first voice sample.</string>
     <string name="selected">Selected</string>
