@@ -6,13 +6,10 @@ env:
 on:
   push:
     branches: [ "production" ]
-  pull_request:
-    branches-ignore:
-      - 'copilot/**'
 
 concurrency:
   group: build-android-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: false
 
 jobs:
 
@@ -22,6 +19,9 @@ jobs:
     steps:
     - name: 🚚 Checkout PR
       uses: actions/checkout@v4
+
+    - name: 🌯 Gradle Wrapper Validation
+      uses: gradle/wrapper-validation-action@v3
 
     - name: 🤖 Android setup
       uses: ./.github/actions/android-setup
@@ -40,20 +40,10 @@ jobs:
         path: mobile/build/reports/lint-results-debug.html
 
 
-  check-gradle-wrapper:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: 🚚 Checkout PR
-      uses: actions/checkout@v4
-
-    - name: 🌯 Gradle Wrapper Validation
-      uses: gradle/wrapper-validation-action@v3
-
   deploy-app:
     runs-on: ubuntu-latest
     environment: Google Play Store Deployment
-    needs: [build, check-gradle-wrapper]
+    needs: [build]
     if: ${{ github.event_name == 'push' && github.ref_name == 'production' }}
 
     steps:
