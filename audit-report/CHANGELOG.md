@@ -2,6 +2,13 @@
 
 All notable changes to the `audit-report/` folder are documented here.
 
+## 2026-04-29 (post-refresh) — ISSUE-029 resolved
+
+- **`mobile/build.gradle`** — Material3 strict pin relaxed from exact `'1.5.0-alpha18'` to range `'[1.5.0-alpha18,)'` on both `androidx.compose.material3:material3` and `:material3-android`. Future M3 versions are now picked up automatically as the Compose BOM advances. Verified with `./gradlew :mobile:dependencies` (resolution still pins to `1.5.0-alpha18` today, the highest published version) and `:mobile:assembleDebug` (BUILD SUCCESSFUL).
+- **`audit-report/18-refresh-2026-04-29.md`** — ISSUE-029 marked resolved.
+
+---
+
 ## 2026-04-29 — Refresh against `9c18daf` (47 commits since baseline)
 
 **Driver:** "Analyze the repo and give me an updated audit report" (task request).
