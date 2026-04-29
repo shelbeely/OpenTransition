@@ -1,9 +1,7 @@
 name: PR Debug Build
 
 on:
-  pull_request:
-    branches-ignore:
-      - 'copilot/**'
+  workflow_dispatch:
 
 jobs:
   check-gradle-wrapper:

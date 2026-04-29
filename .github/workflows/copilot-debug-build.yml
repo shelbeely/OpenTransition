@@ -2,9 +2,6 @@ name: Copilot Debug Build
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - 'copilot/**'
 
 jobs:
   debug:
