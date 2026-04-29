@@ -1,5 +1,9 @@
 # 16 — Prioritized Action Plan
 
+> 🟢 **Refreshed 2026-04-29:** see §8 of [`18-refresh-2026-04-29.md`](18-refresh-2026-04-29.md) for the
+> current Now / Next / Later list. Items 1, 2, 3, 7, 8, 9 from the NOW list below have been **completed**;
+> the new top-of-list NOW item is fixing the `:mobile:lintDebug` failure (ISSUE-035).
+
 > Backlog ordered by ROI (impact ÷ effort). Each item links to an `ISSUE-###` from
 > `07-issues-and-bugs.md` and a platform tag.
 

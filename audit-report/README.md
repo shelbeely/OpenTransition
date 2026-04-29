@@ -1,5 +1,9 @@
 # OpenTransition Monorepo Audit Report
 
+> 🟢 **Latest refresh:** [`18-refresh-2026-04-29.md`](18-refresh-2026-04-29.md) (against `9c18daf`, 47 commits since baseline).
+> See [`CHANGELOG.md`](CHANGELOG.md) for what changed between audit passes.
+> The 17 baseline documents below remain the canonical evidence trail for the original `dd22666` audit.
+
 **Audit date:** 2026-04-22
 **Commit SHA:** `dd22666efb42e7f3f2d7e83a9f57ab7c8123852e` (base) → `37d5e50…` (current branch tip)
 **Branch:** `copilot/audit-monorepo-analysis`
@@ -34,6 +38,8 @@ plus runtime observation on a freshly booted emulator (per follow-up requirement
 | 15 | [`15-release-and-distribution.md`](15-release-and-distribution.md) | Variants, signing, Play Store coupling, versioning. |
 | 16 | [`16-prioritized-action-plan.md`](16-prioritized-action-plan.md) | Ordered backlog (Now / Next / Later) tagged by platform. |
 | 17 | [`17-runtime-observations.md`](17-runtime-observations.md) | **Emulator-driven** runtime findings (cold-start jank, memory, hidden-API warnings, dual launcher icons). |
+| **18** | [**`18-refresh-2026-04-29.md`**](18-refresh-2026-04-29.md) | 🟢 **Refresh** — supersedes per-finding status across docs `00`–`17` against current HEAD. New scores, new criticals (ISSUE-035 lint errors, ISSUE-036 APK growth, ISSUE-029 alpha pin), refreshed action plan. |
+| — | [`CHANGELOG.md`](CHANGELOG.md) | Audit-pass changelog. |
 
 `runtime-artifacts/` contains the captured screenshots and supporting evidence referenced from doc 17.
 

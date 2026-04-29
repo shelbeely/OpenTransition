@@ -1,5 +1,9 @@
 # 00 — Executive Summary
 
+> 🟢 **Refreshed 2026-04-29:** see [`18-refresh-2026-04-29.md`](18-refresh-2026-04-29.md) for the current
+> sub-scores, refreshed criticals, and refreshed "1-week shortlist". The summary below remains the
+> 2026-04-22 baseline snapshot at `dd22666`.
+
 > One-page overview for a non-technical stakeholder.
 > See `README.md` for the full document index.
 
