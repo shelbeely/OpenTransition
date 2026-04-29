@@ -1,8 +1,22 @@
 # OpenTransition
 
-OpenTransition is a transition tracking application made specifically for transgender people, focusing on photo tracking and milestone management. It helps you document your journey privately and securely.
+OpenTransition is a private, secure photo-journal app for tracking a gender transition journey. It is the active successor to the original **TransTracks** app, which was [retired from the Google Play Store in 2025](https://github.com/TransTracks/TransTracks-Android). If you were a TransTracks user, see [Importing from TransTracks](#-importing-from-transtracks) below.
 
-OpenTransition began as a fork of the original **TransTracks** application. TransTracks was [retired from the Google Play Store in 2025](https://github.com/TransTracks/TransTracks-Android) and its repository is now archived and read-only. OpenTransition is the active successor — the recommended way to continue tracking your transition journey. If you were a TransTracks user, see [Importing from TransTracks](#-importing-from-transtracks) below.
+## Table of Contents
+
+- [Multi-Platform Support](#-multi-platform-support)
+- [Documentation](#-documentation)
+- [Screenshots](#-screenshots)
+- [Key Features](#-key-features)
+- [Tech Stack](#-tech-stack)
+- [Architecture](#️-architecture)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started-for-development)
+- [Package Information](#-package-information)
+- [Importing from TransTracks](#-importing-from-transtracks)
+- [Contributing](#-contributing)
+- [License](#license)
+- [Credits](#credits)
 
 ## 📱 Multi-Platform Support
 
@@ -67,6 +81,69 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 - 🎨 **Customizable** - Multiple themes and personalization options
 - ⌚ **Wear OS Companion** - Trigger photo capture and view milestones from your smartwatch
 
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Language** | Kotlin 2.0.20 |
+| **UI** | Jetpack Compose (Material Design 3) + XML Views (incremental migration) |
+| **Navigation** | Jetpack Navigation Component 2.8.5 with SafeArgs |
+| **Async** | Kotlin Coroutines + Flow; RxJava 3 + RxRelay (legacy, being phased out) |
+| **Database** | Room 2.6.1 + SQLCipher 4.5.4 (optional encryption); Realm 2.3.0 (read-only, for TransTracks import) |
+| **Image loading** | Coil 3 |
+| **Camera** | CameraX 1.3.1 |
+| **Face detection** | ML Kit Face Detection 16.1.6 |
+| **Auth / Security** | Firebase Auth, Biometric API, EncryptedSharedPreferences |
+| **Cloud** | Firebase (Analytics, Crashlytics, Firestore, Auth) |
+| **Ads** | Google Mobile Ads (AdMob) 22.4.0 |
+| **Wear communication** | Wearable Data Layer API (play-services-wearable 18.1.0) |
+| **Build** | AGP 8.13.0, Gradle wrapper, KSP 2.0.20-1.0.25 |
+| **CI/CD** | GitHub Actions (debug builds, release bundles, UI screenshots, docs) |
+| **Distribution** | Fastlane → Google Play Store |
+
+## 🗂️ Project Structure
+
+```
+OpenTransition/
+├── mobile/                    # Phone/tablet app (main application)
+│   ├── src/main/java/com/shelbeely/opentransition/
+│   │   ├── ui/                # Screens, fragments, Compose UI
+│   │   ├── data/              # Data models and repositories
+│   │   ├── domain/            # Business logic
+│   │   ├── background/        # Background tasks and workers
+│   │   └── wear/              # Wearable listener service
+│   ├── src/main/res/          # Layouts, drawables, strings
+│   ├── src/test/              # Unit tests
+│   ├── src/androidTest/       # Instrumented tests
+│   ├── schemas/               # Room schema export files
+│   └── build.gradle
+│
+├── wear/                      # Wear OS companion app
+│   ├── src/main/java/com/shelbeely/opentransition/wear/
+│   │   ├── MainActivity.kt
+│   │   └── WearableListenerService.kt
+│   └── build.gradle
+│
+├── shared/                    # Pure-Kotlin library shared by mobile + wear
+│   ├── src/main/java/com/shelbeely/opentransition/shared/
+│   │   ├── WearableConstants.kt
+│   │   └── models/            # Data models for cross-device sync
+│   └── build.gradle
+│
+├── .github/
+│   ├── workflows/             # CI: debug builds, release, screenshots, docs
+│   └── actions/               # Reusable composite actions
+├── fastlane/                  # Play Store deployment configuration
+├── docs/                      # MkDocs source for GitHub Pages docs site
+├── screenshots/               # Auto-captured UI screenshots (updated by CI)
+├── keys/                      # Debug keystore (safe to commit); release injected by CI
+├── audit-report/              # Known issues and technical debt tracking
+├── build.gradle               # Root build script (versions, classpath)
+├── settings.gradle            # Module declarations
+├── secrets.properties.example # Template — copy to secrets.properties
+└── README.md
+```
+
 ## 🔄 Importing from TransTracks
 
 **TransTracks was retired from the Google Play Store in 2025.** If you were a TransTracks user, OpenTransition is the recommended way to continue your journey. It is fully compatible with the `.ttbackup` backup format that TransTracks produces.
@@ -104,25 +181,67 @@ All Realm-related code is marked with `BACKWARDS COMPATIBILITY` comments.
 
 See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for details on the database architecture and optional SQLCipher encryption.
 
-## 🚀 Quick Start for Development
+## 🚀 Getting Started for Development
 
-1. Set up a Firebase project for development
-2. Download the `google-services.json` file from Firebase console
-3. Place the `google-services.json` file in the `mobile/` folder (note: was `app/` previously)
-4. Copy `secrets.properties.example` to `secrets.properties`
-5. Build and run: `./gradlew build`
+### Prerequisites
 
-**Build specific modules:**
+| Requirement | Notes |
+|---|---|
+| **JDK 17** | Required by AGP 8 / Kotlin 2.0.20 |
+| **Android Studio** *Ladybug* or newer | Recommended for IDE support |
+| **Android SDK** | `compileSdk 36`, `targetSdk 35`, `minSdk 26` |
+| **Firebase project** | Needed for Crashlytics, Auth, and Firestore |
+
+### One-time setup
+
 ```bash
-# Mobile app only
+# 1. Clone
+git clone https://github.com/shelbeely/OpenTransition.git
+cd OpenTransition
+
+# 2. Point Gradle at your Android SDK
+echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+# 3. Stub secrets (safe test AdMob IDs are already filled in)
+cp secrets.properties.example secrets.properties
+
+# 4. Place your Firebase google-services.json in the mobile/ folder
+#    (download from Firebase Console → Project settings → Your apps)
+
+# 5. Make the wrapper executable
+chmod +x ./gradlew
+```
+
+> ⚠️ **Never commit** `secrets.properties`, `local.properties`, or a real
+> `mobile/google-services.json`. They are listed in `.gitignore`; CI injects
+> production values from GitHub Secrets.
+
+### Build commands
+
+```bash
+# Debug APK (mobile)
 ./gradlew :mobile:assembleDebug
 
-# Wear OS app only
+# Debug APK (Wear OS)
 ./gradlew :wear:assembleDebug
 
 # All modules
 ./gradlew build
+
+# Unit tests
+./gradlew test
+
+# Instrumented tests (requires running emulator or device)
+./gradlew :mobile:connectedDebugAndroidTest
+
+# Lint
+./gradlew :mobile:lintDebug :wear:lintDebug
+
+# Install on connected device/emulator
+./gradlew :mobile:installDebug
 ```
+
+Append `--stacktrace` when diagnosing build failures.
 
 **Full setup instructions:** [Development Setup Guide](https://shelbeely.github.io/OpenTransition/getting-started/development-setup/)
 
@@ -131,8 +250,8 @@ See [ENCRYPTED_DATABASE.md](ENCRYPTED_DATABASE.md) for details on the database a
 ### Mobile App
 - **Package Name**: `com.shelbeely.opentransition`
 - **App Name**: OpenTransition
-- **Minimum SDK**: 21 (Android 5.0)
-- **Target SDK**: 36
+- **Minimum SDK**: 26 (Android 8.0)
+- **Target SDK**: 35
 
 ### Wear OS App
 - **Package Name**: `com.shelbeely.opentransition.wear`
