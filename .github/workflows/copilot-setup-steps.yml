@@ -23,34 +23,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      # JDK 17 is the safe default for AGP 8+ projects.
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: "17"
-
       # Gradle action restores and saves important Gradle caches automatically.
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # Cache your custom Android CLI download directory.
-      - name: Cache Android CLI
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/android-cli
-          key: android-cli-${{ runner.os }}-v1
-          restore-keys: |
-            android-cli-${{ runner.os }}-
-
-      # Common Android setup path.
-      # Your local composite action can decide whether to do the heavy CLI init.
+      # Common Android setup: JDK 17, Android SDK, Android CLI (always on for
+      # Copilot sessions), local.properties, secrets, and google-services.json.
       - name: Android setup
         uses: ./.github/actions/android-setup
         with:
           secrets-properties-b64: ${{ secrets.SECRETS_PROPERTIES_B64 }}
           google-services-json-b64: ${{ secrets.GOOGLE_SERVICES_JSON }}
-          init-android-cli: ${{ vars.INIT_ANDROID_CLI || 'false' }}
+          init-android-cli: 'true'
 
       # Optional emulator path. Enable by setting this repository environment variable:
       # Settings -> Environments -> copilot -> Variables -> ENABLE_ANDROID_EMULATOR=true
