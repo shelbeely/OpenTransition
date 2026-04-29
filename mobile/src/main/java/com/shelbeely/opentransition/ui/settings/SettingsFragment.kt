@@ -311,6 +311,16 @@ class SettingsFragment : Fragment(R.layout.settings) {
                     startActivity(intent)
                 }
             }
+
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.Credits>()
+            .subscribe {
+                findNavController().navigate(SettingsFragmentDirections.actionGoToCredits())
+            }
+
+        viewDisposables += sharedEvents.ofType<SettingsUiEvent.OssLicenses>()
+            .subscribe {
+                findNavController().navigate(SettingsFragmentDirections.actionGoToOssLicenses())
+            }
     }
 
     override fun onDetach() {

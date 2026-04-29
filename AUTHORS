@@ -6,20 +6,21 @@ GitHub contributors page:
 
 <https://github.com/shelbeely/OpenTransition/graphs/contributors>
 
-## Original authors (TransTracks)
+## Original author (TransTracks)
 
-OpenTransition is a fork of **TransTracks**, originally created and
-maintained by the TransTracks development team. The TransTracks app was
-retired from the Google Play Store in 2025, and its source repository is
-archived at:
+OpenTransition is a fork of **TransTracks**, written and maintained
+single-handedly by **Cassie Wilson** (`<contact@transtracks.app>`) from
+2018 to 2021. The TransTracks app was retired from the Google Play
+Store in 2025, and its source repository is archived at:
 
 <https://github.com/TransTracks/TransTracks-Android>
 
-  Copyright © 2018-2021 TransTracks
+  Copyright © 2018-2021 TransTracks (Cassie Wilson)
 
-We owe a deep debt of gratitude to the TransTracks authors. The bulk of
-the photo, milestone, gallery, import/export, and database functionality
-in OpenTransition originated in their work.
+We owe a deep debt of gratitude to Cassie. The bulk of the photo,
+milestone, gallery, import/export, and database functionality in
+OpenTransition originated in her work, and she chose to release it under
+GPL-3.0-or-later — which is what made this fork possible at all.
 
 ## OpenTransition maintainers
 

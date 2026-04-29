@@ -46,6 +46,8 @@ sealed class SettingsUiEvent {
     object ImportRealmBackup : SettingsUiEvent()
     object Contribute : SettingsUiEvent()
     object PrivacyPolicy : SettingsUiEvent()
+    object Credits : SettingsUiEvent()
+    object OssLicenses : SettingsUiEvent()
 }
 
 data class SettingsUIUserDetails(
@@ -118,7 +120,9 @@ class SettingsView(context: Context, attributeSet: AttributeSet) :
                     onToggleQuickHide = { eventRelay.accept(SettingsUiEvent.ToggleQuickHide) },
                     onImportRealmBackup = { eventRelay.accept(SettingsUiEvent.ImportRealmBackup) },
                     onContribute = { eventRelay.accept(SettingsUiEvent.Contribute) },
-                    onPrivacyPolicy = { eventRelay.accept(SettingsUiEvent.PrivacyPolicy) }
+                    onPrivacyPolicy = { eventRelay.accept(SettingsUiEvent.PrivacyPolicy) },
+                    onCredits = { eventRelay.accept(SettingsUiEvent.Credits) },
+                    onOssLicenses = { eventRelay.accept(SettingsUiEvent.OssLicenses) }
                 )
             }
         }

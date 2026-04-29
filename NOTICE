@@ -12,20 +12,25 @@ Original Work
 OpenTransition is a fork and continuation of TransTracks, a photo-journal
 app for tracking gender transition journeys.
 
-  Original Work : TransTracks for Android
-  Copyright     : (C) 2018-2021 TransTracks
-  License       : GNU General Public License, version 3 or later
-  Source        : https://github.com/TransTracks/TransTracks-Android
-                  (archived; the original Play Store listing was retired
-                  in 2025)
+  Original Work  : TransTracks for Android
+  Original Author: Cassie Wilson <contact@transtracks.app>
+  Copyright      : (C) 2018-2021 TransTracks (Cassie Wilson)
+  License        : GNU General Public License, version 3 or later
+  Source         : https://github.com/TransTracks/TransTracks-Android
+                   (archived; the original Play Store listing was retired
+                   in 2025)
+
+TransTracks was the work of a single developer, Cassie Wilson, who built
+and released it under GPL-3.0-or-later and supported it for years before
+retiring the app in 2025.
 
 Modifications, additions, rebranding, and the Wear OS companion app are
 copyright (C) 2025-2026 Shelbeely and OpenTransition contributors, and
 are likewise licensed under GPL-3.0-or-later, preserving the original
 license chain.
 
-We are deeply grateful to the TransTracks developers and contributors,
-without whose work OpenTransition would not exist.
+We are deeply grateful to Cassie Wilson, without whose work
+OpenTransition would not exist.
 
 ------------------------------------------------------------------------
 Third-Party Code

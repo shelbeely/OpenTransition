@@ -110,7 +110,29 @@
             app:launchSingleTop="true"
             app:popEnterAnim="@android:anim/fade_in"
             app:popExitAnim="@android:anim/fade_out" />
+        <action
+            android:id="@+id/action_goToCredits"
+            app:destination="@id/creditsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/still"
+            app:popEnterAnim="@anim/still"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_goToOssLicenses"
+            app:destination="@id/ossLicensesFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/still"
+            app:popEnterAnim="@anim/still"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+    <fragment
+        android:id="@+id/creditsFragment"
+        android:name="com.shelbeely.opentransition.ui.credits.CreditsFragment"
+        android:label="CreditsFragment" />
+    <fragment
+        android:id="@+id/ossLicensesFragment"
+        android:name="com.shelbeely.opentransition.ui.credits.OssLicensesFragment"
+        android:label="OssLicensesFragment" />
     <fragment
         android:id="@+id/milestonesFragment"
         android:name="com.shelbeely.opentransition.ui.milestones.MilestonesFragment"

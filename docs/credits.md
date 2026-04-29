@@ -2,9 +2,10 @@
 
 ## Original Work
 
-OpenTransition is based on **TransTracks**, which was originally created and maintained by the TransTracks development team. **TransTracks was retired from the Google Play Store in 2025** and its source repository is now archived at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android). OpenTransition is the active continuation of this work.
+OpenTransition is based on **TransTracks**, which was written and maintained single-handedly by **Cassie Wilson** (`<contact@transtracks.app>`). **TransTracks was retired from the Google Play Store in 2025** and its source repository is now archived at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android). OpenTransition is the active continuation of this work.
 
-**Original Copyright**: © 2018 - 2021 TransTracks  
+**Original Author**: Cassie Wilson  
+**Original Copyright**: © 2018 - 2021 TransTracks (Cassie Wilson)  
 **Original Repository**: [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android) (archived, read-only)  
 **License**: GNU General Public License v3.0
 
@@ -20,11 +21,11 @@ OpenTransition maintains the core functionality and design philosophy of TransTr
 
 ## Acknowledgments
 
-We are deeply grateful to the original TransTracks developers and contributors who created this valuable tool for the transgender community. Their work provided the foundation that makes OpenTransition possible. Though TransTracks is no longer active, its legacy lives on in OpenTransition.
+We are deeply grateful to **Cassie Wilson**, who built TransTracks essentially on her own and chose to release it under GPL v3 — creating a valuable tool for the transgender community and ensuring that, when she stepped away in 2025, the community could carry it forward. Though TransTracks itself is no longer active, its legacy lives on in OpenTransition.
 
 ### Original TransTracks Features
 
-All core features in OpenTransition originated from TransTracks:
+All core features in OpenTransition originated from Cassie Wilson's TransTracks:
 
 - Photo tracking system with face, body, and custom categories
 - Milestone management and tracking
@@ -55,7 +56,7 @@ We welcome contributions from everyone! See our [Contributing Guidelines](contri
 OpenTransition maintains the same GNU General Public License v3.0 as the original TransTracks application, ensuring it remains free and open source software.
 
 ```
-Original Copyright (C) 2018 - 2021 TransTracks
+Original Copyright (C) 2018 - 2021 TransTracks (Cassie Wilson)
 Fork modifications and rebranding by the OpenTransition contributors
 
 This program is free software: you can redistribute it and/or modify

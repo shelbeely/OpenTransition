@@ -80,6 +80,8 @@ fun SettingsScreen(
     onImportRealmBackup: () -> Unit,
     onContribute: () -> Unit,
     onPrivacyPolicy: () -> Unit,
+    onCredits: () -> Unit,
+    onOssLicenses: () -> Unit,
 ) {
     val content: Content = when (state) {
         is Content -> state
@@ -172,7 +174,9 @@ fun SettingsScreen(
                 AboutSection(
                     content = content,
                     onContribute = onContribute,
-                    onPrivacyPolicy = onPrivacyPolicy
+                    onPrivacyPolicy = onPrivacyPolicy,
+                    onCredits = onCredits,
+                    onOssLicenses = onOssLicenses
                 )
             }
         }
@@ -436,6 +440,8 @@ private fun AboutSection(
     content: Content,
     onContribute: () -> Unit,
     onPrivacyPolicy: () -> Unit,
+    onCredits: () -> Unit,
+    onOssLicenses: () -> Unit,
 ) {
     SectionHeader(text = stringResource(R.string.about_transtracks_title))
 
@@ -486,6 +492,26 @@ private fun AboutSection(
     ) {
         Text(
             text = stringResource(R.string.privacy_policy),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+
+    TextButton(
+        onClick = onCredits,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.credits_and_thanks),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+
+    TextButton(
+        onClick = onOssLicenses,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.open_source_licenses),
             style = MaterialTheme.typography.titleMedium
         )
     }

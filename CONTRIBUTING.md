@@ -164,7 +164,7 @@ photos to triage UI bugs.
 OpenTransition is licensed under the **GNU General Public License,
 version 3 or (at your option) any later version** — the same license
 used by the original [TransTracks](https://github.com/TransTracks/TransTracks-Android)
-project that this app is forked from.
+project (written by Cassie Wilson) that this app is forked from.
 
 By submitting a contribution (a pull request, patch, translation, or
 any other change) to this repository, you agree that:
