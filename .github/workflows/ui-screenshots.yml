@@ -43,13 +43,16 @@ jobs:
         sudo udevadm control --reload-rules
         sudo udevadm trigger --name-match=kvm
 
+    - name: 📦 Install emulator system dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -y libpulse0 libxcb-cursor0 xvfb
+
     - name: 📱 Create Android Emulator
       run: android emulator create --profile=medium_phone
 
     - name: 🚀 Start Android Emulator
-      run: |
-        android emulator start medium_phone
-        android emulator wait medium_phone
+      run: android emulator start medium_phone
 
     - name: 📸 Capture Screenshots
       run: |
@@ -268,7 +271,7 @@ jobs:
 
     - name: 🛑 Stop Android Emulator
       if: always()
-      run: android emulator stop medium_phone || true
+      run: android emulator stop emulator-5554 || true
 
     - name: 📝 Regenerate screenshots/README.md
       if: always()
@@ -346,6 +349,14 @@ jobs:
       if: always()
       run: |
         SHOTS="screenshots"
+
+        # Skip update if the expected screenshots were not captured this run,
+        # to avoid committing broken image references into README.md.
+        if [ ! -f "$SHOTS/02_home.png" ]; then
+          echo "⚠️ Expected screenshots not found — skipping README.md update to avoid broken references."
+          exit 0
+        fi
+
         DATE=$(date -u '+%Y-%m-%d')
 
         # Build the replacement block (everything between the markers, inclusive).

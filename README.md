@@ -54,16 +54,16 @@ The mobile and Wear OS apps communicate using Google's Wearable Data Layer API, 
 ## 📸 Screenshots
 
 <!-- SCREENSHOTS-START -->
-> 🤖 **Auto-generated** — refreshed by CI on every push to `main`.  Captured on a `medium_phone` emulator (API 36, debug build).
+> 🤖 **Auto-generated** — refreshed by CI on every push to `production`.  Captured on a `medium_phone` emulator (API 36, debug build).
 
 | | | |
 |:---:|:---:|:---:|
-| ![Home](screenshots/02_home.png) | ![Settings](screenshots/06_settings_top.png) | ![Milestones](screenshots/13_milestones_empty.png) |
+| ![Home](screenshots/01_home.png) | ![Settings](screenshots/02_settings.png) | ![Milestones](screenshots/03_milestones_empty.png) |
 | **Home** | **Settings** | **Milestones** |
-| ![Face Gallery](screenshots/16_face_gallery_empty.png) | ![Audio Gallery](screenshots/23_audio_gallery_empty.png) | ![Record Audio](screenshots/24_record_audio_idle.png) |
+| ![Face Gallery](screenshots/05_gallery_face.png) | ![Audio Gallery](screenshots/07_gallery_audio.png) | ![Record Audio](screenshots/10_record_audio.png) |
 | **Face Gallery** | **Audio Gallery** | **Record Audio** |
 
-[📂 View all 40 screenshots →](screenshots/README.md)
+[📂 View all 16 screenshots →](screenshots/README.md)
 <!-- SCREENSHOTS-END -->
 
 ## ✨ Key Features
