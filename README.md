@@ -245,6 +245,22 @@ Append `--stacktrace` when diagnosing build failures.
 
 **Full setup instructions:** [Development Setup Guide](https://shelbeely.github.io/OpenTransition/getting-started/development-setup/)
 
+### Retrieving on-device crash logs
+
+When the app crashes due to an uncaught exception (or an unhandled coroutine
+failure), a plain-text report is written to the app's external files directory
+so it can be retrieved without root access. Reports include the timestamp,
+app/Android/device info, the crashing thread name and the full stack trace.
+
+Pull all reports from a connected device with:
+
+```bash
+adb pull /sdcard/Android/data/com.shelbeely.opentransition/files/crash_logs/
+```
+
+You can also browse to that folder in the **Files** app on the device. The most
+recent 20 reports are kept; older ones are deleted automatically.
+
 ## 📦 Package Information
 
 ### Mobile App

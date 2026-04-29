@@ -14,6 +14,7 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.util.Log
 import com.shelbeely.opentransition.domain.DomainManager
+import com.shelbeely.opentransition.util.CrashLogger
 import com.shelbeely.opentransition.util.FileUtil
 import com.shelbeely.opentransition.util.settings.FirebaseSettingUtil
 import com.shelbeely.opentransition.util.settings.LockDelay
@@ -48,6 +49,8 @@ class TransTracksApp : Application() {
      */
     private val appExceptionHandler = CoroutineExceptionHandler { _, throwable ->
         Log.e("TransTracksApp", "Uncaught coroutine exception", throwable)
+        // Persist a copy on-device so the user can retrieve it without a debugger.
+        CrashLogger.logNonFatal(throwable, contextLabel = "coroutine")
         if (!BuildConfig.DEBUG) {
             try {
                 com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
@@ -67,6 +70,10 @@ class TransTracksApp : Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        // Install on-device crash logger as early as possible so any later
+        // failure during startup is captured to a file the user can retrieve.
+        CrashLogger.install(this)
 
         appVersionUpdateIfNecessary()
 
