@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.background.CameraHandler
 import com.shelbeely.opentransition.background.StoragePermissionHandler
 import com.shelbeely.opentransition.data.Photo
@@ -70,7 +70,7 @@ class HomeFragment : Fragment(R.layout.home) {
 
         AnalyticsUtil.logEvent(Event.HomeControllerShown)
 
-        val domain: HomeDomain = TransTracksApp.instance.domainManager.homeDomain
+        val domain: HomeDomain = OpenTransitionApp.instance.domainManager.homeDomain
 
         if (resultDisposable.isDisposed) {
             resultDisposable = domain.results.subscribe()

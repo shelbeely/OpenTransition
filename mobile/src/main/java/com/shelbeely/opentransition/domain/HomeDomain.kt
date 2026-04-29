@@ -10,7 +10,7 @@
 
 package com.shelbeely.opentransition.domain
 
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.util.RxSchedulers

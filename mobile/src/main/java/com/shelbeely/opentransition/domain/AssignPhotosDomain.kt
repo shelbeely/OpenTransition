@@ -14,7 +14,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.util.FileUtil
 import com.shelbeely.opentransition.util.RxSchedulers
@@ -136,7 +136,7 @@ class AssignPhotosDomain {
                                 }
                                 val uri = uris[action.index]
 
-                                val contentResolver = TransTracksApp.instance.contentResolver
+                                val contentResolver = OpenTransitionApp.instance.contentResolver
                                 var newDateTime = -1L
 
                                 //Let's try to get the date from the exif
@@ -214,7 +214,7 @@ class AssignPhotosDomain {
                     is AssignPhotosAction.Save -> Observable.just(Unit)
                         .observeOn(RxSchedulers.io())
                         .map<Pair<AssignPhotosAction.Save, Boolean>> {
-                            val contentResolver = TransTracksApp.instance.contentResolver
+                            val contentResolver = OpenTransitionApp.instance.contentResolver
                             val uri = uris[action.index]
 
                             var bitmapInputStream: InputStream? = null

@@ -75,7 +75,7 @@ class DomainManager {
 
 ### Application Class
 
-**`TransTracksApp`**: Application singleton
+**`OpenTransitionApp`**: Application singleton
 
 - Initializes MobileAds
 - Manages DomainManager
@@ -83,7 +83,7 @@ class DomainManager {
 - Manages Firebase settings synchronization
 
 ```kotlin
-class TransTracksApp : Application() {
+class OpenTransitionApp : Application() {
     val domainManager = DomainManager()
     val adConsentStatus = BehaviorSubject.createDefault(ConsentStatus.UNKNOWN)
     val firebaseSettingUtil: FirebaseSettingUtil by lazy(LazyThreadSafetyMode.NONE) {
@@ -190,7 +190,7 @@ mobile/src/main/java/com/shelbeely/opentransition/
 │
 ├── wear/                           # Wearable Data Layer integration
 │
-└── TransTracksApp.kt              # Application class (singleton)
+└── OpenTransitionApp.kt              # Application class (singleton)
 ```
 
 ## Data Flow

@@ -11,7 +11,7 @@
 package com.shelbeely.opentransition.util
 
 import android.os.Bundle
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.util.settings.LockType
 import com.google.firebase.analytics.FirebaseAnalytics
 
@@ -47,7 +47,7 @@ object AnalyticsUtil {
 
     fun logEvent(event: Event) {
         FirebaseAnalytics
-            .getInstance(TransTracksApp.instance)
+            .getInstance(OpenTransitionApp.instance)
             .logEvent(getEventName(event), getEventBundle(event))
     }
 

@@ -12,11 +12,11 @@ package com.shelbeely.opentransition.util
 
 import android.content.Context
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import java.time.Period
 
 fun Period.getDisplayString(): String {
-    val context: Context = TransTracksApp.instance
+    val context: Context = OpenTransitionApp.instance
     val period = normalized()
 
     val builder = StringBuilder()

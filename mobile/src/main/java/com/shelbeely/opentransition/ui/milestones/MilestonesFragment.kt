@@ -14,7 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.ui.milestones.MilestonesFragmentDirections
 import com.shelbeely.opentransition.util.AnalyticsUtil
 import com.shelbeely.opentransition.util.Event

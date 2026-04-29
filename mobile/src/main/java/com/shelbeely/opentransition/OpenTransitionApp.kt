@@ -33,7 +33,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class TransTracksApp : Application() {
+class OpenTransitionApp : Application() {
     val domainManager = DomainManager()
 
     val adConsentStatus = BehaviorSubject.createDefault(ConsentStatus.UNKNOWN)
@@ -48,7 +48,7 @@ class TransTracksApp : Application() {
      * Wired into [appScope] so all fire-and-forget background work is covered.
      */
     private val appExceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        Log.e("TransTracksApp", "Uncaught coroutine exception", throwable)
+        Log.e("OpenTransitionApp", "Uncaught coroutine exception", throwable)
         // Persist a copy on-device so the user can retrieve it without a debugger.
         CrashLogger.logNonFatal(throwable, contextLabel = "coroutine")
         if (!BuildConfig.DEBUG) {
@@ -83,11 +83,11 @@ class TransTracksApp : Application() {
         // main thread. Both can block for several hundred milliseconds and are
         // not needed synchronously on the first frame.
         appScope.launch {
-            MobileAds.initialize(this@TransTracksApp)
+            MobileAds.initialize(this@OpenTransitionApp)
         }
 
         appScope.launch(Dispatchers.Main) {
-            SettingsManager.startFirbaseSyncIfLoggedIn(this@TransTracksApp)
+            SettingsManager.startFirbaseSyncIfLoggedIn(this@OpenTransitionApp)
         }
 
         //Clearing these, as we don't want to maintain this state across launches
@@ -96,7 +96,7 @@ class TransTracksApp : Application() {
     }
 
     companion object {
-        lateinit var instance: TransTracksApp
+        lateinit var instance: OpenTransitionApp
             private set
 
         @SuppressLint("ApplySharedPref") //Share pref changes we want to block on
@@ -250,7 +250,7 @@ class TransTracksApp : Application() {
                 !com.shelbeely.opentransition.database.migration.RealmToRoomMigration.isMigrationComplete(instance)) {
                 
                 // Launch migration in background using application coroutine scope
-                android.util.Log.d("TransTracksApp", "Triggering automatic migration from Realm to Room")
+                android.util.Log.d("OpenTransitionApp", "Triggering automatic migration from Realm to Room")
                 // Note: Migration will run when user opens settings and enables encrypted database
                 // The actual migration is handled by the migration wizard in settings
             }

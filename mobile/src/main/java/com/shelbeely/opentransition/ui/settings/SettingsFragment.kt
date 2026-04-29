@@ -32,7 +32,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.shelbeely.opentransition.BuildConfig
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.data.TransTracksFileProvider
 import com.shelbeely.opentransition.domain.SettingsAction
 import com.shelbeely.opentransition.domain.SettingsAction.SettingsUpdated
@@ -67,7 +67,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
 
         AnalyticsUtil.logEvent(Event.SettingsControllerShown)
 
-        val domain: SettingsDomain = TransTracksApp.instance.domainManager.settingsDomain
+        val domain: SettingsDomain = OpenTransitionApp.instance.domainManager.settingsDomain
 
         viewDisposables += domain.results
             .compose(settingsResultsToStates(view.context))
@@ -622,7 +622,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
                                         ).show()
                                     }
 
-                                    TransTracksApp.instance.domainManager.settingsDomain.actions
+                                    OpenTransitionApp.instance.domainManager.settingsDomain.actions
                                         .accept(SettingsUpdated)
                                     progressDialog.dismiss()
                                 }
@@ -694,7 +694,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
                             currentUser.updateEmail(emailText).addOnCompleteListener { result ->
                                 result.exception?.let { handleEmailChangeException(it, view) }
 
-                                TransTracksApp.instance.domainManager.settingsDomain.actions
+                                OpenTransitionApp.instance.domainManager.settingsDomain.actions
                                     .accept(SettingsUpdated)
                                 progressDialog.dismiss()
                             }
@@ -788,7 +788,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
                                         ).show()
                                     }
 
-                                    TransTracksApp.instance.domainManager.settingsDomain.actions
+                                    OpenTransitionApp.instance.domainManager.settingsDomain.actions
                                         .accept(SettingsUpdated)
                                     progressDialog.dismiss()
                                 }

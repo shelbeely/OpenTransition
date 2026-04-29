@@ -113,7 +113,7 @@ change that touches Realm/Room schemas, ViewModels, or fragment transactions.
 - **Image loading**: Coil 3 (`coil3.compose.AsyncImage` for Compose,
   `ImageView.load(…)` extension for legacy Views). Picasso has been removed.
 - **Error handling**: Background work uses
-  `TransTracksApp.appScope`, which has a project-wide `CoroutineExceptionHandler`
+  `OpenTransitionApp.appScope`, which has a project-wide `CoroutineExceptionHandler`
   that forwards to Crashlytics. If you create a new long-lived `CoroutineScope`,
   attach the same handler.
 - **Strings**: Always go through `res/values/strings.xml`; never hard-code

@@ -17,7 +17,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import com.shelbeely.opentransition.BuildConfig
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.ui.settings.SettingsConflictDialog
 import com.shelbeely.opentransition.util.safeValueOf
 import com.shelbeely.opentransition.util.settings.SettingsManager.Key.*
@@ -284,12 +284,12 @@ object SettingsManager {
 
     fun enableFirebaseSync() {
         PrefUtil.setBoolean(saveToFirebase, true)
-        TransTracksApp.instance.firebaseSettingUtil.addListener()
+        OpenTransitionApp.instance.firebaseSettingUtil.addListener()
     }
 
     fun disableFirebaseSync() {
         PrefUtil.setBoolean(saveToFirebase, false)
-        TransTracksApp.instance.firebaseSettingUtil.removeListener()
+        OpenTransitionApp.instance.firebaseSettingUtil.removeListener()
     }
 
     fun firebaseNeedsSetup(context: Context?) {
