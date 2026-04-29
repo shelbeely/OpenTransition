@@ -2,6 +2,17 @@ name: Boycott Check
 
 on:
   pull_request:
+    paths:
+      - 'build.gradle'
+      - 'build.gradle.kts'
+      - 'settings.gradle'
+      - 'settings.gradle.kts'
+      - '**/build.gradle'
+      - '**/build.gradle.kts'
+      - 'gradle/libs.versions.toml'
+      - '.github/workflows/**'
+      - '.github/scripts/boycott_check.py'
+      - '.github/boycott_list.yml'
 
 # Cancel an in-progress run for the same PR when a new commit is pushed
 concurrency:

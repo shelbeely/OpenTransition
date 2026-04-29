@@ -3,17 +3,9 @@ name: UI Screenshots
 on:
   workflow_dispatch:
   push:
-    branches: [main, production]
+    branches: [production]
     paths:
       - 'mobile/src/main/**'
-      - '.github/workflows/ui-screenshots.yml'
-  pull_request:
-    paths:
-      - 'mobile/src/main/res/layout/**'
-      - 'mobile/src/main/res/values/**'
-      - 'mobile/src/main/res/drawable/**'
-      - 'mobile/src/main/java/**/ui/**'
-      - 'mobile/src/main/java/**/widget/**'
       - '.github/workflows/ui-screenshots.yml'
 
 concurrency:
