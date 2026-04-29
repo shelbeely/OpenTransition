@@ -40,6 +40,7 @@ import com.shelbeely.opentransition.domain.SettingsDomain
 import com.shelbeely.opentransition.domain.SettingsResult
 import com.shelbeely.opentransition.domain.SettingsViewEffect
 import com.shelbeely.opentransition.ui.MainActivity
+import com.shelbeely.opentransition.ui.credits.CreditsLinks
 import com.shelbeely.opentransition.ui.settings.SettingsFragmentDirections
 import com.shelbeely.opentransition.ui.widget.SimpleTextWatcher
 import com.shelbeely.opentransition.util.*
@@ -293,7 +294,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
             .subscribe {
                 val activity = activity ?: return@subscribe
 
-                val webpage = Uri.parse("https://github.com/shelbeely/OpenTransition")
+                val webpage = Uri.parse(CreditsLinks.OPENTRANSITION_REPO)
                 val intent = Intent(Intent.ACTION_VIEW, webpage)
                 if (intent.resolveActivity(activity.packageManager) != null) {
                     startActivity(intent)
@@ -304,7 +305,7 @@ class SettingsFragment : Fragment(R.layout.settings) {
             .subscribe {
                 val activity = activity ?: return@subscribe
 
-                val webpage = Uri.parse("https://shelbeely.github.io/OpenTransition/user-guide/privacy/")
+                val webpage = Uri.parse(CreditsLinks.OPENTRANSITION_PRIVACY_DOCS)
                 val intent = Intent(Intent.ACTION_VIEW, webpage)
                 if (intent.resolveActivity(activity.packageManager) != null) {
                     startActivity(intent)

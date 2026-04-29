@@ -1,0 +1,41 @@
+# Authors
+
+OpenTransition is the work of many people. This file records the lineage
+of authorship; for the complete, up-to-date contributor list see the
+GitHub contributors page:
+
+<https://github.com/shelbeely/OpenTransition/graphs/contributors>
+
+## Original authors (TransTracks)
+
+OpenTransition is a fork of **TransTracks**, originally created and
+maintained by the TransTracks development team. The TransTracks app was
+retired from the Google Play Store in 2025, and its source repository is
+archived at:
+
+<https://github.com/TransTracks/TransTracks-Android>
+
+  Copyright © 2018-2021 TransTracks
+
+We owe a deep debt of gratitude to the TransTracks authors. The bulk of
+the photo, milestone, gallery, import/export, and database functionality
+in OpenTransition originated in their work.
+
+## OpenTransition maintainers
+
+  Copyright © 2025-2026 Shelbeely and OpenTransition contributors
+
+- **Shelbeely** — project lead, fork maintainer
+  ([github.com/shelbeely](https://github.com/shelbeely))
+
+## Contributors
+
+For the complete list of individuals who have contributed code,
+documentation, translations, bug reports, or other improvements, please
+see the GitHub contributors page linked above, plus the project's
+`git log`.
+
+## Reporting attribution issues
+
+If you believe your contribution is not properly attributed, please
+open an issue on the OpenTransition repository.

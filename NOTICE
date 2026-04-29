@@ -1,0 +1,42 @@
+OpenTransition
+==============
+
+Copyright (C) 2025-2026 Shelbeely and OpenTransition contributors
+Licensed under the GNU General Public License, version 3 or (at your option)
+any later version. See the LICENSE file for the full text of the license.
+
+------------------------------------------------------------------------
+Original Work
+------------------------------------------------------------------------
+
+OpenTransition is a fork and continuation of TransTracks, a photo-journal
+app for tracking gender transition journeys.
+
+  Original Work : TransTracks for Android
+  Copyright     : (C) 2018-2021 TransTracks
+  License       : GNU General Public License, version 3 or later
+  Source        : https://github.com/TransTracks/TransTracks-Android
+                  (archived; the original Play Store listing was retired
+                  in 2025)
+
+Modifications, additions, rebranding, and the Wear OS companion app are
+copyright (C) 2025-2026 Shelbeely and OpenTransition contributors, and
+are likewise licensed under GPL-3.0-or-later, preserving the original
+license chain.
+
+We are deeply grateful to the TransTracks developers and contributors,
+without whose work OpenTransition would not exist.
+
+------------------------------------------------------------------------
+Third-Party Code
+------------------------------------------------------------------------
+
+Some files in this repository carry their own copyright notices from
+third-party authors (for example, mobile/src/main/java/com/shelbeely/
+opentransition/ui/widget/CursorRecyclerViewAdapter.kt, derived from
+work by skyfish.jy@gmail.com). Those notices are preserved in-file as
+required by their respective licenses.
+
+For an enumerated list of bundled third-party libraries and their
+licenses, see the in-app "Open Source Licenses" screen under
+Settings → About.

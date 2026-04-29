@@ -159,7 +159,27 @@ Please include:
 Sensitive screenshots should be redacted before posting; we don't need real
 photos to triage UI bugs.
 
-## License
+## Licensing of contributions
 
-By contributing you agree your contribution will be licensed under the
-[GNU GPL v3](LICENSE.md) — the same license as the rest of the project.
+OpenTransition is licensed under the **GNU General Public License,
+version 3 or (at your option) any later version** — the same license
+used by the original [TransTracks](https://github.com/TransTracks/TransTracks-Android)
+project that this app is forked from.
+
+By submitting a contribution (a pull request, patch, translation, or
+any other change) to this repository, you agree that:
+
+- Your contribution is licensed under **GPL-3.0-or-later**, the same
+  license as the rest of the project (this is the standard *inbound =
+  outbound* convention used by GPL projects).
+- You have the right to submit it under that license — i.e. it is your
+  own work, or you have permission from the copyright holder(s), and it
+  does not knowingly include code from incompatibly-licensed sources.
+- The project may distribute and sublicense your contribution under
+  GPL-3.0-or-later as part of OpenTransition.
+
+This keeps the license chain back to TransTracks intact and ensures the
+project stays free and open for the trans community.
+
+For the full license text see [`LICENSE`](LICENSE); for the attribution
+summary see [`NOTICE`](NOTICE) and [`AUTHORS`](AUTHORS).
