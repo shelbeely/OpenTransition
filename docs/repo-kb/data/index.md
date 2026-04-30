@@ -1,6 +1,9 @@
 # Data
 
-> **Status: pass-1 placeholder.** Detailed entity / DAO / migration documentation is deferred.
+Detailed pages:
+
+- [`room-entities.md`](./room-entities.md) — `AppDatabase` (v3), the four Room entities, every DAO query, both migrations, and the SQLCipher integration point.
+- [`realm-schema.md`](./realm-schema.md) — Read-only Realm models retained for legacy `.ttbackup` / `.realm` ingestion.
 
 ## Stores in use
 
@@ -16,4 +19,4 @@ See [`ENCRYPTED_DATABASE.md`](../../../ENCRYPTED_DATABASE.md) for the SQLCipher 
 
 ## Next pass
 
-Per-entity pages (Photo, Milestone, AudioRecording, etc.) using the template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Eighth Pass".
+Per-store deep-dives beyond the entity tables (e.g. EncryptedSharedPreferences key inventory, Firestore document shapes) — using the API/Contract template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Eighth Pass".

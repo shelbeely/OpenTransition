@@ -1,0 +1,200 @@
+> Task :shared:extractProguardFiles
+> Task :shared:preDebugAndroidTestBuild UP-TO-DATE
+> Task :shared:generateDebugAndroidTestResValues FROM-CACHE
+> Task :shared:preDebugUnitTestBuild UP-TO-DATE
+> Task :shared:generateDebugRFile
+> Task :shared:compileDebugKotlin
+> Task :shared:extractDebugAnnotations
+> Task :shared:compileDebugJavaWithJavac
+> Task :shared:mergeDebugGeneratedProguardFiles
+> Task :shared:mergeDebugConsumerProguardFiles
+> Task :shared:processDebugJavaRes
+> Task :shared:bundleLibRuntimeToJarDebug
+> Task :shared:bundleLibCompileToJarDebug
+> Task :shared:createFullJarDebug
+> Task :shared:mergeDebugJavaResource
+> Task :shared:generateDebugLintModel
+> Task :shared:syncDebugLibJars
+> Task :shared:bundleDebugLocalLintAar
+> Task :shared:generateDebugAndroidTestLintModel
+> Task :shared:generateDebugUnitTestLintModel
+> Task :mobile:dataBindingMergeDependencyArtifactsDebug
+> Task :shared:lintAnalyzeDebugAndroidTest
+> Task :shared:lintAnalyzeDebug
+> Task :shared:lintAnalyzeDebugUnitTest
+> Task :mobile:generateDebugResValues
+> Task :mobile:generateDebugResources
+> Task :mobile:injectCrashlyticsMappingFileIdDebug
+> Task :mobile:processDebugGoogleServices
+> Task :mobile:generateDebugBuildConfig
+
+> Task :mobile:mergeDebugResources
+/home/runner/.gradle/caches/8.13/transforms/f2d8754d12b9e4d1595627b18c33fefd/transformed/jetified-firebase-ui-auth-8.0.2/res/values/values.xml:35:4: Multiple substitutions specified in non-positional format of string resource string/formants_format. Did you mean to add the formatted="false" attribute?
+
+> Task :mobile:generateSafeArgsDebug
+> Task :mobile:checkDebugAarMetadata
+> Task :mobile:processDebugNavigationResources
+> Task :mobile:compileDebugNavigationResources
+> Task :mobile:mapDebugSourceSetPaths
+> Task :mobile:createDebugCompatibleScreenManifests
+> Task :mobile:extractDeepLinksDebug
+> Task :mobile:processDebugMainManifest
+> Task :mobile:dataBindingGenBaseClassesDebug
+> Task :mobile:processDebugManifest
+> Task :mobile:preDebugAndroidTestBuild SKIPPED
+> Task :mobile:generateDebugAndroidTestResValues FROM-CACHE
+> Task :mobile:javaPreCompileDebug
+> Task :mobile:extractProguardFiles
+> Task :mobile:preDebugUnitTestBuild UP-TO-DATE
+> Task :mobile:processDebugManifestForPackage
+> Task :mobile:processDebugResources
+> Task :mobile:kspDebugKotlin
+
+> Task :mobile:kaptGenerateStubsDebugKotlin
+w: Kapt currently doesn't support language version 2.0+. Falling back to 1.9.
+
+> Task :mobile:kaptDebugKotlin SKIPPED
+> Task :mobile:compileDebugKotlin
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraHandler.kt:45:9 'var retainInstance: Boolean' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraHandler.kt:48:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraHandler.kt:49:15 'fun onActivityResult(p0: Int, p1: Int, p2: Intent?): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraHandler.kt:103:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraHandler.kt:144:9 'fun requestPermissions(p0: (Array<String!>..Array<out String!>), p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraHandler.kt:150:9 'fun startActivityForResult(p0: Intent, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraHandler.kt:163:9 'fun startActivityForResult(p0: Intent, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/CameraXHandler.kt:95:18 'fun setTargetResolution(p0: Size): ImageAnalysis.Builder' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/background/StoragePermissionHandler.kt:84:9 'fun requestPermissions(p0: (Array<String!>..Array<out String!>), p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/domain/AssignPhotosDomain.kt:168:53 Java type mismatch: inferred type is 'kotlin.String?', but 'kotlin.String' was expected.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/MainActivity.kt:192:28 'var statusBarColor: Int' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/MainActivity.kt:310:53 'static field yes: Int' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/MainActivity.kt:311:53 'static field no: Int' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/addeditmilestone/AddEditMilestoneFragment.kt:72:21 'constructor(): Handler' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/addeditmilestone/AddEditMilestoneFragment.kt:106:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/assignphoto/AssignPhotosFragment.kt:61:21 'constructor(): Handler' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/assignphoto/AssignPhotosFragment.kt:157:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/editphoto/EditPhotoFragment.kt:61:21 'constructor(): Handler' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/editphoto/EditPhotoFragment.kt:154:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/gallery/GalleryFragment.kt:81:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/gallery/GalleryScreen.kt:80:61 'val Icons.Filled.ShowChart: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Filled.ShowChart.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/milestones/MilestonesFragment.kt:46:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/selectphoto/SelectPhotoFragment.kt:52:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/selectphoto/SelectPhotoUi.kt:123:17 Check for instance is always 'true'.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/selectphoto/selectalbum/SelectAlbumFragment.kt:42:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/selectphoto/singlealbum/SingleAlbumFragment.kt:41:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/selectphoto/singlealbum/SingleAlbumImageItem.kt:75:17 Check for instance is always 'false'.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/selectphoto/singlealbum/SingleAlbumUi.kt:147:17 Check for instance is always 'true'.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/settings/SettingsFragment.kt:115:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/settings/SettingsFragment.kt:359:17 'var isPasswordVisibilityToggleEnabled: Boolean' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/settings/SettingsFragment.kt:415:17 'var isPasswordVisibilityToggleEnabled: Boolean' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/settings/SettingsFragment.kt:426:17 'var isPasswordVisibilityToggleEnabled: Boolean' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/settings/SettingsScreen.kt:569:38 'fun ClickableText(text: AnnotatedString, modifier: Modifier = ..., style: TextStyle = ..., softWrap: Boolean = ..., overflow: TextOverflow = ..., maxLines: Int = ..., onTextLayout: (TextLayoutResult) -> Unit = ..., onClick: (Int) -> Unit): Unit' is deprecated. Use Text or BasicText and pass an AnnotatedString that contains a LinkAnnotation. Check LinkAnnotation's documentation for more details and samples.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/singlephoto/SinglePhotoFragment.kt:81:44 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/voicegoal/GoalCreationSheet.kt:115:60 'typealias MenuAnchorType = ExposedDropdownMenuAnchorType' is deprecated. Renamed to ExposedDropdownMenuAnchorType.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/util/CrashLogger.kt:123:90 'val id: Long' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/util/ExifInterfaces.kt:76:19 'static field TAG_CAMARA_OWNER_NAME: String' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/util/LocalDates.kt:41:18 'fun Char.toLowerCase(): Char' is deprecated. Use lowercaseChar() instead.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/util/LocalDates.kt:43:23 'fun Char.toLowerCase(): Char' is deprecated. Use lowercaseChar() instead.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/util/settings/PrefUtil.kt:15:8 'class PreferenceManager : Any' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/util/settings/PrefUtil.kt:28:9 'class PreferenceManager : Any' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/util/settings/PrefUtil.kt:28:27 'static fun getDefaultSharedPreferences(p0: Context!): SharedPreferences!' is deprecated. Deprecated in Java.
+
+> Task :mobile:compileDebugJavaWithJavac
+> Task :mobile:bundleDebugClassesToCompileJar
+> Task :mobile:generateDebugLintReportModel
+> Task :mobile:generateDebugAndroidTestLintModel
+> Task :mobile:generateDebugUnitTestLintModel
+> Task :mobile:lintAnalyzeDebugAndroidTest
+> Task :mobile:lintAnalyzeDebugUnitTest
+> Task :mobile:lintAnalyzeDebug
+
+> Task :mobile:lintReportDebug
+Wrote HTML report to file:///home/runner/work/OpenTransition/OpenTransition/mobile/build/reports/lint-results-debug.html
+Lint found 2 errors and 190 warnings. First failure:
+/home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/home/HomeScreen.kt:133: Error: Querying resource values using LocalContext.current [LocalContextGetResourceValueCall from androidx.compose.ui]
+                    startDate = context.getString(
+                                ^
+
+
+> Task :mobile:lintDebug FAILED
+Lint found 2 errors, 190 warnings. First failure:
+
+/home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/home/HomeScreen.kt:133: Error: Querying resource values using LocalContext.current [LocalContextGetResourceValueCall from androidx.compose.ui]
+                    startDate = context.getString(
+                                ^
+
+The full lint text report is located at:
+  /home/runner/work/OpenTransition/OpenTransition/mobile/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_48-1777529053738.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/OpenTransition/OpenTransition/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':mobile:lintDebug'.
+> Lint found errors in the project; aborting build.
+  
+  Fix the issues identified by lint, or create a baseline to see only new errors.
+  To create a baseline, run `gradlew updateLintBaseline` after adding the following to the module's build.gradle file:
+  ```
+  android {
+      lint {
+          baseline = file("lint-baseline.xml")
+      }
+  }
+  ```
+  For more details, see https://developer.android.com/studio/write/lint#snapshot
+  
+  Lint found 2 errors, 190 warnings. First failure:
+  
+  /home/runner/work/OpenTransition/OpenTransition/mobile/src/main/java/com/shelbeely/opentransition/ui/home/HomeScreen.kt:133: Error: Querying resource values using LocalContext.current [LocalContextGetResourceValueCall from androidx.compose.ui]
+                      startDate = context.getString(
+                                  ^
+  
+  The full lint text report is located at:
+    /home/runner/work/OpenTransition/OpenTransition/mobile/build/intermediates/lint_intermediate_text_report/debug/lintReportDebug/lint-results-debug.txt
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 3m 51s
+76 actionable tasks: 74 executed, 2 from cache

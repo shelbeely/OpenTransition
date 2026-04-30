@@ -1,0 +1,86 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.13/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :mobile
+WARNING: The option setting 'android.defaults.buildfeatures.buildconfig=true' is deprecated.
+The current default is 'false'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+To keep using this feature, add the following to your module-level build.gradle files:
+    android.buildFeatures.buildConfig = true
+or from Android Studio, click: `Refactor` > `Migrate BuildConfig to Gradle Build Files`.
+
+> Task :shared:preBuild UP-TO-DATE
+> Task :mobile:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:preDebugBuild UP-TO-DATE
+> Task :mobile:preBuild UP-TO-DATE
+> Task :mobile:preDebugBuild UP-TO-DATE
+> Task :shared:generateDebugResValues UP-TO-DATE
+> Task :shared:generateDebugResources UP-TO-DATE
+> Task :shared:packageDebugResources UP-TO-DATE
+> Task :shared:writeDebugAarMetadata UP-TO-DATE
+> Task :shared:processDebugNavigationResources UP-TO-DATE
+> Task :shared:extractDeepLinksDebug UP-TO-DATE
+> Task :shared:processDebugManifest UP-TO-DATE
+> Task :shared:compileDebugLibraryResources UP-TO-DATE
+> Task :shared:parseDebugLocalResources UP-TO-DATE
+> Task :shared:generateDebugRFile UP-TO-DATE
+> Task :shared:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :shared:generateDebugBuildConfig UP-TO-DATE
+> Task :shared:compileDebugKotlin UP-TO-DATE
+> Task :shared:javaPreCompileDebug UP-TO-DATE
+> Task :shared:compileDebugJavaWithJavac UP-TO-DATE
+> Task :shared:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :shared:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :shared:processDebugJavaRes UP-TO-DATE
+> Task :mobile:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :mobile:generateDebugResValues UP-TO-DATE
+> Task :mobile:generateDebugResources UP-TO-DATE
+> Task :mobile:injectCrashlyticsMappingFileIdDebug UP-TO-DATE
+> Task :mobile:processDebugGoogleServices UP-TO-DATE
+> Task :mobile:mergeDebugResources UP-TO-DATE
+> Task :mobile:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :mobile:generateDebugBuildConfig UP-TO-DATE
+> Task :mobile:generateSafeArgsDebug UP-TO-DATE
+> Task :mobile:checkDebugAarMetadata UP-TO-DATE
+> Task :mobile:processDebugNavigationResources UP-TO-DATE
+> Task :mobile:compileDebugNavigationResources UP-TO-DATE
+> Task :mobile:mapDebugSourceSetPaths UP-TO-DATE
+> Task :mobile:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :mobile:extractDeepLinksDebug UP-TO-DATE
+> Task :mobile:processDebugMainManifest UP-TO-DATE
+> Task :mobile:processDebugManifest UP-TO-DATE
+> Task :mobile:processDebugManifestForPackage UP-TO-DATE
+> Task :mobile:processDebugResources UP-TO-DATE
+> Task :mobile:kspDebugKotlin UP-TO-DATE
+> Task :mobile:kaptGenerateStubsDebugKotlin UP-TO-DATE
+> Task :mobile:kaptDebugKotlin SKIPPED
+> Task :mobile:compileDebugKotlin UP-TO-DATE
+> Task :mobile:javaPreCompileDebug UP-TO-DATE
+> Task :mobile:compileDebugJavaWithJavac UP-TO-DATE
+> Task :mobile:bundleDebugClassesToCompileJar UP-TO-DATE
+> Task :mobile:bundleDebugClassesToRuntimeJar
+> Task :mobile:preDebugUnitTestBuild UP-TO-DATE
+> Task :mobile:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :mobile:processDebugJavaRes
+> Task :mobile:kspDebugUnitTestKotlin
+
+> Task :mobile:kaptGenerateStubsDebugUnitTestKotlin
+w: Kapt currently doesn't support language version 2.0+. Falling back to 1.9.
+
+> Task :mobile:kaptDebugUnitTestKotlin SKIPPED
+> Task :mobile:compileDebugUnitTestKotlin
+> Task :mobile:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :mobile:processDebugUnitTestJavaRes
+> Task :mobile:testDebugUnitTest
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_48-1777529285601.json
+
+[Incubating] Problems report is available at: file:///home/runner/work/OpenTransition/OpenTransition/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.13/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 35s
+50 actionable tasks: 7 executed, 1 from cache, 42 up-to-date

@@ -9,7 +9,7 @@ photo-journal app for tracking gender transition journeys.
 
 | Module | Description |
 |--------|-------------|
-| `:mobile` | Main Android phone app (minSdk 21, targetSdk 36) |
+| `:mobile` | Main Android phone app (minSdk 26, targetSdk 35, compileSdk 36) |
 | `:wear` | Wear OS companion app |
 | `:shared` | Shared Kotlin logic used by both `:mobile` and `:wear` |
 
@@ -141,7 +141,7 @@ To install all skills at once: `android skills add --all --project=<repo-root>`
 ## What NOT to do
 
 - Do not commit `secrets.properties`, `local.properties`, or `google-services.json` with real values.
-- Do not change `minSdkVersion` below 21 or `targetSdkVersion` above 36 without discussion.
+- Do not change `minSdkVersion` below 26 or `targetSdkVersion` above 36 without discussion.
 - Do not remove or weaken existing ProGuard/R8 rules.
 - Do not push directly to `production` or `main` branches.
 
