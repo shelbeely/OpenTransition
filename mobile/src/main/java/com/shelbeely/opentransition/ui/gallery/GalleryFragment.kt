@@ -21,7 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.background.CameraHandler
 import com.shelbeely.opentransition.background.StoragePermissionHandler
 import com.shelbeely.opentransition.data.AudioAnalysis

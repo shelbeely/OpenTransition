@@ -2,6 +2,8 @@
 
 OpenTransition is a private, secure photo-journal app for tracking a gender transition journey. It is the active successor to the original **TransTracks** app, which was [retired from the Google Play Store in 2025](https://github.com/TransTracks/TransTracks-Android). If you were a TransTracks user, see [Importing from TransTracks](#-importing-from-transtracks) below.
 
+> 🙏 **Standing on the shoulders of TransTracks.** OpenTransition exists because of the years of work that **Cassie Wilson** poured — single-handedly — into building [TransTracks](https://github.com/TransTracks/TransTracks-Android), a private, transition-focused journal app. We are deeply grateful for her contribution and we honor her GPL-3.0 license by keeping this fork — and every modification to it — free and open under the same terms. See [Acknowledgments](#-acknowledgments) and [Credits](#credits) for the full attribution.
+
 ## Table of Contents
 
 - [Multi-Platform Support](#-multi-platform-support)
@@ -15,6 +17,7 @@ OpenTransition is a private, secure photo-journal app for tracking a gender tran
 - [Package Information](#-package-information)
 - [Importing from TransTracks](#-importing-from-transtracks)
 - [Contributing](#-contributing)
+- [Acknowledgments](#-acknowledgments)
 - [License](#license)
 - [Credits](#credits)
 
@@ -245,6 +248,22 @@ Append `--stacktrace` when diagnosing build failures.
 
 **Full setup instructions:** [Development Setup Guide](https://shelbeely.github.io/OpenTransition/getting-started/development-setup/)
 
+### Retrieving on-device crash logs
+
+When the app crashes due to an uncaught exception (or an unhandled coroutine
+failure), a plain-text report is written to the app's external files directory
+so it can be retrieved without root access. Reports include the timestamp,
+app/Android/device info, the crashing thread name and the full stack trace.
+
+Pull all reports from a connected device with:
+
+```bash
+adb pull /sdcard/Android/data/com.shelbeely.opentransition/files/crash_logs/
+```
+
+You can also browse to that folder in the **Files** app on the device. The most
+recent 20 reports are kept; older ones are deleted automatically.
+
 ## 📦 Package Information
 
 ### Mobile App
@@ -283,12 +302,22 @@ We are grateful to everyone who has contributed to OpenTransition!
 
 View the full, up-to-date list on [GitHub contributors](https://github.com/shelbeely/OpenTransition/graphs/contributors).
 
+## 🙏 Acknowledgments
+
+OpenTransition would not exist without the original **TransTracks** application — the work of a single developer, **Cassie Wilson** (`<contact@transtracks.app>`). Cassie wrote, maintained, and shipped TransTracks essentially on her own from 2018 to 2021, before the app was retired from the Google Play Store in 2025. Her source code remains archived at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android).
+
+Cassie built — and freely shared, under GPL v3 — almost every foundational feature this app still relies on today: photo categorization, milestone tracking, the gallery and comparison views, the train-tracks privacy mode, the `.ttbackup` data format, and much more. **Thank you, Cassie.** Your work made it possible to keep this kind of app available to the trans community at a moment when it was about to disappear.
+
+OpenTransition is the active continuation of that work, maintained independently by [Shelbeely](https://github.com/shelbeely) and the [OpenTransition contributors](https://github.com/shelbeely/OpenTransition/graphs/contributors), and licensed under the same GPL v3 to keep that chain unbroken.
+
+For the full attribution, see [`NOTICE`](NOTICE), [`AUTHORS`](AUTHORS), and the in-app **Settings → About → Credits** screen.
+
 ## License
 
-OpenTransition is a fork of TransTracks and maintains the same GPL v3 license.
+OpenTransition is a fork of TransTracks and maintains the same GPL v3 license. See [`LICENSE`](LICENSE) for the full license text, [`NOTICE`](NOTICE) for the attribution summary, and [`AUTHORS`](AUTHORS) for the lineage of authorship.
 
 ```
-Original Copyright (C) 2018 - 2021 TransTracks
+Original Copyright (C) 2018 - 2021 TransTracks (Cassie Wilson)
 Fork modifications and rebranding (C) 2025 Shelbeely and OpenTransition contributors
 
 This program is free software: you can redistribute it and/or modify
@@ -307,6 +336,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## Credits
 
-OpenTransition is based on the original **TransTracks** application. TransTracks was retired from the Google Play Store in 2025; its source code is archived at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android). We are deeply grateful to the TransTracks developers and contributors for creating this valuable tool for the transgender community. Their work provided the foundation that makes OpenTransition possible.
+OpenTransition is based on the original **TransTracks** application, written single-handedly by **Cassie Wilson** (`<contact@transtracks.app>`). TransTracks was retired from the Google Play Store in 2025; its source code is archived at [github.com/TransTracks/TransTracks-Android](https://github.com/TransTracks/TransTracks-Android). We are deeply grateful to Cassie for creating this valuable tool for the transgender community and for releasing it under GPL v3 — her work provided the foundation that makes OpenTransition possible.
 
 [Full Credits & Attribution →](https://shelbeely.github.io/OpenTransition/credits/)

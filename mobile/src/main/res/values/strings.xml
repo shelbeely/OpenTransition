@@ -116,12 +116,36 @@
     <string name="lock_delay_label">Lock Delay:</string>
     <string name="app_version_label">App Version:</string>
     <string name="privacy_policy">Privacy Policy</string>
+    <string name="credits_and_thanks">Credits &amp; Thanks</string>
+    <string name="open_source_licenses">Open Source Licenses</string>
     <string name="copyright">© 2018 - 2021 TransTracks, 2025 - %1$s Shelbeely and OpenTransition contributors</string>
     <string name="lock_description">Require a password to access the app</string>
 
     <string name="about_transtracks_title">About OpenTransition</string>
     <string name="about_transtracks_description">OpenTransition is a community-driven fork maintained by Shelbeely, focused on helping people document their transition journey privately and securely. We welcome contributions and feedback to make this app better for everyone.</string>
     <string name="contribute">Contribute</string>
+
+    <!-- Credits & Thanks screen -->
+    <string name="credits_screen_title">Credits &amp; Thanks</string>
+    <string name="credits_thanks_to_transtracks_heading">Thank you, Cassie 🙏</string>
+    <string name="credits_thanks_to_transtracks_body">OpenTransition would not exist without TransTracks — written single-handedly by Cassie Wilson. From 2018 to 2021 she built — and shared freely under GPL v3 — the photo categorization, milestone tracking, gallery, comparison, train-tracks privacy mode, and .ttbackup data format that this app still relies on today. When TransTracks was retired from the Google Play Store in 2025, OpenTransition picked up the torch so the community would not lose this kind of tool. We are deeply grateful.</string>
+    <string name="credits_originally_created_label">Originally written by Cassie Wilson as TransTracks</string>
+    <string name="credits_open_archived_repo">Open the archived TransTracks repository</string>
+    <string name="credits_license_heading">License</string>
+    <string name="credits_license_body">OpenTransition is licensed under the GNU General Public License, version 3 or (at your option) any later version — the same license as the original TransTracks. This guarantees the app stays free and open for the trans community, forever.</string>
+    <string name="credits_view_gpl_v3">Read the GPL v3 license text (gnu.org)</string>
+    <string name="credits_view_in_repo_license">View the LICENSE file in the OpenTransition repository</string>
+    <string name="credits_continued_by_heading">Continued by</string>
+    <string name="credits_continued_by_body">OpenTransition is maintained independently by Shelbeely and the OpenTransition contributors, and licensed under GPL-3.0-or-later to keep the chain back to TransTracks unbroken.</string>
+    <string name="credits_view_contributors">View OpenTransition contributors on GitHub</string>
+    <string name="credits_view_full_attribution">Full credits &amp; attribution (docs site)</string>
+
+    <!-- Open Source Licenses screen -->
+    <string name="oss_screen_title">Open Source Licenses</string>
+    <string name="oss_intro">OpenTransition stands on the shoulders of many open-source projects. The most important is TransTracks — the upstream app, written by Cassie Wilson and pinned at the top of this list — followed by the third-party libraries bundled with the app.</string>
+    <string name="oss_view_license_link">View license</string>
+    <string name="oss_section_upstream">Upstream</string>
+    <string name="oss_section_libraries">Bundled libraries</string>
 
     <string name="select_theme">Select Theme</string>
     <string name="blue">Blue</string>

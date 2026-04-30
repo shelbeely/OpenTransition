@@ -11,7 +11,7 @@
 package com.shelbeely.opentransition.util
 
 import android.provider.MediaStore
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import java.io.File
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -64,19 +64,19 @@ object FileUtil {
     }
 
     fun getPhotosDirectory(): File {
-        val photosDir = File(TransTracksApp.instance.filesDir, "photos/")
+        val photosDir = File(OpenTransitionApp.instance.filesDir, "photos/")
         photosDir.mkdirs()
         return photosDir
     }
 
     fun getAudioDirectory(): File {
-        val audioDir = File(TransTracksApp.instance.filesDir, "audio/")
+        val audioDir = File(OpenTransitionApp.instance.filesDir, "audio/")
         audioDir.mkdirs()
         return audioDir
     }
 
     private fun getTempFolder(): File {
-        val tempFolder = File(TransTracksApp.instance.filesDir, TEMP_FOLDER)
+        val tempFolder = File(OpenTransitionApp.instance.filesDir, TEMP_FOLDER)
         tempFolder.mkdirs()
         return tempFolder
     }
@@ -100,7 +100,7 @@ object FileUtil {
     }
 
     fun removeImageFromGallery(filePath: String) {
-        TransTracksApp.instance.contentResolver.delete(
+        OpenTransitionApp.instance.contentResolver.delete(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             "${MediaStore.Files.FileColumns.DATA} = ?",
             arrayOf(filePath)

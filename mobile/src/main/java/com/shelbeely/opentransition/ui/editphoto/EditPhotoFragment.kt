@@ -19,7 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.domain.EditPhotoAction
 import com.shelbeely.opentransition.domain.EditPhotoDomain
@@ -53,7 +53,7 @@ class EditPhotoFragment : Fragment(R.layout.edit_photo) {
 
         AnalyticsUtil.logEvent(Event.EditPhotoControllerShown)
 
-        val domain: EditPhotoDomain = TransTracksApp.instance.domainManager.editPhotoDomain
+        val domain: EditPhotoDomain = OpenTransitionApp.instance.domainManager.editPhotoDomain
 
         if (resultsDisposable.isDisposed) {
             resultsDisposable = domain.results

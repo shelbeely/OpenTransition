@@ -145,7 +145,7 @@ and release it in `stopRecording()`.
 ---
 
 ### `CoroutineExceptionHandler` baseline
-**Files:** `TransTracksApp.kt` and key `CoroutineScope` sites
+**Files:** `OpenTransitionApp.kt` and key `CoroutineScope` sites
 Unhandled coroutine exceptions are currently logged by the default handler only.
 **To do:** Install a project-wide `CoroutineExceptionHandler` that routes uncaught exceptions to
 Crashlytics (when enabled) and logs them at `ERROR` level.

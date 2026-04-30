@@ -1,5 +1,9 @@
 /*
- * Copyright © 2025 OpenTransition Contributors. All rights reserved.
+ * Copyright © 2025-2026 Shelbeely and OpenTransition contributors.
+ *
+ * Part of OpenTransition, a fork of TransTracks (© 2018-2021 TransTracks),
+ * licensed under GPL-3.0-or-later. See the NOTICE and AUTHORS files for
+ * full attribution.
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
  *

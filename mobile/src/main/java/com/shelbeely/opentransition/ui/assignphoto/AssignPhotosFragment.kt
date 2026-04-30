@@ -19,7 +19,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.data.Photo
 import com.shelbeely.opentransition.domain.AssignPhotosAction
 import com.shelbeely.opentransition.domain.AssignPhotosDomain
@@ -53,7 +53,7 @@ class AssignPhotosFragment : Fragment(R.layout.assign_photo) {
 
         AnalyticsUtil.logEvent(Event.AssignPhotoControllerShown)
 
-        val domain: AssignPhotosDomain = TransTracksApp.instance.domainManager.assignPhotosDomain
+        val domain: AssignPhotosDomain = OpenTransitionApp.instance.domainManager.assignPhotosDomain
 
         if (resultsDisposable.isDisposed) {
             resultsDisposable = domain.results

@@ -31,7 +31,7 @@ import androidx.navigation.fragment.NavHostFragment
 import com.shelbeely.opentransition.BuildConfig
 import com.shelbeely.opentransition.MainNavDirections
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.background.CameraHandler
 import com.shelbeely.opentransition.background.StoragePermissionHandler
 import com.shelbeely.opentransition.data.AudioAnalysis
@@ -143,7 +143,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            TransTracksApp.instance.domainManager.settingsDomain.actions.accept(SettingsAction.SettingsUpdated)
+            OpenTransitionApp.instance.domainManager.settingsDomain.actions.accept(SettingsAction.SettingsUpdated)
         }
 
         val navHostFragment =
@@ -159,12 +159,12 @@ class MainActivity : AppCompatActivity() {
         processIntent(intent)
 
         consentInformation = UserMessagingPlatform.getConsentInformation(this).apply {
-            TransTracksApp.instance.adConsentStatus.onNext(this.consentStatus)
+            OpenTransitionApp.instance.adConsentStatus.onNext(this.consentStatus)
 
             requestConsentInfoUpdate(this@MainActivity,
                 // Our app isn't targeted at those under the age of consent
                 ConsentRequestParameters.Builder().setTagForUnderAgeOfConsent(false).build(),
-                { TransTracksApp.instance.adConsentStatus.onNext(consentStatus) },
+                { OpenTransitionApp.instance.adConsentStatus.onNext(consentStatus) },
                 {
                     // Handle the error.
                     FirebaseCrashlytics.getInstance().recordException(
@@ -231,7 +231,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-        viewDisposables += TransTracksApp.instance.adConsentStatus.subscribe {
+        viewDisposables += OpenTransitionApp.instance.adConsentStatus.subscribe {
             if (it == ConsentStatus.REQUIRED
                 && consentInformation.isConsentFormAvailable
                 && SettingsManager.showAds()

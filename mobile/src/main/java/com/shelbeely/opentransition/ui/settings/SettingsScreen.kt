@@ -50,6 +50,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.shelbeely.opentransition.R
 import com.shelbeely.opentransition.database.migration.RealmToRoomMigration
+import com.shelbeely.opentransition.ui.credits.CreditsLinks
 import com.shelbeely.opentransition.ui.settings.SettingsUiState.Content
 import com.shelbeely.opentransition.ui.settings.SettingsUiState.Loading
 
@@ -79,6 +80,8 @@ fun SettingsScreen(
     onImportRealmBackup: () -> Unit,
     onContribute: () -> Unit,
     onPrivacyPolicy: () -> Unit,
+    onCredits: () -> Unit,
+    onOssLicenses: () -> Unit,
 ) {
     val content: Content = when (state) {
         is Content -> state
@@ -171,7 +174,9 @@ fun SettingsScreen(
                 AboutSection(
                     content = content,
                     onContribute = onContribute,
-                    onPrivacyPolicy = onPrivacyPolicy
+                    onPrivacyPolicy = onPrivacyPolicy,
+                    onCredits = onCredits,
+                    onOssLicenses = onOssLicenses
                 )
             }
         }
@@ -435,6 +440,8 @@ private fun AboutSection(
     content: Content,
     onContribute: () -> Unit,
     onPrivacyPolicy: () -> Unit,
+    onCredits: () -> Unit,
+    onOssLicenses: () -> Unit,
 ) {
     SectionHeader(text = stringResource(R.string.about_transtracks_title))
 
@@ -489,6 +496,26 @@ private fun AboutSection(
         )
     }
 
+    TextButton(
+        onClick = onCredits,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.credits_and_thanks),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+
+    TextButton(
+        onClick = onOssLicenses,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Text(
+            text = stringResource(R.string.open_source_licenses),
+            style = MaterialTheme.typography.titleMedium
+        )
+    }
+
     Spacer(modifier = Modifier.height(8.dp))
 
     CopyrightText(
@@ -524,9 +551,9 @@ private fun CopyrightText(copyright: String, modifier: Modifier = Modifier) {
         data class Link(val start: Int, val end: Int, val tag: String, val url: String)
 
         val links = buildList {
-            if (ttIdx >= 0) add(Link(ttIdx, ttIdx + transTracksKey.length, transTracksTag, "https://github.com/TransTracks/TransTracks"))
-            if (sbIdx >= 0) add(Link(sbIdx, sbIdx + shelBeelyKey.length, shelBeelyTag, "https://github.com/shelbeely"))
-            if (otIdx >= 0) add(Link(otIdx, otIdx + openTransitionKey.length, openTransitionTag, "https://github.com/shelbeely/OpenTransition/graphs/contributors"))
+            if (ttIdx >= 0) add(Link(ttIdx, ttIdx + transTracksKey.length, transTracksTag, CreditsLinks.TRANSTRACKS_REPO))
+            if (sbIdx >= 0) add(Link(sbIdx, sbIdx + shelBeelyKey.length, shelBeelyTag, CreditsLinks.SHELBEELY_GITHUB))
+            if (otIdx >= 0) add(Link(otIdx, otIdx + openTransitionKey.length, openTransitionTag, CreditsLinks.OPENTRANSITION_CONTRIBUTORS))
         }.sortedBy { it.start }
 
         for (link in links) {

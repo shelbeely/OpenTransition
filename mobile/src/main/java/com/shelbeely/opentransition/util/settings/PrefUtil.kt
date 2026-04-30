@@ -14,7 +14,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.shelbeely.opentransition.BuildConfig
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.util.settings.SettingsManager.Key
 import java.time.LocalDate
 
@@ -25,7 +25,7 @@ object PrefUtil {
 
     //region Default Prefs
     fun getDefaultPrefs(): SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(TransTracksApp.instance)
+        PreferenceManager.getDefaultSharedPreferences(OpenTransitionApp.instance)
 
     fun getBoolean(key: Key, default: Boolean): Boolean =
         getDefaultPrefs().getBoolean(key.name, default)
@@ -70,7 +70,7 @@ object PrefUtil {
 
     //region AlbumFirstVisible
     private fun getAlbumFirstVisiblePrefs(): SharedPreferences =
-        TransTracksApp.instance.getSharedPreferences("albumFirstVisible", Context.MODE_PRIVATE)
+        OpenTransitionApp.instance.getSharedPreferences("albumFirstVisible", Context.MODE_PRIVATE)
 
     fun clearAllAlbumFirstVisiblePrefs() {
         getAlbumFirstVisiblePrefs().edit().clear().apply()

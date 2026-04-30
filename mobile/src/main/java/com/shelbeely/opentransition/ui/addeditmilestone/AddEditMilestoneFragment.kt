@@ -21,7 +21,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.shelbeely.opentransition.R
-import com.shelbeely.opentransition.TransTracksApp
+import com.shelbeely.opentransition.OpenTransitionApp
 import com.shelbeely.opentransition.data.Milestone
 import com.shelbeely.opentransition.domain.AddEditMilestoneAction
 import com.shelbeely.opentransition.domain.AddEditMilestoneAction.InitialAdd
@@ -64,7 +64,7 @@ class AddEditMilestoneFragment : Fragment(R.layout.add_milestone) {
         AnalyticsUtil.logEvent(Event.AddEditMilestoneControllerShown)
 
         val domain: AddEditMilestoneDomain =
-            TransTracksApp.instance.domainManager.addEditMilestoneDomain
+            OpenTransitionApp.instance.domainManager.addEditMilestoneDomain
 
         if (resultsDisposable.isDisposed) {
             resultsDisposable = domain.results
