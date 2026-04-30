@@ -78,7 +78,7 @@ Always add `--stacktrace` when diagnosing build failures.
 ### 2. Apply official Android Skills (SKILL.md pattern)
 
 When working on complex or fast-moving areas, consult the relevant Android Skill.
-Skills ship in `.github/skills/android/` and `skills/` (installed), or install via `android skills add`:
+Skills ship as flat subdirectories of `.github/skills/` (per the [GitHub Agent Skills spec](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills)) and may also be present under the top-level `skills/` directory (the install location used by `android skills add`):
 - **Navigation 3 setup** — use `android skills add --skill=navigation-3`
 - **Edge-to-edge / insets** — use `android skills add --skill=edge-to-edge`
 - **AGP 9 migration** — use `android skills add --skill=agp-9-upgrade`
@@ -149,7 +149,7 @@ To install all skills at once: `android skills add --all --project=<repo-root>`
 
 ## Repo Knowledge Base (read first)
 
-This repository has a durable knowledge base in [`docs/repo-kb/`](../docs/repo-kb/index.md), built and maintained with the [`repo-knowledge-base`](skills/curated/repo-knowledge-base/SKILL.md) agent skill (per the [GitHub Agent Skills spec](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)).
+This repository has a durable knowledge base in [`docs/repo-kb/`](../docs/repo-kb/index.md), built and maintained with the [`repo-knowledge-base`](skills/repo-knowledge-base/SKILL.md) agent skill (per the [GitHub Agent Skills spec](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)).
 
 Use the knowledge base before broad repo exploration. It exists to help Copilot Cloud Agent, Copilot CLI, and IDE agent sessions work faster and avoid repeated discovery.
 

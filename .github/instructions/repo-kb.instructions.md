@@ -4,7 +4,7 @@ applyTo: "docs/repo-kb/**"
 
 # Repo Knowledge Base Editing Instructions
 
-These files are the OpenTransition repository knowledge base, built with the [`repo-knowledge-base`](../skills/curated/repo-knowledge-base/SKILL.md) agent skill.
+These files are the OpenTransition repository knowledge base, built with the [`repo-knowledge-base`](../skills/repo-knowledge-base/SKILL.md) agent skill.
 
 Keep them factual, grounded, and useful for future Copilot Cloud Agent, Copilot CLI, and IDE agent sessions.
 
@@ -37,4 +37,4 @@ A good KB page answers:
 
 ## When in doubt
 
-Open `docs/repo-kb/maintenance-guide.md` for the refresh process and `.github/skills/curated/repo-knowledge-base/SKILL.md` for the canonical templates and pass structure.
+Open `docs/repo-kb/maintenance-guide.md` for the refresh process and `.github/skills/repo-knowledge-base/SKILL.md` for the canonical templates and pass structure.

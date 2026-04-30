@@ -10,4 +10,4 @@ No HTTP server lives in this repo. The relevant "contracts" here are:
 | Firebase data model (Firestore) | Deferred | Defined inline in `:mobile` Firestore calls; not centrally schematized |
 | AdMob unit IDs | Deferred | `secrets.properties` (test IDs in `secrets.properties.example`) |
 
-Per-contract pages follow the template in [`.github/skills/curated/repo-knowledge-base/SKILL.md`](../../../.github/skills/curated/repo-knowledge-base/SKILL.md) §"Eighth Pass: APIs, Routes, and Data Contracts".
+Per-contract pages follow the template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Eighth Pass: APIs, Routes, and Data Contracts".

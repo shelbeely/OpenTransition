@@ -2,7 +2,7 @@
 
 ## Pass 1 — Bootstrap (this session)
 
-- [x] Move `repo-knowledge-base-SKILL.md` from repo root to `.github/skills/curated/repo-knowledge-base/SKILL.md` (per [GitHub Agent Skills docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)).
+- [x] Move `repo-knowledge-base-SKILL.md` from repo root to `.github/skills/repo-knowledge-base/SKILL.md` (per [GitHub Agent Skills docs](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)).
 - [x] Create `docs/repo-kb/` directory tree.
 - [x] Write top-level pages: `index.md`, `repo-map.md`, `architecture.md`, `quickstart-for-agents.md`, `build-and-release.md`, `testing.md`, `configuration.md`, `security-and-risk.md`, `maintenance-guide.md`, `glossary.md`, `dependency-map.md`, `data-flow.md`.
 - [x] Write index pages for `features/`, `components/`, `apis/`, `data/`, `workflows/`, `decisions/`, `questions/`, `files/`.

@@ -16,4 +16,4 @@ See [`ENCRYPTED_DATABASE.md`](../../../ENCRYPTED_DATABASE.md) for the SQLCipher 
 
 ## Next pass
 
-Per-entity pages (Photo, Milestone, AudioRecording, etc.) using the template in [`.github/skills/curated/repo-knowledge-base/SKILL.md`](../../../.github/skills/curated/repo-knowledge-base/SKILL.md) §"Eighth Pass".
+Per-entity pages (Photo, Milestone, AudioRecording, etc.) using the template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Eighth Pass".

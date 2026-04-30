@@ -1,6 +1,6 @@
 # Repository Knowledge Base
 
-Durable, evidence-based knowledge base for the **OpenTransition** Android monorepo. Built with the [`repo-knowledge-base`](../../.github/skills/curated/repo-knowledge-base/SKILL.md) agent skill.
+Durable, evidence-based knowledge base for the **OpenTransition** Android monorepo. Built with the [`repo-knowledge-base`](../../.github/skills/repo-knowledge-base/SKILL.md) agent skill.
 
 ## Project Summary
 

@@ -2,83 +2,73 @@
 
 This directory contains AI agent skills for GitHub Copilot and Claude. Skills are folders of instructions, scripts, and resources that AI agents can discover and use to perform specialized tasks.
 
-Skills in this directory are at `.github/skills/`, which is one of the [supported project skill locations](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills) for GitHub Copilot cloud agent, GitHub Copilot CLI, and agent mode in VS Code.
+Skills in this directory are at `.github/skills/`, which is one of the [supported project skill locations](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) for GitHub Copilot cloud agent, GitHub Copilot CLI, and agent mode in VS Code.
 
-## Directory Structure
+## Layout
 
-Skills are organized by source and category:
+Per the [Add skills](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/add-skills) docs, each skill must live as a **direct child** of `.github/skills/`, with a `SKILL.md` file whose `name:` frontmatter matches the directory name:
 
-- **`android/`** - Official Android skills from Google (build, navigation, system, performance, Jetpack Compose, Play)
-- **`curated/`** - Curated skills from OpenAI (GitHub automation, Notion integration)
-- **`experimental/`** - Experimental skills from OpenAI (planning, Linear)
-- **`system/`** - System skills from OpenAI (skill creation and installation)
-- **`anthropic/`** - Skills from Anthropic (documents, creative, development, enterprise)
+```
+.github/skills/
+├── <skill-name>/
+│   └── SKILL.md
+└── …
+```
 
-## Android Skills (`android/`)
+Category subfolders are not supported by Copilot's discovery, so all skills here are flat.
 
-Official skills from the [Android skills GitHub repository](https://github.com/android/skills) — licensed under Apache 2.0. See `android/LICENSE.txt`.
+## Skills
 
-### Build
-- **agp-9-upgrade** (`build/agp/agp-9-upgrade`) - Upgrade or migrate an Android project to Android Gradle Plugin 9
+### Android (from [`android/skills`](https://github.com/android/skills), Apache 2.0 — see [`ANDROID_LICENSE.txt`](ANDROID_LICENSE.txt))
 
-### Navigation
-- **navigation-3** (`navigation/navigation-3`) - Install and migrate to Jetpack Navigation 3, including deep links, multiple backstacks, scenes, and architecture patterns
+- [`edge-to-edge`](edge-to-edge/SKILL.md) — Migrate a Jetpack Compose app to add adaptive edge-to-edge support
+- [`navigation-3`](navigation-3/SKILL.md) — Install and migrate to Jetpack Navigation 3 (deep links, multiple backstacks, scenes, architecture)
+- [`migrate-xml-views-to-jetpack-compose`](migrate-xml-views-to-jetpack-compose/SKILL.md) — Structured workflow for migrating Android XML Views to Jetpack Compose
+- [`r8-analyzer`](r8-analyzer/SKILL.md) — Analyze R8/ProGuard keep rules to identify redundancies and optimize app size
+- [`play-billing-library-version-upgrade`](play-billing-library-version-upgrade/SKILL.md) — Upgrade an Android project to the latest Google Play Billing Library version
+
+See also [`androidx-compose-material3-release-guard.md`](androidx-compose-material3-release-guard.md) for Material 3 release guidance.
+
+### Curated (from [`openai/skills`](https://github.com/openai/skills))
+
+- [`gh-address-comments`](gh-address-comments/SKILL.md) — Address PR review comments efficiently
+- [`gh-fix-ci`](gh-fix-ci/SKILL.md) — Debug and fix failing GitHub Actions CI/CD
+- [`notion-knowledge-capture`](notion-knowledge-capture/SKILL.md) — Capture conversations into structured Notion pages
+- [`notion-meeting-intelligence`](notion-meeting-intelligence/SKILL.md) — Prepare meeting materials with context
+- [`notion-research-documentation`](notion-research-documentation/SKILL.md) — Research and synthesize documentation
+- [`notion-spec-to-implementation`](notion-spec-to-implementation/SKILL.md) — Turn specs into implementation plans
+- [`repo-knowledge-base`](repo-knowledge-base/SKILL.md) — Build and maintain `docs/repo-kb/` for this repo
+
+### Experimental
+
+- [`create-plan`](create-plan/SKILL.md) — Create concise plans for coding tasks
+- [`linear`](linear/SKILL.md) — Manage issues and workflows in Linear
 
 ### System
-- **edge-to-edge** (`system/edge-to-edge`) - Migrate a Jetpack Compose app to add adaptive edge-to-edge support
 
-### Performance
-- **r8-analyzer** (`performance/r8-analyzer`) - Analyze R8/ProGuard keep rules to identify redundancies and optimize app size
+- [`skill-creator`](skill-creator/SKILL.md) — Guide for creating effective skills
+- [`skill-installer`](skill-installer/SKILL.md) — Install skills from GitHub repositories
 
-### Jetpack Compose
-- **migrate-xml-views-to-jetpack-compose** (`jetpack-compose/migration/migrate-xml-views-to-jetpack-compose`) - Structured workflow for migrating Android XML Views to Jetpack Compose
+### Anthropic (from [`anthropics/skills`](https://github.com/anthropics/skills) — see [`ANTHROPIC_README.md`](ANTHROPIC_README.md), [`ANTHROPIC_THIRD_PARTY_NOTICES.md`](ANTHROPIC_THIRD_PARTY_NOTICES.md))
 
-### Play
-- **play-billing-library-version-upgrade** (`play/play-billing-library-version-upgrade`) - Upgrade an Android project to the latest Google Play Billing Library version
+Creative & Design:
+- [`algorithmic-art`](algorithmic-art/SKILL.md), [`canvas-design`](canvas-design/SKILL.md), [`frontend-design`](frontend-design/SKILL.md), [`slack-gif-creator`](slack-gif-creator/SKILL.md), [`theme-factory`](theme-factory/SKILL.md)
 
-## OpenAI Skills
+Development & Technical:
+- [`mcp-builder`](mcp-builder/SKILL.md), [`web-artifacts-builder`](web-artifacts-builder/SKILL.md), [`webapp-testing`](webapp-testing/SKILL.md)
 
-### Curated (`curated/`)
-- **gh-address-comments** - Address PR review comments efficiently
-- **gh-fix-ci** - Debug and fix failing GitHub Actions CI/CD
-- **notion-knowledge-capture** - Capture conversations into structured Notion pages
-- **notion-meeting-intelligence** - Prepare meeting materials with context
-- **notion-research-documentation** - Research and synthesize documentation
-- **notion-spec-to-implementation** - Turn specs into implementation plans
+Documents:
+- [`docx`](docx/SKILL.md), [`pdf`](pdf/SKILL.md), [`pptx`](pptx/SKILL.md), [`xlsx`](xlsx/SKILL.md)
 
-### Experimental (`experimental/`)
-- **create-plan** - Create concise plans for coding tasks
-- **linear** - Manage issues and workflows in Linear
+Enterprise & Communication:
+- [`brand-guidelines`](brand-guidelines/SKILL.md), [`doc-coauthoring`](doc-coauthoring/SKILL.md), [`internal-comms`](internal-comms/SKILL.md)
 
-### System (`system/`)
-- **skill-creator** - Guide for creating new skills
-- **skill-installer** - Install skills from GitHub repositories
+### Project skills (this repo)
 
-## Anthropic Skills (`anthropic/`)
-
-### Creative & Design
-- **algorithmic-art** - Create algorithmic art with p5.js
-- **canvas-design** - Create beautiful visual art in PNG/PDF
-- **frontend-design** - Create production-grade frontend interfaces
-- **slack-gif-creator** - Create animated GIFs for Slack
-- **theme-factory** - Style artifacts with themes
-
-### Development & Technical
-- **mcp-builder** - Create MCP (Model Context Protocol) servers
-- **web-artifacts-builder** - Create complex web artifacts with React
-- **webapp-testing** - Test web applications with Playwright
-
-### Document Skills
-- **docx** - Document creation, editing, and analysis
-- **pdf** - PDF manipulation toolkit
-- **pptx** - Presentation creation and editing
-- **xlsx** - Spreadsheet creation and analysis
-
-### Enterprise & Communication
-- **brand-guidelines** - Apply brand colors and typography
-- **doc-coauthoring** - Guide for co-authoring documentation
-- **internal-comms** - Write internal communications
-- **skill-creator** - Guide for creating effective skills
+- [`android-accessibility`](android-accessibility/SKILL.md), [`android-architecture`](android-architecture/SKILL.md), [`android-coroutines`](android-coroutines/SKILL.md), [`android-data-layer`](android-data-layer/SKILL.md), [`android-emulator-skill`](android-emulator-skill/SKILL.md), [`android-gradle-logic`](android-gradle-logic/SKILL.md), [`android-retrofit`](android-retrofit/SKILL.md), [`android-testing`](android-testing/SKILL.md), [`android-viewmodel`](android-viewmodel/SKILL.md)
+- [`coil-compose`](coil-compose/SKILL.md), [`compose-navigation`](compose-navigation/SKILL.md), [`compose-performance-audit`](compose-performance-audit/SKILL.md), [`compose-ui`](compose-ui/SKILL.md)
+- [`gradle-build-performance`](gradle-build-performance/SKILL.md), [`kotlin-concurrency-expert`](kotlin-concurrency-expert/SKILL.md)
+- [`rxjava-to-coroutines-migration`](rxjava-to-coroutines-migration/SKILL.md), [`xml-to-compose-migration`](xml-to-compose-migration/SKILL.md)
 
 ## Usage
 
@@ -86,13 +76,10 @@ Skills are automatically discovered by AI assistants when working in this reposi
 
 Examples:
 - "Use the gh-fix-ci skill to debug the failing CI pipeline"
-- "Use the agp-9-upgrade skill to migrate this project to AGP 9"
-- "Make the app UI edge-to-edge"
+- "Use the edge-to-edge skill to make the app UI edge-to-edge"
 
-## Sources
+## Sources & licensing
 
-- [Android Skills](https://github.com/android/skills) - Apache 2.0 License
-- [OpenAI Skills](https://github.com/openai/skills) - Apache 2.0 / MIT License
-- [Anthropic Skills](https://github.com/anthropics/skills) - Apache 2.0 License (most), Source-available (docx/pdf/pptx/xlsx)
-
-See `THIRD_PARTY_NOTICES.md` for complete license information.
+- [Android Skills](https://github.com/android/skills) — Apache 2.0 (see [`ANDROID_LICENSE.txt`](ANDROID_LICENSE.txt))
+- [OpenAI Skills](https://github.com/openai/skills) — Apache 2.0 / MIT
+- [Anthropic Skills](https://github.com/anthropics/skills) — Apache 2.0 (most); source-available for `docx`, `pdf`, `pptx`, `xlsx` (see [`ANTHROPIC_THIRD_PARTY_NOTICES.md`](ANTHROPIC_THIRD_PARTY_NOTICES.md))

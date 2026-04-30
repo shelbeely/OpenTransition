@@ -1,6 +1,6 @@
 # Maintenance Guide
 
-How to keep `docs/repo-kb/` accurate as the repo evolves. The skill that built it lives at [`.github/skills/curated/repo-knowledge-base/SKILL.md`](../../.github/skills/curated/repo-knowledge-base/SKILL.md).
+How to keep `docs/repo-kb/` accurate as the repo evolves. The skill that built it lives at [`.github/skills/repo-knowledge-base/SKILL.md`](../../.github/skills/repo-knowledge-base/SKILL.md).
 
 ## Refresh Triggers
 
@@ -29,7 +29,7 @@ Update the matching KB page **in the same pull request** when you change:
 
 ## When to Run a Full Refresh Pass
 
-Re-run the [`repo-knowledge-base`](../../.github/skills/curated/repo-knowledge-base/SKILL.md) skill end-to-end when:
+Re-run the [`repo-knowledge-base`](../../.github/skills/repo-knowledge-base/SKILL.md) skill end-to-end when:
 
 - The KB has not been touched in many PRs.
 - A large refactor (new module, framework swap, major upgrade) lands.

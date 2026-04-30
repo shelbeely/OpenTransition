@@ -1,6 +1,6 @@
 # Agent Instructions
 
-This repository uses [`docs/repo-kb/`](docs/repo-kb/index.md) as its durable knowledge base, built and maintained with the [`repo-knowledge-base`](.github/skills/curated/repo-knowledge-base/SKILL.md) agent skill.
+This repository uses [`docs/repo-kb/`](docs/repo-kb/index.md) as its durable knowledge base, built and maintained with the [`repo-knowledge-base`](.github/skills/repo-knowledge-base/SKILL.md) agent skill.
 
 Before making non-trivial changes, read in this order:
 
