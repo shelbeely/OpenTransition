@@ -19,8 +19,8 @@ flowchart LR
 ```
 
 - `:mobile` and `:wear` both depend on `:shared`. They do **not** depend on each other.
-- Cross-app communication uses Google's **Wearable Data Layer API** (`com.google.android.gms:play-services-wearable:18.1.0`), declared in both `:wear` and `:shared`. See [`shared/src/main/java/com/shelbeely/opentransition/shared/WearableConstants.kt`](../../shared/src/main/java/com/shelbeely/opentransition/shared/WearableConstants.kt) for shared message paths.
-- Shared data models live under `shared/src/main/java/com/shelbeely/opentransition/shared/models/`, e.g. `MilestoneData.kt`.
+- Cross-app communication uses Google's **Wearable Data Layer API** (`com.google.android.gms:play-services-wearable:18.1.0`), declared in both `:wear` and `:shared`. The full message-path / data-item / helper contract is documented in [`apis/wearable-data-layer.md`](./apis/wearable-data-layer.md).
+- Shared code in `:shared` consists of three Kotlin sources: `WearableConstants.kt` (message paths + keys), `models/MilestoneData.kt` (`@Parcelize` DTO), and `util/WearableHelper.kt` (helper wrapping `MessageClient`/`DataClient`).
 
 ## Build & SDK Targets
 

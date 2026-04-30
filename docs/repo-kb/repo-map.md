@@ -63,17 +63,28 @@ mobile/schemas/       # Exported Room schemas (KSP arg `room.schemaLocation`)
 ```
 wear/src/main/java/com/shelbeely/opentransition/wear/
   MainActivity.kt
+  AudioRecordActivity.kt
+  CameraControlActivity.kt
   WearableListenerService.kt
-wear/src/main/res/
+  theme/WearTheme.kt
+wear/src/main/res/   # layouts, drawables, strings, launcher icons
+wear/src/main/AndroidManifest.xml
 ```
+
+`AndroidManifest.xml` declares all three activities and registers `WearableListenerService` as an exported `WearableListenerService` with an intent filter on the `/opentransition` path prefix. `MainActivity` is the LAUNCHER; the other two activities are not exported.
 
 ## Shared Module Source Layout
 
 ```
 shared/src/main/java/com/shelbeely/opentransition/shared/
-  WearableConstants.kt
-  models/MilestoneData.kt
+  WearableConstants.kt        # message paths, capabilities, keys
+  models/MilestoneData.kt     # @Parcelize cross-app milestone DTO
+  util/WearableHelper.kt      # send/sync helpers wrapping MessageClient + DataClient
+shared/src/test/java/com/shelbeely/opentransition/shared/
+  util/WearableHelperTest.kt  # JVM unit test for parseMilestones round-tripping
 ```
+
+The mobile side has its own `mobile/src/main/java/com/shelbeely/opentransition/wear/MobileWearableListenerService.kt` that consumes the same `WearableConstants` paths (photo trigger, request sync, camera shutter/zoom/flash/switch, audio data channel).
 
 ## Notes for Future Passes
 

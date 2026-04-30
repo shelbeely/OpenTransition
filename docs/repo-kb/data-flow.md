@@ -38,7 +38,7 @@ flowchart LR
   Mobile -- Wearable Data Layer --> Wear
 ```
 
-- Message paths and serialized models are defined in [`shared/src/main/java/com/shelbeely/opentransition/shared/`](../../shared/src/main/java/com/shelbeely/opentransition/shared/) (`WearableConstants.kt`, `models/MilestoneData.kt`).
+- Message paths and serialized models are defined in [`shared/src/main/java/com/shelbeely/opentransition/shared/`](../../shared/src/main/java/com/shelbeely/opentransition/shared/) (`WearableConstants.kt`, `models/MilestoneData.kt`), and the wire helpers in `util/WearableHelper.kt`. Full contract: [`apis/wearable-data-layer.md`](./apis/wearable-data-layer.md).
 - Both modules pull `com.google.android.gms:play-services-wearable:18.1.0` to talk to the Wearable API.
 - See [`audit-report/05-mobile-wear-integration.md`](../../audit-report/05-mobile-wear-integration.md) for the integration audit.
 

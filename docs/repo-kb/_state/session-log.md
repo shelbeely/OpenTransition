@@ -58,3 +58,61 @@ None blocking.
 ### Next Recommended Action
 
 Start pass 2: `features/photo-capture.md` (the CameraX + ML Kit pipeline is the most code-heavy area unique to this app).
+
+---
+
+## 2026-04-30 04:23 — Refresh + pass 3 start
+
+### Goal
+
+Re-apply the `repo-knowledge-base` skill: refresh pass-1 inventory against the current source, then advance one deferred item using the contract template from §"Eighth Pass: APIs, Routes, and Data Contracts".
+
+### Commands Run
+
+| Command | Result |
+|---|---|
+| `find shared/src wear/src mobile/.../wear -type f` | Discovered 3 source files in `:shared` (not 2), 4 in `wear/.../wear/`, 1 in `mobile/.../wear/` |
+| `view shared/.../WearableConstants.kt`, `models/MilestoneData.kt`, `util/WearableHelper.kt` | Captured the full constant set and helper API |
+| `view wear/.../WearableListenerService.kt`, `wear/src/main/AndroidManifest.xml` | Captured wear-side dispatch and intent-filter / permissions |
+| `grep -E 'PATH_\|DATA_PATH_' mobile/.../MobileWearableListenerService.kt` | Captured the mobile-side dispatch table |
+
+No build / test / lint commands were run — pass 3 only added documentation.
+
+### Files Read
+
+- All three `:shared` Kotlin sources + `WearableHelperTest.kt`
+- `wear/src/main/java/com/shelbeely/opentransition/wear/WearableListenerService.kt`
+- `wear/src/main/AndroidManifest.xml`
+- `mobile/src/main/java/com/shelbeely/opentransition/wear/MobileWearableListenerService.kt`
+- `.github/skills/curated/repo-knowledge-base/SKILL.md` §"Eighth Pass: APIs, Routes, and Data Contracts" (template)
+
+### Files Created or Updated
+
+Created:
+
+- `docs/repo-kb/apis/wearable-data-layer.md` — full Mobile↔Wear contract page following the skill's per-contract template (Location / Purpose / Inputs / Outputs / Validation / Auth-Security / Callers / Side Effects / Related Tests / Evidence).
+
+Updated:
+
+- `docs/repo-kb/repo-map.md` — corrected `:wear` and `:shared` source layouts (added `AudioRecordActivity`, `CameraControlActivity`, `theme/WearTheme.kt`, `util/WearableHelper.kt` and its test, noted mobile-side `MobileWearableListenerService`).
+- `docs/repo-kb/architecture.md` — pointed module-boundaries section at the new contract page; added `WearableHelper` to the `:shared` summary.
+- `docs/repo-kb/data-flow.md` — pointed the mobile↔wear flow at the new contract page and `WearableHelper`.
+- `docs/repo-kb/apis/index.md` — promoted the Mobile↔Wear contract from "deferred" to ✅ documented; added a Documented? column.
+- `docs/repo-kb/_state/coverage.md` — APIs row updated; Source-entrypoints note acknowledges the two listener services.
+- `docs/repo-kb/_state/progress.md` — split deferred work into pass 2 (features) and pass 3 (contracts); ticked the Wearable contract.
+
+### Key Findings
+
+- `:shared` has **three** Kotlin sources, not two — pass 1 missed `util/WearableHelper.kt` (with JVM unit test). Now indexed.
+- `:wear` has **four** Kotlin source files (`MainActivity`, `AudioRecordActivity`, `CameraControlActivity`, `WearableListenerService`) plus a Compose theme — pass 1 listed only two.
+- `:mobile` has its own listener service at `mobile/src/main/java/com/shelbeely/opentransition/wear/MobileWearableListenerService.kt` mirroring the wear-side dispatch.
+- The wire format includes **far more paths than pass 1 implied** — full camera-control and audio-streaming paths exist.
+- The `parseMilestones` helper swallows all deserialization exceptions and returns `emptyList()` — captured as a Validation note for any future schema change.
+
+### Problems
+
+- I drifted from the skill template on first draft of `wearable-data-layer.md` (used my own headings) and only fixed it after the user prompted me to re-read the skill. Recorded as a process lesson: **always re-open `SKILL.md` at the start of any session that touches the KB**.
+
+### Next Recommended Action
+
+Pick the next pass-2 / pass-3 item from `progress.md`. Lowest-risk, highest-value next: `data/room-entities.md` — Room schemas are already exported under `mobile/schemas/`, which gives a strict source of truth.

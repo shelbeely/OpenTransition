@@ -13,7 +13,7 @@
 - [x] Create top-level `AGENTS.md` (Copilot CLI / VS Code agent entry point).
 - [x] Record SDK-target discrepancy in `_state/unknowns.md` and `questions/index.md`.
 
-## Pass 2 — Per-feature deep dive (deferred)
+## Pass 2 — Per-feature deep dive (in progress)
 
 - [ ] `features/photo-capture.md` (CameraX + ML Kit)
 - [ ] `features/import.md` (TransTracks `.ttbackup` → Realm → Room)
@@ -21,9 +21,9 @@
 - [ ] `features/audio-tracking.md`
 - [ ] `features/wear-companion.md`
 
-## Pass 3 — Per-contract / per-entity (deferred)
+## Pass 3 — Per-contract / per-entity (in progress)
 
-- [ ] `apis/wearable-data-layer.md`
+- [x] `apis/wearable-data-layer.md` — full Mobile↔Wear contract (capabilities, message paths, data-item paths, message keys, helper API, side effects, related test)
 - [ ] `data/room-entities.md`
 - [ ] `data/realm-import-schema.md`
 
