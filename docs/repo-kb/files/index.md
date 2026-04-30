@@ -2,7 +2,7 @@
 
 > **Status: pass-1 placeholder.** No per-file pages exist yet.
 
-When you next deep-dive a particular file, create a page here using the file template in [`.github/skills/curated/repo-knowledge-base/SKILL.md`](../../../.github/skills/curated/repo-knowledge-base/SKILL.md) §"Fourth Pass: File and Module Documentation".
+When you next deep-dive a particular file, create a page here using the file template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Fourth Pass: File and Module Documentation".
 
 Suggested first targets (unblock other agents):
 

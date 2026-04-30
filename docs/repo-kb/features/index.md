@@ -19,4 +19,4 @@
 
 ## Next pass
 
-Create one page per feature using the template in [`.github/skills/curated/repo-knowledge-base/SKILL.md`](../../../.github/skills/curated/repo-knowledge-base/SKILL.md) §"Fifth Pass: Features", grounded in code under `mobile/src/main/java/com/shelbeely/opentransition/`.
+Create one page per feature using the template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Fifth Pass: Features", grounded in code under `mobile/src/main/java/com/shelbeely/opentransition/`.

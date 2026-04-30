@@ -9,7 +9,7 @@ The component graph (Compose composables, Activities/Fragments, ViewModels, serv
 - `mobile/src/main/java/com/shelbeely/opentransition/wear/`
 - `wear/src/main/java/com/shelbeely/opentransition/wear/`
 
-For per-package documentation guidance see the directory-level template in [`.github/skills/curated/repo-knowledge-base/SKILL.md`](../../../.github/skills/curated/repo-knowledge-base/SKILL.md) §"Fourth Pass: File and Module Documentation".
+For per-package documentation guidance see the directory-level template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Fourth Pass: File and Module Documentation".
 
 ## Suggested first targets
 

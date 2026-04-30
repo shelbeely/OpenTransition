@@ -48,7 +48,7 @@ App version constants (`appMajor`, `appMinor`, `appBaseBuildNumber`, `getAppVers
 - Kotlin Coroutines + Flow are the preferred primitives.
 - RxJava 3 + RxRelay + RxBinding are present and being phased out.
 - `kotlinx-coroutines-rx3` provides the bridge during migration.
-- See [`.github/skills/migration/rxjava-to-coroutines-migration/SKILL.md`](../../.github/skills/migration/rxjava-to-coroutines-migration/SKILL.md) for the migration playbook.
+- See [`.github/skills/rxjava-to-coroutines-migration/SKILL.md`](../../.github/skills/rxjava-to-coroutines-migration/SKILL.md) for the migration playbook.
 
 ## Persistence Layer
 

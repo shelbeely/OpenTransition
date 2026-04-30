@@ -49,7 +49,7 @@ Snapshot at the end of pass 1.
 | `mkdocs.yml` | Noted | Powers the public docs site |
 | `secrets.properties.example` | Noted | Referenced by [`configuration.md`](../configuration.md) |
 | `.github/workflows/*.yml` | Summarized | One row in [`workflows/index.md`](../workflows/index.md) per file |
-| `.github/skills/curated/repo-knowledge-base/SKILL.md` | Installed | This is the skill that built the KB |
+| `.github/skills/repo-knowledge-base/SKILL.md` | Installed | This is the skill that built the KB |
 
 ## Skipped (intentionally)
 

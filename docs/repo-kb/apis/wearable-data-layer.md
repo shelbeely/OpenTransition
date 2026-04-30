@@ -2,7 +2,7 @@
 
 The wire contract between `:mobile` and `:wear`. Single source of truth lives in `:shared`. This page summarises and links — do not let it drift from the source.
 
-Page structure follows the contract template in [`.github/skills/curated/repo-knowledge-base/SKILL.md`](../../../.github/skills/curated/repo-knowledge-base/SKILL.md) §"Eighth Pass: APIs, Routes, and Data Contracts".
+Page structure follows the contract template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Eighth Pass: APIs, Routes, and Data Contracts".
 
 ## Location
 

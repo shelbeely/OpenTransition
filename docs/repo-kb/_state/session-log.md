@@ -10,7 +10,7 @@ Move the `repo-knowledge-base` skill to the location specified by the [GitHub Ag
 
 | Command | Result |
 |---|---|
-| `git mv repo-knowledge-base-SKILL.md .github/skills/curated/repo-knowledge-base/SKILL.md` | OK |
+| `git mv repo-knowledge-base-SKILL.md .github/skills/repo-knowledge-base/SKILL.md` | OK |
 | `find . -path ./node_modules -prune -o -name SKILL.md -print` | OK — confirmed 50+ existing skills under `.github/skills/` |
 | `cat settings.gradle build.gradle gradle.properties` | OK — captured Kotlin/AGP/Nav/Realm versions and version-constant scheme |
 | `head` of each `.github/workflows/*.yml` | OK — captured triggers for all 9 workflows |
@@ -24,13 +24,13 @@ No build / test / lint commands were run in this session — pass 1 only adds do
 - `build.gradle`, `settings.gradle`, `gradle.properties`, `mobile/build.gradle`, `wear/build.gradle`, `shared/build.gradle`
 - `.github/copilot-instructions.md`
 - All 9 `.github/workflows/*.yml`
-- The skill itself (`.github/skills/curated/repo-knowledge-base/SKILL.md`) for templates
+- The skill itself (`.github/skills/repo-knowledge-base/SKILL.md`) for templates
 
 ### Files Created or Updated
 
 Created:
 
-- `.github/skills/curated/repo-knowledge-base/SKILL.md` (moved from repo root)
+- `.github/skills/repo-knowledge-base/SKILL.md` (moved from repo root)
 - `docs/repo-kb/index.md`, `repo-map.md`, `architecture.md`, `quickstart-for-agents.md`, `build-and-release.md`, `testing.md`, `configuration.md`, `security-and-risk.md`, `maintenance-guide.md`, `glossary.md`, `dependency-map.md`, `data-flow.md`
 - `docs/repo-kb/{features,components,apis,data,workflows,decisions,questions,files}/index.md`
 - `docs/repo-kb/_state/{progress,coverage,session-log,unknowns,command-log}.md`
@@ -84,7 +84,7 @@ No build / test / lint commands were run — pass 3 only added documentation.
 - `wear/src/main/java/com/shelbeely/opentransition/wear/WearableListenerService.kt`
 - `wear/src/main/AndroidManifest.xml`
 - `mobile/src/main/java/com/shelbeely/opentransition/wear/MobileWearableListenerService.kt`
-- `.github/skills/curated/repo-knowledge-base/SKILL.md` §"Eighth Pass: APIs, Routes, and Data Contracts" (template)
+- `.github/skills/repo-knowledge-base/SKILL.md` §"Eighth Pass: APIs, Routes, and Data Contracts" (template)
 
 ### Files Created or Updated
 
