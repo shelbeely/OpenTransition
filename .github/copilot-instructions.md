@@ -144,3 +144,34 @@ To install all skills at once: `android skills add --all --project=<repo-root>`
 - Do not change `minSdkVersion` below 21 or `targetSdkVersion` above 36 without discussion.
 - Do not remove or weaken existing ProGuard/R8 rules.
 - Do not push directly to `production` or `main` branches.
+
+---
+
+## Repo Knowledge Base (read first)
+
+This repository has a durable knowledge base in [`docs/repo-kb/`](../docs/repo-kb/index.md), built and maintained with the [`repo-knowledge-base`](skills/curated/repo-knowledge-base/SKILL.md) agent skill (per the [GitHub Agent Skills spec](https://docs.github.com/en/copilot/concepts/agents/about-agent-skills)).
+
+Use the knowledge base before broad repo exploration. It exists to help Copilot Cloud Agent, Copilot CLI, and IDE agent sessions work faster and avoid repeated discovery.
+
+### Start Here
+
+Before making non-trivial changes, read in order:
+
+1. [`docs/repo-kb/index.md`](../docs/repo-kb/index.md)
+2. [`docs/repo-kb/quickstart-for-agents.md`](../docs/repo-kb/quickstart-for-agents.md)
+3. [`docs/repo-kb/architecture.md`](../docs/repo-kb/architecture.md)
+4. [`docs/repo-kb/repo-map.md`](../docs/repo-kb/repo-map.md)
+5. [`docs/repo-kb/_state/coverage.md`](../docs/repo-kb/_state/coverage.md)
+6. [`docs/repo-kb/_state/unknowns.md`](../docs/repo-kb/_state/unknowns.md)
+
+Then read any relevant page under `features/`, `components/`, `apis/`, `data/`, `workflows/`, or `files/`.
+
+### Rules
+
+- The source code is the final authority. If the KB conflicts with the source, trust the source and **update the KB in the same PR**.
+- After meaningful changes (architecture, build/test commands, deps, workflows, env vars, APIs, security-sensitive behaviour, user-facing features), update the matching KB page and the relevant `_state/` file. The full checklist is in [`docs/repo-kb/maintenance-guide.md`](../docs/repo-kb/maintenance-guide.md).
+- Do not mark coverage Complete unless it actually is.
+- Do not invent undocumented behaviour — file an entry in [`docs/repo-kb/_state/unknowns.md`](../docs/repo-kb/_state/unknowns.md).
+- At the end of a meaningful agent session, append a short note to [`docs/repo-kb/_state/session-log.md`](../docs/repo-kb/_state/session-log.md).
+
+A path-scoped editing instruction file lives at [`.github/instructions/repo-kb.instructions.md`](instructions/repo-kb.instructions.md) and applies automatically to edits under `docs/repo-kb/**`.
