@@ -116,3 +116,27 @@ Updated:
 ### Next Recommended Action
 
 Pick the next pass-2 / pass-3 item from `progress.md`. Lowest-risk, highest-value next: `data/room-entities.md` — Room schemas are already exported under `mobile/schemas/`, which gives a strict source of truth.
+
+## 2026-05-03 00:47 — App introduction docs and audio
+
+### Goal
+
+Create a spoken + written app introduction for OpenTransition as requested in the problem statement.
+
+### What changed
+
+| File | Description |
+|---|---|
+| `docs/app-introduction.md` | New file. Short written intro, 30-second narration script, 60-second narration script. |
+| `docs/audio/app-introduction.mp3` | Generated audio of the 30-second script using ElevenLabs, narrated in Shelbee's own cloned voice (`voice_id: 6msqkRQQIp6SumoiB7TS`). |
+
+### What was validated
+
+- Feature list cross-checked against `README.md` §"Key Features" — no overclaims.
+- Audio tracking correctly described as a **preview feature** (pitch/formant are estimates, not measurements).
+- ElevenLabs API call succeeded; audio saved to `docs/audio/app-introduction.mp3`.
+
+### Notes for future agents
+
+- The "Shelbee" cloned ElevenLabs voice ID is `6msqkRQQIp6SumoiB7TS` — use it for any further audio generation for this project.
+- No build/lint changes were made; no tests required for documentation-only PR.
