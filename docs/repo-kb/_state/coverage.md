@@ -9,14 +9,14 @@ Snapshot at the end of pass 1.
 | Root docs | Complete | README, ARCHITECTURE, MONOREPO, CONTRIBUTING, ENCRYPTED_DATABASE all linked from KB |
 | Build tooling | Complete | [`build-and-release.md`](../build-and-release.md) covers AGP, Kotlin, KSP, signing, version sharing |
 | Source entrypoints | Partial | Module directories mapped; specific Activities/Services not yet pageized. The Wear `WearableListenerService` and the mobile `MobileWearableListenerService` are now indexed under the [Wearable Data Layer contract](../apis/wearable-data-layer.md) |
-| Features | Partial | Inventory captured in [`features/index.md`](../features/index.md); no per-feature pages yet |
+| Features | Complete | 11 per-feature pages exist under [`features/`](../features/); inventory linked from [`features/index.md`](../features/index.md) |
 | Components | Missing | Placeholder index only |
 | Tests | Partial | Commands + CI summarized in [`testing.md`](../testing.md); audit-report holds the coverage detail |
 | CI/CD | Complete | [`workflows/index.md`](../workflows/index.md) lists all 9 workflows with triggers + roles |
 | Config / env | Complete | [`configuration.md`](../configuration.md) lists files, generated files, CI secret names |
-| APIs / contracts | Partial | [`apis/index.md`](../apis/index.md) — Mobile↔Wear contract is fully documented at [`apis/wearable-data-layer.md`](../apis/wearable-data-layer.md); Room/Realm/Firestore/AdMob still deferred |
-| Data | Partial | [`data/index.md`](../data/index.md) lists stores; per-entity pages deferred |
-| Decisions | Partial | 10 inferred decisions captured in [`decisions/index.md`](../decisions/index.md); no formal ADRs |
+| APIs / contracts | Complete | [`apis/index.md`](../apis/index.md) — Mobile↔Wear contract at [`wearable-data-layer.md`](../apis/wearable-data-layer.md) (with functional/dead column); Firebase contract at [`firebase-contracts.md`](../apis/firebase-contracts.md) |
+| Data | Complete | [`data/index.md`](../data/index.md) — per-entity pages for Room, Realm, prefs, file layout, and `.ttbackup` format |
+| Decisions | Partial | 10 inferred decisions in [`decisions/index.md`](../decisions/index.md); two ADR-style pages: [`diff-vs-transtracks.md`](../decisions/diff-vs-transtracks.md), [`rewrite-target-stack.md`](../decisions/rewrite-target-stack.md). No formal numbered ADRs yet |
 | Security / risk | Complete (risk-map level) | [`security-and-risk.md`](../security-and-risk.md) — full audit lives in `audit-report/10-security-review.md` |
 | Glossary | Complete | [`glossary.md`](../glossary.md) |
 | Dependency map | Complete (high-level) | [`dependency-map.md`](../dependency-map.md) |

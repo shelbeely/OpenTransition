@@ -1,6 +1,13 @@
 # Decisions
 
-> **Status: pass-1 placeholder.** Decisions captured in code/audit artifacts but not yet rewritten as ADRs.
+> Decisions captured in code/audit artifacts, plus standalone ADR-style pages.
+
+## ADR-style pages
+
+| Page | Scope |
+|---|---|
+| [`diff-vs-transtracks.md`](./diff-vs-transtracks.md) | Per-line evidence-based diff between OpenTransition and the archived upstream `TransTracks/TransTracks-Android` at SHA `f8560a1a` |
+| [`rewrite-target-stack.md`](./rewrite-target-stack.md) | Target stack and ordered migration plan for any future ground-up rewrite, grounded in the Phase 1–5 evidence |
 
 ## Inferred Decisions (with evidence)
 

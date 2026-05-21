@@ -116,3 +116,68 @@ Updated:
 ### Next Recommended Action
 
 Pick the next pass-2 / pass-3 item from `progress.md`. Lowest-risk, highest-value next: `data/room-entities.md` — Room schemas are already exported under `mobile/schemas/`, which gives a strict source of truth.
+
+---
+
+## 2026-05-21 05:38 — Phases 3–6 (data, contracts, upstream, rewrite)
+
+### Goal
+
+Promote the KB from "feature pages exist" to "evidence-based per-feature spec
+that could drive a clean rewrite". Specifically: produce the data-layer pages,
+extend the wearable contract with a functional/dead column, add a Firebase
+contract page, do a pinned-SHA diff against upstream TransTracks, and write a
+rewrite proposal that rests on the documented evidence.
+
+### Commands Run
+
+| Command | Result |
+|---|---|
+| `grep` for `PATH_*` / `DATA_PATH_*` usages in both listener services + `WearableHelper` | OK — produced the functional/dead matrix |
+| `github-mcp-server-search_repositories` `TransTracks-Android` | Confirmed `TransTracks/TransTracks-Android` (archived) is the real upstream |
+| `github-mcp-server-list_commits` | Pinned upstream to SHA `f8560a1aa643e06fa9cfb9dd7c8b4bcbf802f5c9` (2026-04-11, archival commit) |
+| `github-mcp-server-get_file_contents` for upstream `README.md`, `build.gradle`, `app/build.gradle`, `settings.gradle`, `app/src/main/java/com/drspaceboo/transtracks/data/` | Captured upstream toolchain and `data/` listing |
+| `grep` for Firebase usages, `AuthUI.IdpConfig.*`, Firestore `.collection(...)`, `AnalyticsUtil` events | Captured every Firebase entrypoint |
+| `view` of `AudioAnalysisUtil.kt`, `PitchTracker.kt` | Verified DSP "computed vs stubbed" claim — formants explicitly zeroed per inline comment |
+
+No build / test / lint commands were run — only docs changed.
+
+### Files Created
+
+- `docs/repo-kb/data/room-entities.md`
+- `docs/repo-kb/data/realm-models.md`
+- `docs/repo-kb/data/shared-prefs-keys.md`
+- `docs/repo-kb/data/file-layout.md`
+- `docs/repo-kb/data/ttbackup-format.md`
+- `docs/repo-kb/apis/firebase-contracts.md`
+- `docs/repo-kb/decisions/diff-vs-transtracks.md`
+- `docs/repo-kb/decisions/rewrite-target-stack.md`
+
+### Files Updated
+
+- `docs/repo-kb/apis/wearable-data-layer.md` — added a "Functional today?" column to both the Message-paths and DataItem-paths tables, marking `PATH_AUDIO_START` / `PATH_AUDIO_STOP` / `PATH_SYNC_MILESTONES` / `DATA_PATH_AUDIO` as dead and `DATA_PATH_SETTINGS` / `PATH_TRIGGER_PHOTO` as partial, all with file/line citations.
+- `docs/repo-kb/features/index.md` — replaced the pass-1 placeholder with a real cross-link table to the 11 feature pages that now exist.
+- `docs/repo-kb/data/index.md` — promoted to "Complete"; cross-linked the 5 per-entity pages.
+- `docs/repo-kb/apis/index.md` — promoted Firebase, Room, `.ttbackup`, and Realm to ✅.
+- `docs/repo-kb/decisions/index.md` — listed the two new ADR-style pages.
+- `docs/repo-kb/_state/coverage.md` — Features → Complete; APIs → Complete; Data → Complete; Decisions remains Partial pending numbered ADRs.
+- `docs/repo-kb/_state/unknowns.md` — added six concrete questions (schema v2, transcript column, dead wear paths, upstream diff completeness, archive root layout).
+
+### Key Findings
+
+- **Audio DSP is honestly "real except formants"** — `PitchTracker` is a real nACF implementation; `f1Mean..f4Mean` are explicitly persisted as `0f` and the inline comment ([`AudioAnalysisUtil.kt:27-29`](../../../mobile/src/main/java/com/shelbeely/opentransition/util/AudioAnalysisUtil.kt)) admits LPC is not implemented. This is the documented honest state — no guessing was needed.
+- **`transcript` is a one-way column** — written to Realm only, no Room column. Going to need a migration when Realm is removed.
+- **Three dead wire paths in the Wear contract.** Removing them is a Phase F cleanup item per the rewrite plan.
+- **Upstream is archived** at SHA `f8560a1a` (2026-04-11). All future upstream diffs can pin to this SHA; the archived repo will not move.
+- **Upstream is single-module** (`:app` only). The `:mobile`/`:wear`/`:shared` split is entirely an OpenTransition addition.
+- **Firestore collection naming is `{uid}/settings`, not `users/{uid}`.** Already upstream-inherited; flagged in the Firebase contract page.
+
+### Problems
+
+- I initially tried to create feature pages that already existed (they were authored in an earlier session). The right reaction was to verify content first; I did, and they're already evidence-based and accurate. No rework needed there.
+
+### Next Recommended Action
+
+- Run the rewrite-target-stack plan past the maintainer; in particular, the **migration order** in Phase B–F is opinionated about what blocks what.
+- Resolve the six items in `_state/unknowns.md` before locking the rewrite order, especially the `transcript` decision (add column vs drop persistence).
+- Optional: walk upstream's `ui/` tree at SHA `f8560a1a` to settle the two follow-ups noted in `diff-vs-transtracks.md`.

@@ -1,22 +1,23 @@
 # Features
 
-> **Status: pass-1 placeholder.** No per-feature pages exist yet. The user-facing feature inventory is in [`README.md`](../../../README.md) §"Key Features" and [`WEAR_APP_FEATURES.md`](../../../WEAR_APP_FEATURES.md). See also [`audit-report/08-unfinished-features.md`](../../../audit-report/08-unfinished-features.md).
+Per-feature evidence-based pages. Each page lists entry points (Activities /
+Fragments / Composables), state holders, persistence touched, external APIs,
+and cross-references to known issues in [`audit-report/`](../../../audit-report/).
 
-## Known features (linkable summary)
-
-| Feature | Owner module | User-facing source |
+| Feature | Page | Owner module |
 |---|---|---|
-| Photo tracking + face/body/custom albums | `:mobile` | `README.md` |
-| Face-detection camera (CameraX + ML Kit) | `:mobile` | `README.md` |
-| Milestone management | `:mobile` (+ `:wear` view) | `README.md`, `WEAR_APP_FEATURES.md` |
-| Audio tracking (preview) | `:mobile` | `README.md`; caveat in [`audit-report/07-issues-and-bugs.md`](../../../audit-report/07-issues-and-bugs.md) ISSUE-005 |
-| App lock (PIN / pattern / biometric) | `:mobile` | `README.md` |
-| Disguised mode | `:mobile` | `README.md` |
-| Decoy vault | `:mobile` | `README.md` |
-| Optional encrypted DB (SQLCipher) | `:mobile` | [`ENCRYPTED_DATABASE.md`](../../../ENCRYPTED_DATABASE.md) |
-| TransTracks `.ttbackup` import | `:mobile` | `README.md` |
-| Wear OS companion (capture + milestones) | `:wear` | [`WEAR_APP_FEATURES.md`](../../../WEAR_APP_FEATURES.md) |
+| Photo capture (CameraX + ML Kit) | [`photo-capture.md`](./photo-capture.md) | `:mobile` |
+| Photo gallery + viewer | [`photo-gallery-and-viewer.md`](./photo-gallery-and-viewer.md) | `:mobile` |
+| Milestones | [`milestones.md`](./milestones.md) | `:mobile` (+ read-only `:wear`) |
+| Audio / voice tracking | [`audio-tracking.md`](./audio-tracking.md) | `:mobile` |
+| App lock (PIN / biometric / disguise entry) | [`app-lock.md`](./app-lock.md) | `:mobile` |
+| Disguised mode ("Train Tracks") | [`disguised-mode.md`](./disguised-mode.md) | `:mobile` |
+| Decoy vault | [`decoy-vault.md`](./decoy-vault.md) | `:mobile` |
+| Encrypted database (toggle-off) | [`encrypted-database.md`](./encrypted-database.md) | `:mobile` |
+| TransTracks `.ttbackup` import | [`transtracks-import.md`](./transtracks-import.md) | `:mobile` |
+| Wear OS companion | [`wear-companion.md`](./wear-companion.md) | `:wear` |
+| Settings | [`settings.md`](./settings.md) | `:mobile` |
 
-## Next pass
+Pages follow the template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Fifth Pass: Features".
 
-Create one page per feature using the template in [`.github/skills/repo-knowledge-base/SKILL.md`](../../../.github/skills/repo-knowledge-base/SKILL.md) §"Fifth Pass: Features", grounded in code under `mobile/src/main/java/com/shelbeely/opentransition/`.
+For the user-facing summary, see [`README.md`](../../../README.md) §"Key Features" and [`WEAR_APP_FEATURES.md`](../../../WEAR_APP_FEATURES.md). For known bugs and unfinished items, see [`audit-report/07-issues-and-bugs.md`](../../../audit-report/07-issues-and-bugs.md) and [`audit-report/08-unfinished-features.md`](../../../audit-report/08-unfinished-features.md).

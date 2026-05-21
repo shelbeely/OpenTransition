@@ -46,25 +46,27 @@ Transport is Google's **Wearable Data Layer API** via `com.google.android.gms:pl
 
 | Constant | Path | Direction | Body |
 |---|---|---|---|
-| `PATH_TRIGGER_PHOTO` | `/opentransition/trigger_photo` | wear → mobile | UTF-8 photo type (`"face"` / `"body"`) |
-| `PATH_SYNC_MILESTONES` | `/opentransition/sync_milestones` | mobile → wear | trigger only (typically empty) |
-| `PATH_MILESTONE_UPDATE` | `/opentransition/milestone_update` | mobile → wear | empty notification |
-| `PATH_REQUEST_SYNC` | `/opentransition/request_sync` | wear → mobile | `ByteArray(0)` |
-| `PATH_CAMERA_SHUTTER` | `/opentransition/camera/shutter` | wear → mobile | empty |
-| `PATH_CAMERA_ZOOM` | `/opentransition/camera/zoom` | wear → mobile | encodes `KEY_ZOOM_LEVEL` |
-| `PATH_CAMERA_FLASH` | `/opentransition/camera/flash` | wear → mobile | encodes `KEY_FLASH_MODE` |
-| `PATH_CAMERA_SWITCH` | `/opentransition/camera/switch` | wear → mobile | empty |
-| `PATH_AUDIO_START` | `/opentransition/audio/start` | wear → mobile | empty |
-| `PATH_AUDIO_STOP` | `/opentransition/audio/stop` | wear → mobile | empty |
-| `PATH_AUDIO_DATA` | `/opentransition/audio/data` | wear → mobile (channel) | streamed bytes; channel path is `PATH_AUDIO_DATA + "/<filename>"` |
+| Constant | Path | Direction | Body | Functional today? |
+|---|---|---|---|---|
+| `PATH_TRIGGER_PHOTO` | `/opentransition/trigger_photo` | wear → mobile | UTF-8 photo type (`"face"` / `"body"`) | ⚠️ **Partial** — handler at [`MobileWearableListenerService.kt:163-166`](../../../mobile/src/main/java/com/shelbeely/opentransition/wear/MobileWearableListenerService.kt) logs only; does not open camera UI |
+| `PATH_REQUEST_SYNC` | `/opentransition/request_sync` | wear → mobile | `ByteArray(0)` | ✅ Live — `handleSyncRequest` reads Realm, sends `DATA_PATH_MILESTONES` ([`MobileWearableListenerService.kt:172-200`](../../../mobile/src/main/java/com/shelbeely/opentransition/wear/MobileWearableListenerService.kt)) |
+| `PATH_CAMERA_SHUTTER` | `/opentransition/camera/shutter` | wear → mobile | empty | ✅ Live — broadcasts `ACTION_CAMERA_SHUTTER` |
+| `PATH_CAMERA_ZOOM` | `/opentransition/camera/zoom` | wear → mobile | UTF-8 float in `KEY_ZOOM_LEVEL` | ✅ Live — broadcasts `ACTION_CAMERA_ZOOM` |
+| `PATH_CAMERA_FLASH` | `/opentransition/camera/flash` | wear → mobile | UTF-8 in `KEY_FLASH_MODE` | ✅ Live — broadcasts `ACTION_CAMERA_FLASH` |
+| `PATH_CAMERA_SWITCH` | `/opentransition/camera/switch` | wear → mobile | empty | ✅ Live — broadcasts `ACTION_CAMERA_SWITCH` |
+| `PATH_AUDIO_DATA` | `/opentransition/audio/data` | wear → mobile (channel) | streamed bytes on channel path `PATH_AUDIO_DATA + "/<filename>"` | ✅ Live — `onChannelOpened` reads channel, writes to `filesDir/audio/`, broadcasts `ACTION_AUDIO_RECEIVED` ([`MobileWearableListenerService.kt:113-160`](../../../mobile/src/main/java/com/shelbeely/opentransition/wear/MobileWearableListenerService.kt)) |
+| `PATH_MILESTONE_UPDATE` | `/opentransition/milestone_update` | mobile → wear | empty | ⚠️ **Dead path on the sender side** — wear `WearableListenerService.kt:61` listens, but **no source in `:mobile` ever sends it** (grep yields zero `sendMessage` calls). Wear-side `MainActivity.kt:237` also listens. |
+| `PATH_SYNC_MILESTONES` | `/opentransition/sync_milestones` | mobile → wear | trigger | ⚠️ **Dead** — declared in `WearableConstants`, never sent. Bulk sync uses `DATA_PATH_MILESTONES` instead. |
+| `PATH_AUDIO_START` | `/opentransition/audio/start` | wear → mobile | empty | ❌ **Dead** — no handler on either side. |
+| `PATH_AUDIO_STOP` | `/opentransition/audio/stop` | wear → mobile | empty | ❌ **Dead** — no handler on either side. |
 
 ### DataItem paths
 
-| Constant | Path | Producer | Keys |
-|---|---|---|---|
-| `DATA_PATH_MILESTONES` | `/opentransition/data/milestones` | `:mobile` | `KEY_MILESTONE_DATA` (Gson JSON), `KEY_MILESTONE_COUNT` (`Int`), `KEY_LAST_SYNC` (`Long`, epoch ms) |
-| `DATA_PATH_SETTINGS` | `/opentransition/data/settings` | reserved | wear-side handler currently logs only |
-| `DATA_PATH_AUDIO` | `/opentransition/data/audio` | reserved | — |
+| Constant | Path | Producer | Keys | Functional today? |
+|---|---|---|---|---|
+| `DATA_PATH_MILESTONES` | `/opentransition/data/milestones` | `:mobile` (`WearableHelper.syncMilestones`) | `KEY_MILESTONE_DATA` (Gson JSON), `KEY_MILESTONE_COUNT` (`Int`), `KEY_LAST_SYNC` (`Long`, epoch ms) | ✅ Live — produced by mobile, persisted by wear `WearableListenerService.handleMilestoneSync` |
+| `DATA_PATH_SETTINGS` | `/opentransition/data/settings` | reserved | — | ⚠️ **Partial / dead** — wear-side `handleSettingsSync` is an empty function body ([`wear/WearableListenerService.kt:53`](../../../wear/src/main/java/com/shelbeely/opentransition/wear/WearableListenerService.kt)); no mobile producer; flagged as ISSUE-007 |
+| `DATA_PATH_AUDIO` | `/opentransition/data/audio` | reserved | — | ❌ **Dead** — declared in `WearableConstants`, no producer or consumer in the tree. Audio uses `ChannelClient` on `PATH_AUDIO_DATA` instead. |
 
 ### Message / DataMap keys
 
